@@ -117,7 +117,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router>
+        <Router basename="/shed">
           <Routes>
             <Route path="/" element={
               <h1 className="wave-text">

@@ -6,7 +6,7 @@ from . import database, base, elo
 from typing import List
 from datetime import datetime
 
-app = FastAPI(title="Competition App API")
+app = FastAPI(title="Shed Tournament API", root_path="/shedapi")
 
 # Configure CORS
 app.add_middleware(
@@ -42,7 +42,7 @@ class MatchRequest(BaseModel):
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Competition App API"} 
+    return {"message": "Shed Tournament API"}
 
 @app.post("/addplayer", response_model=PlayerResponse)
 async def addplayer(player: PlayerRequest, db: Session = Depends(database.get_db)):
