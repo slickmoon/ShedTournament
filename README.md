@@ -48,7 +48,7 @@ docker compose build
 docker compose up -d
 ```
 
-2. The application will be available at `http://localhost:3000`
+2. The application will be available at `http://localhost:81`
 
 ### Going Live
 
