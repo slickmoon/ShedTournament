@@ -1,0 +1,16 @@
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.wave-text {
+  text-align: center;
+  background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: wave 2s ease-in-out infinite;
+} 
