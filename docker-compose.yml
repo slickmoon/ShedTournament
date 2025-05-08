@@ -21,6 +21,9 @@ services:
       - "81:80"
     depends_on:
       - backend
+    environment:
+      - BACKEND_API_URL=http://localhost:8000
+
 
   db:
     image: postgres:15
