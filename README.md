@@ -24,8 +24,8 @@ This app can be self-hosted with minimal modification.
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/shed-tournament.git
-cd shed-tournament
+git clone https://github.com/yourusername/ShedTournament.git
+cd ShedTournament
 ```
 
 2. Set up the backend:
@@ -38,11 +38,6 @@ pip install flask flask-sqlalchemy flask-migrate flask-cors python-dotenv
 ```bash
 cd frontend
 npm install
-```
-
-4. Create a `.env` file in the backend directory with your configuration:
-```
-DATABASE_URL=sqlite:///tournament.db
 ```
 
 ## Usage with Docker
@@ -58,7 +53,7 @@ docker compose up -d
 ### Going Live
 
 If you want to make this app externally accessible in production you will need to update the docker-compose.yml file:
-- Update BACKEND_API_URL environment parameter for the frontend app
+- Update `BACKEND_API_URL` environment parameter for the frontend app
 - Add the network your reverse proxy container (such as nginx)
 
 ## Contributing
