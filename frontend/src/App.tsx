@@ -33,6 +33,7 @@ function App() {
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
   const [auditlog, setAuditLog] = useState<AuditLog[]>([]);
   const [openMatchDialog, setOpenMatchDialog] = useState(false);
+  const [matchError, setMatchError] = useState<string>('');
   const [winner, setWinner] = useState<string>('');
   const [loser, setLoser] = useState<string>('');
 
@@ -76,7 +77,12 @@ function App() {
       const loserPlayer = players.find(p => p.player_name === loser);
       
       if (!winnerPlayer || !loserPlayer) {
-        setStatusMessage('Please select both winner and loser');
+        setMatchError('Please select both winner and loser');
+        return;
+      }
+
+      if (winnerPlayer.id == loserPlayer.id) {
+        setMatchError('Winner and loser cannot be the same player');
         return;
       }
 
@@ -259,6 +265,11 @@ function App() {
                 <Button onClick={() => setOpenMatchDialog(false)}>Cancel</Button>
                 <Button onClick={recordMatch} variant="contained">Record Match</Button>
               </DialogActions>
+              {matchError && (
+                    <Typography variant="h6" sx={{ mt: 2 , color: 'red'}}>
+                      {matchError}
+                    </Typography>
+              )}
             </Dialog>
           </div>
         </Router>

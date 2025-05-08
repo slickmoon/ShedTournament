@@ -103,7 +103,8 @@ async def record_match(match: MatchRequest, db: Session = Depends(database.get_d
     # Get players
     winner = db.query(base.Player).filter(base.Player.id == match.winner_id).first()
     loser = db.query(base.Player).filter(base.Player.id == match.loser_id).first()
-    
+    if winner.id == loser.id:
+        raise HTTPException(status_code=400, detail="Cannot record match against self")
     if not winner or not loser:
         raise HTTPException(status_code=404, detail="One or both players not found")
     
