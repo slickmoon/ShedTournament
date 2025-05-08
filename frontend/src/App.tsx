@@ -262,6 +262,12 @@ function App() {
                 </Box>
               </DialogContent>
               <DialogActions>
+                <Button onClick={() => {
+                  setOpenMatchDialog(false);
+                  setWinner('');
+                  setLoser('');
+                  setMatchError('');
+                }}>Cancel</Button>
                 <Button onClick={() => setOpenMatchDialog(false)}>Cancel</Button>
                 <Button onClick={recordMatch} variant="contained">Record Match</Button>
               </DialogActions>
