@@ -102,6 +102,9 @@ function App() {
         listPlayers();
         listAuditLog();
         setOpenMatchDialog(false);
+        setWinner('');
+        setLoser('');
+        setMatchError('');
       } else {
         setStatusMessage('Error recording match');
       }
@@ -268,7 +271,6 @@ function App() {
                   setLoser('');
                   setMatchError('');
                 }}>Cancel</Button>
-                <Button onClick={() => setOpenMatchDialog(false)}>Cancel</Button>
                 <Button onClick={recordMatch} variant="contained">Record Match</Button>
               </DialogActions>
               {matchError && (
