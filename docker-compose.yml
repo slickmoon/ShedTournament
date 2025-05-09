@@ -11,8 +11,6 @@ services:
       - "4322:8000"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@shed-tournament-db:5432/competition_app
-      - APP_PASSWORD=your-secure-password-here
-      - AUTH_SECRET_KEY=your-secret-key-here
     depends_on:
       - shed-tournament-db
     volumes:
