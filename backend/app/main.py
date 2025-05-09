@@ -110,7 +110,8 @@ async def record_match(match: MatchRequest, db: Session = Depends(database.get_d
     
     # Calculate new ELO ratings
     new_winner_elo, new_loser_elo = elo.calculate_new_ratings(winner.elo, loser.elo)
-    
+    original_winner_elo = winner.elo
+    original_loser_elo = loser.elo
     # Update player ratings
     winner.elo = new_winner_elo
     loser.elo = new_loser_elo
@@ -129,12 +130,14 @@ async def record_match(match: MatchRequest, db: Session = Depends(database.get_d
         "winner": {
             "id": winner.id,
             "name": winner.player_name,
-            "new_elo": winner.elo
+            "new_elo": winner.elo,
+            "elo_change": winner.elo - original_winner_elo 
         },
         "loser": {
             "id": loser.id,
             "name": loser.player_name,
-            "new_elo": loser.elo
+            "new_elo": loser.elo,
+            "elo_change": loser.elo - original_loser_elo
         }
     }
 
