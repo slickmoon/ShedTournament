@@ -53,7 +53,7 @@ class LoginRequest(BaseModel):
     password: str
 
 def create_access_token():
-    expire = datetime.now(datetime.UTC) + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
     to_encode = {"exp": expire}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
