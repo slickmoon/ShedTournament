@@ -14,6 +14,7 @@ export const randomTexts = [
     "Is your refridgerator running?",
     "Beau's Last Chance",
     "How about a lil rip of the bingus?",
-    "The Spins help me spin"
+    "The Spins help me spin",
+    "Next camp when??"
 
   ];
