@@ -6,8 +6,9 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+      - lsio
     ports:
-      - "8000:8000"
+      - "4322:8000"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@shed-tournament-db:5432/competition_app
     depends_on:
@@ -23,13 +24,19 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+      - lsio
     ports:
-      - "81:80"
+      - "4321:80"
     depends_on:
       - shed-tournament-api
     environment:
       - BACKEND_API_URL=https://slkmn.k.vu/shedapi
       - PUBLIC_URL=/shed
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:4321/shed"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 
   shed-tournament-db:
@@ -49,5 +56,6 @@ volumes:
 networks:
   app-network:
     driver: bridge
-
+  lsio:
+    name: lsio
 
