@@ -47,14 +47,23 @@ function App() {
   const [winner, setWinner] = useState<string>('');
   const [loser, setLoser] = useState<string>('');
 
+  // Load initial data and check token
   useEffect(() => {
-    // Check for existing token on mount
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
     }
     setLoading(false);
   }, []);
+
+  // Load players and audit log when token is available
+  useEffect(() => {
+    if (token) {
+      listPlayers();
+      listAuditLog();
+      setSelectedPlayerUpdateElo(1000);
+    }
+  }, [token]);
 
   const handleLogin = (newToken: string) => {
     setToken(newToken);
@@ -223,13 +232,6 @@ function App() {
       setStatusMessage(`Error deleting player: ${error}`);
     }
   };
-
-  // Load initial data
-  useEffect(() => {
-    listPlayers();
-    listAuditLog();
-    setSelectedPlayerUpdateElo(1000);
-  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
