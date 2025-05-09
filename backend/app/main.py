@@ -6,12 +6,15 @@ from . import database, base, elo
 from typing import List
 from datetime import datetime
 
-app = FastAPI(title="Shed Tournament API", root_path="/shedapi")
+app = FastAPI(
+    title="Shed Tournament API",
+    root_path="/shedapi"
+)
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # React frontend URL
+    allow_origins=["http://slkmn.k.vu", "https://slkmn.k.vu", "http://localhost", "http://localhost:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
