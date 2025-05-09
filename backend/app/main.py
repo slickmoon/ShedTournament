@@ -135,7 +135,7 @@ async def get_players(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    return db.query(base.Player).all()
+    return db.query(base.Player).order_by(base.Player.elo.desc()).all()
 
 @api.get("/players/{player_id}", response_model=PlayerResponse)
 async def get_player(
