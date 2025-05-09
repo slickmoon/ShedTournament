@@ -4,6 +4,14 @@ FROM node:18-alpine AS build
 # Set working directory
 WORKDIR /app
 
+# Add build arguments
+ARG PUBLIC_URL
+ARG REACT_APP_API_URL
+
+# Set environment variables
+ENV PUBLIC_URL=$PUBLIC_URL
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
 # Copy package files first to leverage Docker cache
 COPY package*.json ./
 
