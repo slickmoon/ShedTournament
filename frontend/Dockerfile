@@ -1,17 +1,18 @@
 # Build stage
-FROM node:18-alpine as build
+FROM node:18-alpine AS build
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files first to leverage Docker cache
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
-# Copy project files
-COPY . .
+# Copy only necessary files for build
+COPY public/ ./public/
+COPY src/ ./src/
 
 # Build the application
 RUN npm run build
