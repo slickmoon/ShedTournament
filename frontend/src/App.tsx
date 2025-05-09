@@ -275,7 +275,7 @@ function App() {
                 size="large"
                 onClick={() => setOpenMatchDialog(true)}
               >
-                Record Match
+                Record Match Result
               </Button>
             </Box>
             {statusMessage && (
