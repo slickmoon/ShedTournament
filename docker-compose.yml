@@ -53,12 +53,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=competition_app
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data: 
-    driver: local
-    path: bin/shed-tournament-db
+      - ./bin/postgres_data:/var/lib/postgresql/data
 
 networks:
   app-network:
