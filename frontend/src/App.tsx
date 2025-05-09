@@ -6,6 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
+import { randomTexts } from './data/shed-quotes.ts';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ function App() {
   const [matchError, setMatchError] = useState<string>('');
   const [winner, setWinner] = useState<string>('');
   const [loser, setLoser] = useState<string>('');
+  const [randomText, setRandomText] = useState<string>('');
 
   // Load initial data and check token
   useEffect(() => {
@@ -54,6 +56,8 @@ function App() {
       setToken(storedToken);
     }
     setLoading(false);
+    // Set random text on initial load
+    setRandomText(randomTexts[Math.floor(Math.random() * randomTexts.length)]);
   }, []);
 
   // Load players and audit log when token is available
@@ -244,6 +248,7 @@ function App() {
                 <h1 className="wave-text">
                   Welcome to the Shed tournament
                 </h1>
+                
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
                   <Button 
                     variant="contained" 
@@ -258,15 +263,98 @@ function App() {
               </div>
             } />
           </Routes>
+          <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    textAlign: 'center', 
+                    mb: 3,
+                    fontStyle: 'italic',
+                    color: 'text.secondary'
+                  }}
+                >
+            {randomText}
+          </Typography>
           <div style={{ margin: '1em', textAlign: 'center' }}>
             <h2>Players</h2>
-            <p id="playerlist">
-              {players.map((player) => (
-                <div key={player.id}>
-                  {player.player_name} (ELO: {player.elo})
-                </div>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: { xs: 'column', md: 'row' },
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              gap: 2,
+              mb: 4,
+              minHeight: '200px'
+            }}>
+              {players.slice(0, 3).map((player, index) => (
+                <Box
+                  key={player.id}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    order: { xs: 0, md: index === 1 ? 0 : index === 0 ? 1 : 2 },
+                    flex: { xs: 1, md: 'none' },
+                    width: { xs: '100%', md: '200px' },
+                    position: 'relative',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: index === 0 ? '120px' : index === 1 ? '80px' : '40px',
+                      backgroundColor: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
+                      borderRadius: '8px 8px 0 0',
+                      zIndex: 0
+                    }
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      position: 'relative',
+                      zIndex: 1,
+                      mb: 1,
+                      fontWeight: 'bold',
+                      color: 'text.primary'
+                    }}
+                  >
+                    {player.player_name}
+                  </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      position: 'relative',
+                      zIndex: 1,
+                      color: 'text.secondary',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    ELO: {player.elo}
+                  </Typography>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      position: 'relative',
+                      zIndex: 1,
+                      color: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
+                      fontWeight: 'bold',
+                      mt: 1
+                    }}
+                  >
+                    #{index + 1}
+                  </Typography>
+                </Box>
               ))}
-            </p>
+            </Box>
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>Other Players</Typography>
+              {players.slice(3).map((player) => (
+                <Typography key={player.id} sx={{ mb: 1 }}>
+                  {player.player_name} (ELO: {player.elo})
+                </Typography>
+              ))}
+            </Box>
             
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
               <Button 
