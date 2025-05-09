@@ -8,7 +8,6 @@ from datetime import datetime
 
 app = FastAPI(
     title="Shed Tournament API",
-    root_path="/shedapi"
 )
 
 # Configure CORS
@@ -19,6 +18,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Create a sub-application for the /shedapi prefix
+api = FastAPI()
+app.mount("/shedapi", api)
 
 class PlayerRequest(BaseModel):
     player_name: str
@@ -47,11 +50,11 @@ class MatchRequest(BaseModel):
     winner_id: int
     loser_id: int
 
-@app.get("/")
+@api.get("/")
 async def root():
     return {"message": "Shed Tournament API"}
 
-@app.post("/addplayer", response_model=PlayerResponse)
+@api.post("/addplayer", response_model=PlayerResponse)
 async def addplayer(player: PlayerRequest, db: Session = Depends(database.get_db)):
     db_player = base.Player(player_name=player.player_name)
     db.add(db_player)
@@ -65,18 +68,18 @@ async def addplayer(player: PlayerRequest, db: Session = Depends(database.get_db
     
     return db_player
 
-@app.get("/players", response_model=List[PlayerResponse])
+@api.get("/players", response_model=List[PlayerResponse])
 async def get_players(db: Session = Depends(database.get_db)):
     return db.query(base.Player).all()
 
-@app.get("/players/{player_id}", response_model=PlayerResponse)
+@api.get("/players/{player_id}", response_model=PlayerResponse)
 async def get_player(player_id: int, db: Session = Depends(database.get_db)):
     player = db.query(base.Player).filter(base.Player.id == player_id).first()
     if player is None:
         raise HTTPException(status_code=404, detail="Player not found")
     return player
 
-@app.put("/players/{player_id}")
+@api.put("/players/{player_id}")
 async def update_player(player: PlayerUpdateRequest, player_id: int = Path(..., description="The ID of the player to update"), db: Session = Depends(database.get_db)):
     db_player = db.query(base.Player).filter(base.Player.id == player_id).first()
     if db_player is None:
@@ -88,7 +91,7 @@ async def update_player(player: PlayerUpdateRequest, player_id: int = Path(..., 
     db.commit()
     return {"message": f"Player {player_id} updated successfully"}
 
-@app.delete("/players/{player_id}")
+@api.delete("/players/{player_id}")
 async def delete_player(player_id: int, db: Session = Depends(database.get_db)):
     player = db.query(base.Player).filter(base.Player.id == player_id).first()
     if player is None:
@@ -99,14 +102,14 @@ async def delete_player(player_id: int, db: Session = Depends(database.get_db)):
     db.commit()
     return {"message": f"Player {player_id} deleted successfully"}
 
-@app.get("/auditlog", response_model=List[AuditLogResponse])
+@api.get("/auditlog", response_model=List[AuditLogResponse])
 async def get_audit_log(db: Session = Depends(database.get_db)):
     return db.query(base.AuditLog)\
         .order_by(base.AuditLog.timestamp.desc())\
         .limit(100)\
         .all()
 
-@app.post("/record-match")
+@api.post("/record-match")
 async def record_match(match: MatchRequest, db: Session = Depends(database.get_db)):
     # Get players
     winner = db.query(base.Player).filter(base.Player.id == match.winner_id).first()
