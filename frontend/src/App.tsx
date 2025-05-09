@@ -29,7 +29,7 @@ function App() {
   }, []);
   
   const [players, setPlayers] = useState<Player[]>([]);
-  const [statusMessage, setStatusMessage] = useState<string>('');
+  const [statusMessage, setStatusMessage] = useState<string | React.ReactNode>('');
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
   const [auditlog, setAuditLog] = useState<AuditLog[]>([]);
   const [openMatchDialog, setOpenMatchDialog] = useState(false);
@@ -98,7 +98,17 @@ function App() {
       });
 
       if (response.ok) {
-        setStatusMessage('Match recorded successfully');
+        const data = await response.json();
+        setStatusMessage(
+          <Box>
+            <Typography>Match recorded successfully</Typography>
+            <Typography>
+              <Typography component="span" color="success.main">{winnerPlayer.player_name} (+{data.winner.elo_change})</Typography>
+              {' '}beat{' '}
+              <Typography component="span" color="error.main">{loserPlayer.player_name} ({data.loser.elo_change})</Typography>
+            </Typography>
+          </Box>
+        );
         listPlayers();
         listAuditLog();
         setOpenMatchDialog(false);
@@ -145,80 +155,87 @@ function App() {
                 Record Match
               </Button>
             </Box>
-
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mb: 3 }}>
-              <Box sx={{ textAlign: 'center' }}>
-                <h2>Add Player</h2>
-                <TextField id="player-name-input" label="Player Name" variant="outlined" />
-                <Box sx={{ mt: 2 }}>
-                  <Button 
-                    variant="contained"
-                    onClick={() => {
-                      const playerNameInput = document.getElementById('player-name-input') as HTMLInputElement;
-                      addplayer(playerNameInput.value);
-                    }}
-                  >
-                    Add player
-                  </Button>
-                </Box>
-              </Box>
-
-              <Box sx={{ textAlign: 'center' }}>
-                <h2>Delete Player</h2>
-                <Select
-                  id="player-delete-input"
-                  label="Player Name"
-                  variant="outlined"
-                  value={selectedPlayer}
-                  onChange={(e) => setSelectedPlayer(e.target.value)}
-                  sx={{ minWidth: 200 }}
-                >
-                  {players.map((player) => (
-                    <MenuItem key={player.id} value={player.player_name}>
-                      {player.player_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    variant="contained"
-                    color="error" 
-                    onClick={async () => {
-                      try {
-                        const player = players.find(p => p.player_name.toLowerCase() === selectedPlayer.toLowerCase());
-                        if (!player) {
-                          setStatusMessage(`Player ${selectedPlayer} not found`);
-                          return;
-                        } else {
-                          const player_id = player.id;
-                          const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
-                            method: 'DELETE'
-                          });
-                          if (response.ok) {
-                            setStatusMessage(`Successfully deleted player ${selectedPlayer} (ID: ${player_id})`);
-                            listPlayers(); // Refresh the player list
-                            listAuditLog(); // Refresh the audit log
-                          } else {
-                            setStatusMessage(`Error deleting player ${selectedPlayer} (ID: ${player_id})`);
-                          }
-                        }
-                      } catch (error) {
-                        setStatusMessage(`Error deleting player ${selectedPlayer}: ${error}`);
-                      }
-                    }}
-                  >
-                    Delete player
-                  </Button>
-                </Box>
-              </Box>
-            </Box>
-
             {statusMessage && (
               <Typography variant="h6" sx={{ mt: 2 }}>
                 {statusMessage}
               </Typography>
             )}
 
+            <h2>Player Administration</h2>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Add/Delete Players</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mb: 3 }}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <h2>Add Player</h2>
+                    <TextField id="player-name-input" label="Player Name" variant="outlined" />
+                    <Box sx={{ mt: 2 }}>
+                      <Button 
+                        variant="contained"
+                        onClick={() => {
+                          const playerNameInput = document.getElementById('player-name-input') as HTMLInputElement;
+                          addplayer(playerNameInput.value);
+                        }}
+                      >
+                        Add player
+                      </Button>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ textAlign: 'center' }}>
+                    <h2>Delete Player</h2>
+                    <Select
+                      id="player-delete-input"
+                      label="Player Name"
+                      variant="outlined"
+                      value={selectedPlayer}
+                      onChange={(e) => setSelectedPlayer(e.target.value)}
+                      sx={{ minWidth: 200 }}
+                    >
+                      {players.map((player) => (
+                        <MenuItem key={player.id} value={player.player_name}>
+                          {player.player_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <Box sx={{ mt: 2 }}>
+                      <Button
+                        variant="contained"
+                        color="error" 
+                        onClick={async () => {
+                          try {
+                            const player = players.find(p => p.player_name.toLowerCase() === selectedPlayer.toLowerCase());
+                            if (!player) {
+                              setStatusMessage(`Player ${selectedPlayer} not found`);
+                              return;
+                            } else {
+                              const player_id = player.id;
+                              const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
+                                method: 'DELETE'
+                              });
+                              if (response.ok) {
+                                setStatusMessage(`Successfully deleted player ${selectedPlayer} (ID: ${player_id})`);
+                                listPlayers(); // Refresh the player list
+                                listAuditLog(); // Refresh the audit log
+                              } else {
+                                setStatusMessage(`Error deleting player ${selectedPlayer} (ID: ${player_id})`);
+                              }
+                            }
+                          } catch (error) {
+                            setStatusMessage(`Error deleting player ${selectedPlayer}: ${error}`);
+                          }
+                        }}
+                      >
+                        Delete player
+                      </Button>
+                    </Box>
+                  </Box>
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+            
             <h2>Audit Log</h2>
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
