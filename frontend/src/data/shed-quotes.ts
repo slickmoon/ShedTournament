@@ -15,6 +15,7 @@ export const randomTexts = [
     "Beau's Last Chance",
     "How about a lil rip of the bingus?",
     "The Spins help me spin",
-    "Next camp when??"
+    "Next camp when??",
+    "Hey I’m trying to eat lunch here"
 
   ];
