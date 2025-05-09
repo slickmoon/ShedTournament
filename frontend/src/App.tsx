@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider, CssBaseline, Button, Typography, Box, TextField, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
+import { Login } from './components/Login.tsx';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -22,13 +23,8 @@ interface AuditLog {
 }
 
 function App() {
-  //run on startup
-  React.useEffect(() => {
-    listPlayers();
-    listAuditLog();
-    setSelectedPlayerUpdateElo(1000);
-  }, []);
-  
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [players, setPlayers] = useState<Player[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | React.ReactNode>('');
   const [updatePlayerMessage, setUpdatePlayerMessage] = useState<string | React.ReactNode>('');
@@ -41,6 +37,39 @@ function App() {
   const [matchError, setMatchError] = useState<string>('');
   const [winner, setWinner] = useState<string>('');
   const [loser, setLoser] = useState<string>('');
+
+  useEffect(() => {
+    // Check for existing token on mount
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+    }
+    setLoading(false);
+
+  }, []);
+
+  const handleLogin = (newToken: string) => {
+    setToken(newToken);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+  };
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
+
+  if (!token) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Login onLogin={handleLogin} />
+      </ThemeProvider>
+    );
+    
+  }
 
   const addplayer = async (playerName: string) => {
     try {
@@ -162,6 +191,10 @@ function App() {
       setStatusMessage(`Error recording match: ${error}`);
     }
   };
+  //startup actions
+  listPlayers();
+  listAuditLog();
+  setSelectedPlayerUpdateElo(1000);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -170,9 +203,13 @@ function App() {
         <Router basename="/shed">
           <Routes>
             <Route path="/" element={
-              <h1 className="wave-text">
-                Welcome to the Shed tournament
-              </h1>
+              <div>
+                <h1 className="wave-text">
+                  Welcome to the Shed tournament
+                </h1>
+                <button onClick={handleLogout}>Logout</button>
+                {/* Rest of your app content */}
+              </div>
             } />
           </Routes>
           <div style={{ margin: '1em', textAlign: 'center' }}>
