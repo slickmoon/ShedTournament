@@ -31,6 +31,7 @@ function App() {
   
   const [players, setPlayers] = useState<Player[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | React.ReactNode>('');
+  const [updatePlayerMessage, setUpdatePlayerMessage] = useState<string | React.ReactNode>('');
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
   const [selectedUpdatePlayer, setSelectedUpdatePlayer] = useState<string>('');
   const [selectedPlayerUpdateName, setSelectedPlayerUpdateName] = useState<string>('');
@@ -65,12 +66,12 @@ function App() {
   const updatePlayer = async (player_id: number, playerName: string, newElo: number) => {
     try{
       if (!player_id) {
-        setStatusMessage('No player selected');
+        setUpdatePlayerMessage('No player selected');
         return;
       }
 
       if (!playerName || !newElo) {
-        setStatusMessage('Please fill in both name and ELO fields');
+        setUpdatePlayerMessage('Please fill in both name and ELO fields');
         return;
       }
       const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
@@ -84,18 +85,18 @@ function App() {
       })
     });
     if (response.ok) {
-      setStatusMessage(`Successfully updated player ${playerName} (ID: ${player_id})`);
+      setUpdatePlayerMessage(`Successfully updated player ${playerName} (ID: ${player_id})`);
       setSelectedUpdatePlayer('');
       setSelectedPlayerUpdateName('');
       setSelectedPlayerUpdateElo(1000);
       listPlayers(); // Refresh the player list
       listAuditLog(); // Refresh the audit log
     } else {
-      setStatusMessage(`Error updating player ${playerName} (ID: ${player_id})`);
+      setUpdatePlayerMessage(`Error updating player ${playerName} (ID: ${player_id})`);
     }
   }
     catch (error) {
-      setStatusMessage(`Error updating player ${playerName} (ID: ${player_id}): ${error}`);
+      setUpdatePlayerMessage(`Error updating player ${playerName} (ID: ${player_id}): ${error}`);
     }
   };
   const listPlayers = async () => {
@@ -215,7 +216,11 @@ function App() {
                         variant="contained"
                         onClick={() => {
                           const playerNameInput = document.getElementById('player-name-input') as HTMLInputElement;
-                          addplayer(playerNameInput.value);
+                          if (playerNameInput.value) {
+                            addplayer(playerNameInput.value);
+                          } else {
+                            setStatusMessage('Please fill in a player name');
+                          }
                         }}
                       >
                         Add player
@@ -310,12 +315,17 @@ function App() {
                             playerNameInput.value = '';
                             playerEloInput.value = '1000';
                           } else {
-                            setStatusMessage('No player selected to update');
+                            setUpdatePlayerMessage('No player selected to update');
                           }
                         }}
                       >
                       Update player
                     </Button>
+                    {updatePlayerMessage && (
+                    <Typography variant="h6" sx={{ mt: 2 }}>
+                      {updatePlayerMessage}
+                    </Typography>
+                  )}
                   </Box>
                 </Box>
               </Box>
