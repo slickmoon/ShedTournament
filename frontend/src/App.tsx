@@ -272,7 +272,7 @@ function App() {
                     color: 'text.secondary'
                   }}
                 >
-            {randomText}
+            "{randomText}"
           </Typography>
           <div style={{ margin: '1em', textAlign: 'center' }}>
             <h2>Players</h2>
