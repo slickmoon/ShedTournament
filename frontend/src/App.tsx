@@ -290,10 +290,19 @@ function App() {
                 <Typography>Add/Delete Players</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mb: 3 }}>
-                  <Box sx={{ textAlign: 'center' }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: { xs: 'column', md: 'row' }, // Stack vertically on mobile, horizontal on medium and up
+                  justifyContent: 'center', 
+                  gap: 4, 
+                  mb: 3,
+                  '& > *': { // Add margin between stacked items on mobile
+                    mb: { xs: 4, md: 0 }
+                  }
+                }}>
+                  <Box sx={{ textAlign: 'center', width: { xs: '100%', md: 'auto' } }}>
                     <h2>Add Player</h2>
-                    <TextField id="player-name-input" label="Player Name" variant="outlined" InputLabelProps={{ shrink: true }} />
+                    <TextField id="player-name-input" label="Player Name" variant="outlined" InputLabelProps={{ shrink: true }} fullWidth />
                     <Box sx={{ mt: 2 }}>
                       <Button 
                         variant="contained"
@@ -311,7 +320,7 @@ function App() {
                     </Box>
                   </Box>
 
-                  <Box sx={{ textAlign: 'center' }}>
+                  <Box sx={{ textAlign: 'center', width: { xs: '100%', md: 'auto' } }}>
                     <h2>Delete Player</h2>
                     <Select
                       id="player-delete-input"
@@ -319,7 +328,8 @@ function App() {
                       variant="outlined"
                       value={selectedPlayer}
                       onChange={(e) => setSelectedPlayer(e.target.value)}
-                      sx={{ minWidth: 200 }}
+                      sx={{ minWidth: { xs: '100%', md: 200 } }}
+                      fullWidth
                     >
                       {players.map((player) => (
                         <MenuItem key={player.id} value={player.player_name}>
@@ -350,7 +360,8 @@ function App() {
                       </Button>
                     </Box>
                   </Box>
-                  <Box sx={{ textAlign: 'center' }}>
+
+                  <Box sx={{ textAlign: 'center', width: { xs: '100%', md: 'auto' } }}>
                     <h2>Manually Update Player details</h2>
                     <Select
                       id="player-update-input"
@@ -358,7 +369,8 @@ function App() {
                       variant="outlined"
                       value={selectedUpdatePlayer}
                       onChange={(e) => setSelectedUpdatePlayer(e.target.value)}
-                      sx={{ minWidth: 200 }}
+                      sx={{ minWidth: { xs: '100%', md: 200 } }}
+                      fullWidth
                     >
                       {players.map((player) => (
                         <MenuItem key={player.id} value={player.id} onClick={() => {
@@ -373,9 +385,31 @@ function App() {
                         </MenuItem>
                       ))}
                     </Select>
-                    <TextField id="player-id-read-only" label="Player ID" variant="outlined" value={selectedUpdatePlayer} disabled />
-                    <TextField id="player-elo-input" label="New ELO" variant="outlined" InputLabelProps={{ shrink: true }} />
-                    <TextField id="player-name-update-input" label="New Name" variant="outlined" InputLabelProps={{ shrink: true }} />
+                    <TextField 
+                      id="player-id-read-only" 
+                      label="Player ID" 
+                      variant="outlined" 
+                      value={selectedUpdatePlayer} 
+                      disabled 
+                      fullWidth
+                      sx={{ mt: 2 }}
+                    />
+                    <TextField 
+                      id="player-elo-input" 
+                      label="New ELO" 
+                      variant="outlined" 
+                      InputLabelProps={{ shrink: true }} 
+                      fullWidth
+                      sx={{ mt: 2 }}
+                    />
+                    <TextField 
+                      id="player-name-update-input" 
+                      label="New Name" 
+                      variant="outlined" 
+                      InputLabelProps={{ shrink: true }} 
+                      fullWidth
+                      sx={{ mt: 2 }}
+                    />
                     <Box sx={{ mt: 2 }}>
                       <Button
                         variant="contained"
@@ -393,16 +427,16 @@ function App() {
                           }
                         }}
                       >
-                      Update player
-                    </Button>
-                    {updatePlayerMessage && (
-                    <Typography variant="h6" sx={{ mt: 2 }}>
-                      {updatePlayerMessage}
-                    </Typography>
-                  )}
+                        Update player
+                      </Button>
+                      {updatePlayerMessage && (
+                        <Typography variant="h6" sx={{ mt: 2 }}>
+                          {updatePlayerMessage}
+                        </Typography>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
-              </Box>
               </AccordionDetails>
             </Accordion>
             
