@@ -45,6 +45,7 @@ services:
 
   shed-tournament-db:
     image: postgres:15
+    restart: unless-stopped
     networks:
       - app-network
     environment:
@@ -56,6 +57,8 @@ services:
 
 volumes:
   postgres_data: 
+    driver: local
+    path: bin/shed-tournament-db
 
 networks:
   app-network:
