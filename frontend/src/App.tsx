@@ -10,6 +10,15 @@ import './App.css';
 
 const queryClient = new QueryClient();
 
+// Helper function to get auth headers
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+};
+
 interface Player {
   id: number;
   player_name: string;
@@ -45,7 +54,6 @@ function App() {
       setToken(storedToken);
     }
     setLoading(false);
-
   }, []);
 
   const handleLogin = (newToken: string) => {
@@ -68,16 +76,13 @@ function App() {
         <Login onLogin={handleLogin} />
       </ThemeProvider>
     );
-    
   }
 
   const addplayer = async (playerName: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/addplayer`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ player_name: playerName })
       });
       const data = await response.json();
@@ -92,8 +97,9 @@ function App() {
       setStatusMessage(`Error adding player ${playerName}: ${error}`);
     }
   };
+
   const updatePlayer = async (player_id: number, playerName: string, newElo: number) => {
-    try{
+    try {
       if (!player_id) {
         setUpdatePlayerMessage('No player selected');
         return;
@@ -105,39 +111,49 @@ function App() {
       }
       const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
         method: 'PUT',
-        headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        player_name: playerName,
-        player_elo: newElo
-      })
-    });
-    if (response.ok) {
-      setUpdatePlayerMessage(`Successfully updated player ${playerName} (ID: ${player_id})`);
-      setSelectedUpdatePlayer('');
-      setSelectedPlayerUpdateName('');
-      setSelectedPlayerUpdateElo(1000);
-      listPlayers(); // Refresh the player list
-      listAuditLog(); // Refresh the audit log
-    } else {
-      setUpdatePlayerMessage(`Error updating player ${playerName} (ID: ${player_id})`);
-    }
-  }
-    catch (error) {
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          player_name: playerName,
+          player_elo: newElo
+        })
+      });
+      if (response.ok) {
+        setUpdatePlayerMessage(`Successfully updated player ${playerName} (ID: ${player_id})`);
+        setSelectedUpdatePlayer('');
+        setSelectedPlayerUpdateName('');
+        setSelectedPlayerUpdateElo(1000);
+        listPlayers(); // Refresh the player list
+        listAuditLog(); // Refresh the audit log
+      } else {
+        setUpdatePlayerMessage(`Error updating player ${playerName} (ID: ${player_id})`);
+      }
+    } catch (error) {
       setUpdatePlayerMessage(`Error updating player ${playerName} (ID: ${player_id}): ${error}`);
     }
   };
+
   const listPlayers = async () => {
-    const response = await fetch(`${API_BASE_URL}/players`);
-    const data = await response.json();
-    setPlayers(data);
+    try {
+      const response = await fetch(`${API_BASE_URL}/players`, {
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      setPlayers(data);
+    } catch (error) {
+      setStatusMessage(`Error fetching players: ${error}`);
+    }
   };
 
   const listAuditLog = async () => {
-    const response = await fetch(`${API_BASE_URL}/auditlog`);
-    const data = await response.json();
-    setAuditLog(data);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auditlog`, {
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      setAuditLog(data);
+    } catch (error) {
+      setStatusMessage(`Error fetching audit log: ${error}`);
+    }
   };
 
   const recordMatch = async () => {
@@ -157,9 +173,7 @@ function App() {
 
       const response = await fetch(`${API_BASE_URL}/record-match`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           winner_id: winnerPlayer.id,
           loser_id: loserPlayer.id
@@ -191,10 +205,31 @@ function App() {
       setStatusMessage(`Error recording match: ${error}`);
     }
   };
-  //startup actions
-  listPlayers();
-  listAuditLog();
-  setSelectedPlayerUpdateElo(1000);
+
+  const deletePlayer = async (playerId: number) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/players/${playerId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      if (response.ok) {
+        setStatusMessage(`Successfully deleted player (ID: ${playerId})`);
+        listPlayers(); // Refresh the player list
+        listAuditLog(); // Refresh the audit log
+      } else {
+        setStatusMessage(`Error deleting player (ID: ${playerId})`);
+      }
+    } catch (error) {
+      setStatusMessage(`Error deleting player: ${error}`);
+    }
+  };
+
+  // Load initial data
+  useEffect(() => {
+    listPlayers();
+    listAuditLog();
+    setSelectedPlayerUpdateElo(1000);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -293,16 +328,7 @@ function App() {
                               return;
                             } else {
                               const player_id = player.id;
-                              const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
-                                method: 'DELETE'
-                              });
-                              if (response.ok) {
-                                setStatusMessage(`Successfully deleted player ${selectedPlayer} (ID: ${player_id})`);
-                                listPlayers(); // Refresh the player list
-                                listAuditLog(); // Refresh the audit log
-                              } else {
-                                setStatusMessage(`Error deleting player ${selectedPlayer} (ID: ${player_id})`);
-                              }
+                              deletePlayer(player_id);
                             }
                           } catch (error) {
                             setStatusMessage(`Error deleting player ${selectedPlayer}: ${error}`);
