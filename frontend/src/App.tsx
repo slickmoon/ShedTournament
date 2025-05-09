@@ -12,7 +12,7 @@ const queryClient = new QueryClient();
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('shed-tournament-token');
   return {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`
@@ -49,7 +49,7 @@ function App() {
 
   // Load initial data and check token
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
+    const storedToken = localStorage.getItem('shed-tournament-token');
     if (storedToken) {
       setToken(storedToken);
     }
@@ -70,7 +70,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('shed-tournament-token');
     setToken(null);
   };
 
@@ -244,7 +244,16 @@ function App() {
                 <h1 className="wave-text">
                   Welcome to the Shed tournament
                 </h1>
-                <button onClick={handleLogout}>Logout</button>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
+                  <Button 
+                    variant="contained" 
+                    color="secondary"
+                    size="large"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Button>
+                </Box>
                 {/* Rest of your app content */}
               </div>
             } />

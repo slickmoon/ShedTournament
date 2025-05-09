@@ -30,7 +30,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('shed-tournament-token', data.access_token);
       onLogin(data.access_token);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
