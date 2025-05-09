@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -19,6 +19,10 @@ app.add_middleware(
 
 class PlayerRequest(BaseModel):
     player_name: str
+
+class PlayerUpdateRequest(BaseModel):
+    player_name: str
+    player_elo: int
 
 class PlayerResponse(BaseModel):
     id: int
@@ -70,12 +74,13 @@ async def get_player(player_id: int, db: Session = Depends(database.get_db)):
     return player
 
 @app.put("/players/{player_id}")
-async def update_player(player_id: int, player_name: str, db: Session = Depends(database.get_db)):
-    player = db.query(base.Player).filter(base.Player.id == player_id).first()
-    if player is None:
+async def update_player(player: PlayerUpdateRequest, player_id: int = Path(..., description="The ID of the player to update"), db: Session = Depends(database.get_db)):
+    db_player = db.query(base.Player).filter(base.Player.id == player_id).first()
+    if db_player is None:
         raise HTTPException(status_code=404, detail="Player not found")
-    player.player_name = player_name
-    audit_log = base.AuditLog(log=f"Player {player_name} updated")
+    db_player.player_name = player.player_name
+    db_player.elo = player.player_elo
+    audit_log = base.AuditLog(log=f"Player {player.player_name} updated")
     db.add(audit_log)
     db.commit()
     return {"message": f"Player {player_id} updated successfully"}

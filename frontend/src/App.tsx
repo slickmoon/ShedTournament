@@ -26,11 +26,15 @@ function App() {
   React.useEffect(() => {
     listPlayers();
     listAuditLog();
+    setSelectedPlayerUpdateElo(1000);
   }, []);
   
   const [players, setPlayers] = useState<Player[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | React.ReactNode>('');
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
+  const [selectedUpdatePlayer, setSelectedUpdatePlayer] = useState<string>('');
+  const [selectedPlayerUpdateName, setSelectedPlayerUpdateName] = useState<string>('');
+  const [selectedPlayerUpdateElo, setSelectedPlayerUpdateElo] = useState<number>(0);
   const [auditlog, setAuditLog] = useState<AuditLog[]>([]);
   const [openMatchDialog, setOpenMatchDialog] = useState(false);
   const [matchError, setMatchError] = useState<string>('');
@@ -58,7 +62,42 @@ function App() {
       setStatusMessage(`Error adding player ${playerName}: ${error}`);
     }
   };
+  const updatePlayer = async (player_id: number, playerName: string, newElo: number) => {
+    try{
+      if (!player_id) {
+        setStatusMessage('No player selected');
+        return;
+      }
 
+      if (!playerName || !newElo) {
+        setStatusMessage('Please fill in both name and ELO fields');
+        return;
+      }
+      const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
+        method: 'PUT',
+        headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        player_name: playerName,
+        player_elo: newElo
+      })
+    });
+    if (response.ok) {
+      setStatusMessage(`Successfully updated player ${playerName} (ID: ${player_id})`);
+      setSelectedUpdatePlayer('');
+      setSelectedPlayerUpdateName('');
+      setSelectedPlayerUpdateElo(1000);
+      listPlayers(); // Refresh the player list
+      listAuditLog(); // Refresh the audit log
+    } else {
+      setStatusMessage(`Error updating player ${playerName} (ID: ${player_id})`);
+    }
+  }
+    catch (error) {
+      setStatusMessage(`Error updating player ${playerName} (ID: ${player_id}): ${error}`);
+    }
+  };
   const listPlayers = async () => {
     const response = await fetch(`${API_BASE_URL}/players`);
     const data = await response.json();
@@ -170,7 +209,7 @@ function App() {
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mb: 3 }}>
                   <Box sx={{ textAlign: 'center' }}>
                     <h2>Add Player</h2>
-                    <TextField id="player-name-input" label="Player Name" variant="outlined" />
+                    <TextField id="player-name-input" label="Player Name" variant="outlined" InputLabelProps={{ shrink: true }} />
                     <Box sx={{ mt: 2 }}>
                       <Button 
                         variant="contained"
@@ -232,7 +271,54 @@ function App() {
                       </Button>
                     </Box>
                   </Box>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <h2>Manually Update Player details</h2>
+                    <Select
+                      id="player-update-input"
+                      label="Player Name"
+                      variant="outlined"
+                      value={selectedUpdatePlayer}
+                      onChange={(e) => setSelectedUpdatePlayer(e.target.value)}
+                      sx={{ minWidth: 200 }}
+                    >
+                      {players.map((player) => (
+                        <MenuItem key={player.id} value={player.id} onClick={() => {
+                          const playerNameInput = document.getElementById('player-name-update-input') as HTMLInputElement;
+                          const playerEloInput = document.getElementById('player-elo-input') as HTMLInputElement;
+                          playerEloInput.value = player.elo.toString();
+                          playerNameInput.value = player.player_name;
+                          setSelectedPlayerUpdateName(player.player_name);
+                          setSelectedPlayerUpdateElo(player.elo);
+                        }}>
+                          {player.player_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <TextField id="player-id-read-only" label="Player ID" variant="outlined" value={selectedUpdatePlayer} disabled />
+                    <TextField id="player-elo-input" label="New ELO" variant="outlined" InputLabelProps={{ shrink: true }} />
+                    <TextField id="player-name-update-input" label="New Name" variant="outlined" InputLabelProps={{ shrink: true }} />
+                    <Box sx={{ mt: 2 }}>
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                          const playerNameInput = document.getElementById('player-name-update-input') as HTMLInputElement;
+                          const playerEloInput = document.getElementById('player-elo-input') as HTMLInputElement;
+                          const player = players.find(p => p.id == parseInt(selectedUpdatePlayer));
+                          if (player) {
+                            updatePlayer(player.id, playerNameInput.value, parseInt(playerEloInput.value));
+                            setSelectedUpdatePlayer('');
+                            playerNameInput.value = '';
+                            playerEloInput.value = '1000';
+                          } else {
+                            setStatusMessage('No player selected to update');
+                          }
+                        }}
+                      >
+                      Update player
+                    </Button>
+                  </Box>
                 </Box>
+              </Box>
               </AccordionDetails>
             </Accordion>
             
