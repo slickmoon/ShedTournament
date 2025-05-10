@@ -1,1 +1,1 @@
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://slkmn.k.vu/shedapi';
+export const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://localhost/shedapi';
