@@ -9,8 +9,6 @@ services:
       - lsio
     ports:
       - "4322:8000"
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@shed-tournament-db:5432/competition_app
     env_file:
       - .env
     depends_on:
@@ -30,7 +28,6 @@ services:
       - "4321:80"
     depends_on:
       - shed-tournament-api
-    environment:
     env_file:
       - .env
     healthcheck:
@@ -39,7 +36,6 @@ services:
       timeout: 10s
       retries: 3
 
-
   shed-tournament-db:
     image: postgres:15
     restart: unless-stopped
@@ -47,10 +43,6 @@ services:
       - app-network
     env_file:
       - .env
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=competition_app
     volumes:
       - ./bin/postgres_data:/var/lib/postgresql/data
 
