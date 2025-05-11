@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, CssBaseline, Button, Typography, Box, TextField, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { ThemeProvider, CssBaseline, Button, Typography, Box, TextField, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Accordion, AccordionSummary, AccordionDetails, Paper } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
@@ -32,6 +33,14 @@ interface AuditLog {
   timestamp: string;
 }
 
+interface PlayerStreak {
+  player_id: number;
+  player_name: string;
+  current_streak: number;
+  elo: number;
+  elo_change: number;
+}
+
 function App() {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,6 +60,7 @@ function App() {
   const [isDoubles, setIsDoubles] = useState(false);
   const [winner2, setWinner2] = useState<string>('');
   const [loser2, setLoser2] = useState<string>('');
+  const [playerStreaks, setPlayerStreaks] = useState<PlayerStreak[]>([]);
 
   // Load initial data and check token
   useEffect(() => {
@@ -68,6 +78,7 @@ function App() {
     if (token) {
       listPlayers();
       listAuditLog();
+      listPlayerStreaks();
       setSelectedPlayerUpdateElo(1000);
     }
   }, [token]);
@@ -169,6 +180,18 @@ function App() {
       setAuditLog(data);
     } catch (error) {
       setStatusMessage(`Error fetching audit log: ${error}`);
+    }
+  };
+
+  const listPlayerStreaks = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/players/streaks`, {
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      setPlayerStreaks(data);
+    } catch (error) {
+      setStatusMessage(`Error fetching player streaks: ${error}`);
     }
   };
 
@@ -332,85 +355,172 @@ function App() {
             {randomText}
           </Typography>
           <div style={{ margin: '1em', textAlign: 'center' }}>
-            <h2>Players</h2>
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: { xs: 'column', md: 'row' },
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              gap: 2,
-              mb: 4,
-              minHeight: '200px'
-            }}>
-              {players.slice(0, 3).map((player, index) => (
-                <Box
-                  key={player.id}
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    order: { xs: 0, md: index === 1 ? 0 : index === 0 ? 1 : 2 },
-                    flex: { xs: 1, md: 'none' },
-                    width: { xs: '100%', md: '200px' },
-                    position: 'relative',
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: index === 0 ? '120px' : index === 1 ? '80px' : '40px',
-                      backgroundColor: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
-                      borderRadius: '8px 8px 0 0',
-                      zIndex: 0
-                    }
-                  }}
-                >
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      position: 'relative',
-                      zIndex: 1,
-                      mb: 1,
-                      fontWeight: 'bold',
-                      color: 'text.primary'
-                    }}
-                  >
-                    {player.player_name}
-                  </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      position: 'relative',
-                      zIndex: 1,
-                      color: 'text.secondary',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    ELO: {player.elo}
-                  </Typography>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      position: 'relative',
-                      zIndex: 1,
-                      color: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
-                      fontWeight: 'bold',
-                      mt: 1
-                    }}
-                  >
-                    #{index + 1}
-                  </Typography>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
+              {/* Main Players Section */}
+              <Box sx={{ flex: 1 }}>
+                <h2>Players</h2>
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: { xs: 'column', md: 'row' },
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  gap: 2,
+                  mb: 4,
+                  minHeight: '200px'
+                }}>
+                  {players.slice(0, 3).map((player, index) => (
+                    <Box
+                      key={player.id}
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        order: { xs: 0, md: index === 1 ? 0 : index === 0 ? 1 : 2 },
+                        flex: { xs: 1, md: 'none' },
+                        width: { xs: '100%', md: '200px' },
+                        position: 'relative',
+                        '&::after': {
+                          content: '""',
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: index === 0 ? '120px' : index === 1 ? '80px' : '40px',
+                          backgroundColor: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
+                          borderRadius: '8px 8px 0 0',
+                          zIndex: 0
+                        }
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          position: 'relative',
+                          zIndex: 1,
+                          mb: 1,
+                          fontWeight: 'bold',
+                          color: 'text.primary'
+                        }}
+                      >
+                        {player.player_name}
+                      </Typography>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          position: 'relative',
+                          zIndex: 1,
+                          color: 'text.secondary',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        ELO: {player.elo}
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          position: 'relative',
+                          zIndex: 1,
+                          color: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
+                          fontWeight: 'bold',
+                          mt: 1
+                        }}
+                      >
+                        #{index + 1}
+                      </Typography>
+                    </Box>
+                  ))}
                 </Box>
-              ))}
-            </Box>
-            <Box sx={{ mt: 4 }}>
-              <Typography variant="h6" sx={{ mb: 2 }}>Other Players</Typography>
-              {players.slice(3).map((player) => (
-                <Typography key={player.id} sx={{ mb: 1 }}>
-                  {player.player_name} (ELO: {player.elo})
-                </Typography>
-              ))}
+                <Box sx={{ mt: 4 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>Other Players</Typography>
+                  {players.slice(3).map((player) => (
+                    <Typography key={player.id} sx={{ mb: 1 }}>
+                      {player.player_name} (ELO: {player.elo})
+                    </Typography>
+                  ))}
+                </Box>
+              </Box>
+
+              {/* Streaks Panel */}
+              <Box sx={{ flex: 1 }}>
+                <h2>Current Winning Streaks</h2>
+                <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
+                  {playerStreaks.slice(0, 3).map((streak, index) => (
+                    <Box
+                      key={streak.player_id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        p: 2,
+                        mb: 2,
+                        borderRadius: 1,
+                        bgcolor: index === 0 ? 'rgba(255, 215, 0, 0.1)' : 
+                                index === 1 ? 'rgba(192, 192, 192, 0.1)' : 
+                                'rgba(205, 127, 50, 0.1)',
+                        border: '1px solid',
+                        borderColor: index === 0 ? 'gold' : 
+                                    index === 1 ? 'silver' : 
+                                    '#cd7f32'
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <LocalFireDepartmentIcon 
+                          sx={{ 
+                            color: index === 0 ? 'gold' : 
+                                  index === 1 ? 'silver' : 
+                                  '#cd7f32',
+                            fontSize: 24
+                          }} 
+                        />
+                        <Typography variant="h6" sx={{ color: index === 0 ? 'gold' : 
+                                                                index === 1 ? 'silver' : 
+                                                                '#cd7f32' }}>
+                          {streak.current_streak}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                          {streak.player_name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          ELO Earned: (+{streak.elo_change})
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                  {playerStreaks.slice(3).map((streak) => (
+                    <Box
+                      key={streak.player_id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        p: 1,
+                        mb: 1,
+                        borderRadius: 1,
+                        '&:hover': {
+                          backgroundColor: 'action.hover'
+                        }
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <LocalFireDepartmentIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                        <Typography variant="body1" color="text.secondary">
+                          {streak.current_streak}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body1">
+                          {streak.player_name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          ELO Earned: (+{streak.elo_change})
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Paper>
+              </Box>
             </Box>
             
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>

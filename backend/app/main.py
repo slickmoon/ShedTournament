@@ -140,6 +140,50 @@ async def get_players(
 ):
     return db.query(base.Player).filter(base.Player.deleted == False).order_by(base.Player.elo.desc()).all()
 
+@api.get("/players/streaks", response_model=List[Dict])
+async def get_player_streaks(
+    db: Session = Depends(database.get_db),
+    token: dict = Depends(verify_token)
+):
+    # Get all non-deleted players
+    players = db.query(base.Player).filter(base.Player.deleted == False).all()
+    
+    player_streaks = []
+    for player in players:
+        # Get all matches involving this player
+        matches = db.query(base.Match).filter(
+            (base.Match.winner1_id == player.id) | 
+            (base.Match.winner2_id == player.id) |
+            (base.Match.loser1_id == player.id) |
+            (base.Match.loser2_id == player.id)
+        ).order_by(base.Match.timestamp.desc()).all()
+        
+        # Calculate current streak
+        current_streak = 0
+        streak_elo_change = 0
+        for match in matches:
+            # Check if player won
+            if match.winner1_id == player.id or match.winner2_id == player.id:
+                current_streak += 1
+                streak_elo_change += match.winner1_elo_change
+            else:
+                break
+        if current_streak > 1:
+            player_streaks.append({
+                "player_id": player.id,
+                "player_name": player.player_name,
+                "current_streak": current_streak,
+                "elo": player.elo,
+                "elo_change": streak_elo_change
+            })
+    
+    # Sort by streak (descending) and then by elo (descending) for tiebreaker
+    player_streaks.sort(key=lambda x: (-x["current_streak"], -x["elo"]))
+    player_streaks = player_streaks[:5]
+
+    return player_streaks
+
+
 @api.get("/players/{player_id}", response_model=PlayerResponse)
 async def get_player(
     player_id: int, 
