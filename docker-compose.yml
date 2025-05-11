@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile
       args:
         - PUBLIC_URL=/shed
-        - REACT_APP_API_URL=https://slkmn.k.vu/shedapi
+        - REACT_APP_API_URL=https://localhost:4322/shedapi
     restart: unless-stopped
     networks:
       - app-network
@@ -34,7 +34,7 @@ services:
     depends_on:
       - shed-tournament-api
     environment:
-      - BACKEND_API_URL=https://slkmn.k.vu/shedapi
+      - BACKEND_API_URL=https://localhost:4322/shedapi
       - PUBLIC_URL=/shed
     healthcheck:
       test: ["CMD", "wget", "--spider", "http://localhost:4321/shed"]
