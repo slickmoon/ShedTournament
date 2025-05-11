@@ -354,6 +354,21 @@ function App() {
                 >
             {randomText}
           </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
+              <Button 
+                variant="contained" 
+                color="primary"
+                size="large"
+                onClick={() => setOpenMatchDialog(true)}
+              >
+                Record Match Result
+              </Button>
+            </Box>
+            {statusMessage && (
+              <Typography variant="h6" sx={{ mt: 2 }}>
+                {statusMessage}
+              </Typography>
+            )}
           <div style={{ margin: '1em', textAlign: 'center' }}>
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
               {/* Main Players Section */}
@@ -522,22 +537,6 @@ function App() {
                 </Paper>
               </Box>
             </Box>
-            
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
-              <Button 
-                variant="contained" 
-                color="primary"
-                size="large"
-                onClick={() => setOpenMatchDialog(true)}
-              >
-                Record Match Result
-              </Button>
-            </Box>
-            {statusMessage && (
-              <Typography variant="h6" sx={{ mt: 2 }}>
-                {statusMessage}
-              </Typography>
-            )}
 
             <h2>Player Administration</h2>
             <Accordion>
