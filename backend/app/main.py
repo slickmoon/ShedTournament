@@ -208,13 +208,17 @@ async def record_match(
     # Get players
     winner1 = db.query(base.Player).filter(base.Player.id == match.winner1_id).first()
     loser1 = db.query(base.Player).filter(base.Player.id == match.loser1_id).first()
-    
+    print(f"winner1: {winner1}")
+    print(f"loser1: {loser1}")
+
     if not winner1 or not loser1:
         raise HTTPException(status_code=404, detail="One or both players not found")
     
     if match.is_doubles:
         winner2 = db.query(base.Player).filter(base.Player.id == match.winner2_id).first()
         loser2 = db.query(base.Player).filter(base.Player.id == match.loser2_id).first()
+        print(f"winner2: {winner2}")
+        print(f"loser2: {loser2}")
         if not winner2 or not loser2:
             raise HTTPException(status_code=404, detail="One or both players not found")
         
@@ -226,14 +230,19 @@ async def record_match(
         # Validate singles match
         if winner1.id == loser1.id:
             raise HTTPException(status_code=400, detail="Cannot record match against self")
+    
     original_winner1_elo = winner1.elo
     original_loser1_elo = loser1.elo
     original_winner2_elo = 0
     original_loser2_elo = 0
+    print(f"original_winner1_elo: {original_winner1_elo}")
+    print(f"original_loser1_elo: {original_loser1_elo}")
     # Calculate new ELO ratings
     if match.is_doubles:
         original_winner2_elo = winner2.elo
         original_loser2_elo = loser2.elo
+        print(f"original_winner2_elo: {original_winner2_elo}")
+        print(f"original_loser2_elo: {original_loser2_elo}")
         # For doubles, average the ELO ratings of each team
         team1_elo = (winner1.elo + winner2.elo) / 2
         team2_elo = (loser1.elo + loser2.elo) / 2
