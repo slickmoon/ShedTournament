@@ -20,17 +20,19 @@ export const randomTexts = [
     "Next camp when??",
     "Hey I’m trying to eat lunch here",
     "That's game Hendrix!",
-    "You know what Wednesday rhymes with? Drugs!",
-    "Imagine I'm the ant in a microwave"
+    "Imagine I'm the ant in a microwave",
+    "If you're reading this, tell my wife I said 'Hello'"
   ];
 export const wednesdayTexts = [ 
     "It's Wednesday my dudes",
     "Beau's Last Chance",
     "!CRIKEY!",
     "Are you winning son?",
-    "If you won trivia this week you are directed to take rip of the bingus",
+    "If you won trivia this week, take a rip of the bingus",
     "Perhaps a lil ramekin on this fine weeknight?",
-    "If you lost trivia this week you are directed to take a rip of the bingus",
+    "If you lost trivia this week, take a rip of the bingus",
+    "If you didn't go to trivia this week, take a rip of the bingus",
     "Trivia, I hardly knew 'er",
-    "The shed feels Holmes alone without you"
+    "The shed feels Holmes alone without you",
+    "You know what Wednesday rhymes with? Drugs!"
 ];
