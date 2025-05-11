@@ -1,6 +1,6 @@
 export const randomTexts = [
     "Chandon??",
-    "|| || || |_",
+    "| || || |_",
     "Better than a pizza dog",
     "The Norwood Eye",
     "!CRIKEY!",
@@ -14,6 +14,14 @@ export const randomTexts = [
     "Is your refridgerator running?",
     "Beau's Last Chance",
     "How about a lil rip of the bingus?",
-    "The Spins help me spin"
-
+    "The Spins help me spin",
+    "Shed is love",
+    "Heaven is a Shed on earth",
+    "Quick game of pool?",
+    "Let's break some records",
+    "Next camp when??",
+    "Hey I’m trying to eat lunch here",
+    "That's game Hendrix!",
+    "You know what Wednesday rhymes with? Drugs!",
+    "Imagine I'm the ant in a microwave"
   ];
