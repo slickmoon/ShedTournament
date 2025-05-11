@@ -105,8 +105,11 @@ class AuditLogResponse(BaseModel):
         orm_mode = True
 
 class MatchRequest(BaseModel):
-    winner_id: int
-    loser_id: int
+    is_doubles: bool = False
+    winner1_id: int
+    winner2_id: Optional[int] = None
+    loser1_id: int
+    loser2_id: Optional[int] = None
 
 @api.get("/")
 async def root():
@@ -196,44 +199,138 @@ async def record_match(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
+    # Validate doubles match
+    if match.is_doubles and (match.winner2_id is None or match.loser2_id is None):
+        raise HTTPException(status_code=400, detail="Doubles match requires both winner2_id and loser2_id")
+    if not match.is_doubles and (match.winner2_id is not None or match.loser2_id is not None):
+        raise HTTPException(status_code=400, detail="Singles match cannot have winner2_id or loser2_id")
+
     # Get players
-    winner = db.query(base.Player).filter(base.Player.id == match.winner_id).first()
-    loser = db.query(base.Player).filter(base.Player.id == match.loser_id).first()
-    if winner.id == loser.id:
-        raise HTTPException(status_code=400, detail="Cannot record match against self")
-    if not winner or not loser:
+    winner1 = db.query(base.Player).filter(base.Player.id == match.winner1_id).first()
+    loser1 = db.query(base.Player).filter(base.Player.id == match.loser1_id).first()
+    
+    if not winner1 or not loser1:
         raise HTTPException(status_code=404, detail="One or both players not found")
     
+    if match.is_doubles:
+        winner2 = db.query(base.Player).filter(base.Player.id == match.winner2_id).first()
+        loser2 = db.query(base.Player).filter(base.Player.id == match.loser2_id).first()
+        if not winner2 or not loser2:
+            raise HTTPException(status_code=404, detail="One or both players not found")
+        
+        # Validate no duplicate players in doubles
+        player_ids = {match.winner1_id, match.winner2_id, match.loser1_id, match.loser2_id}
+        if len(player_ids) != 4:
+            raise HTTPException(status_code=400, detail="Duplicate players not allowed in doubles match")
+    else:
+        # Validate singles match
+        if winner1.id == loser1.id:
+            raise HTTPException(status_code=400, detail="Cannot record match against self")
+    original_winner1_elo = winner1.elo
+    original_loser1_elo = loser1.elo
+    original_winner2_elo = 0
+    original_loser2_elo = 0
     # Calculate new ELO ratings
-    new_winner_elo, new_loser_elo = elo.calculate_new_ratings(winner.elo, loser.elo)
-    original_winner_elo = winner.elo
-    original_loser_elo = loser.elo
-    # Update player ratings
-    winner.elo = new_winner_elo
-    loser.elo = new_loser_elo
-    
-    # Create audit log
-    audit_log = base.AuditLog(
-        log=f"Match recorded: {winner.player_name} ({winner.elo}) defeated {loser.player_name} ({loser.elo})"
-    )
+    if match.is_doubles:
+        original_winner2_elo = winner2.elo
+        original_loser2_elo = loser2.elo
+        # For doubles, average the ELO ratings of each team
+        team1_elo = (winner1.elo + winner2.elo) / 2
+        team2_elo = (loser1.elo + loser2.elo) / 2
+        new_team1_elo, new_team2_elo = elo.calculate_new_ratings(team1_elo, team2_elo)
+        
+        # Calculate individual changes
+        elo_diff1 = new_team1_elo - team1_elo
+        elo_diff2 = new_team2_elo - team2_elo
+        
+        # Update player ratings
+        winner1.elo = int(winner1.elo + elo_diff1)
+        winner2.elo = int(winner2.elo + elo_diff1)
+        loser1.elo = int(loser1.elo + elo_diff2)
+        loser2.elo = int(loser2.elo + elo_diff2)
+        
+        # Create match record
+        match_record = base.Match(
+            is_doubles=True,
+            winner1_id=winner1.id,
+            winner2_id=winner2.id,
+            winner1_starting_elo=original_winner1_elo,
+            winner2_starting_elo=original_winner2_elo,
+            winner1_elo_change=elo_diff1,
+            winner2_elo_change=elo_diff1,
+            loser1_id=loser1.id,
+            loser2_id=loser2.id,
+            loser1_starting_elo=original_loser1_elo,
+            loser2_starting_elo=original_loser2_elo,
+            loser1_elo_change=elo_diff2,
+            loser2_elo_change=elo_diff2
+        )
+        db.add(match_record)
+        
+        # Create audit log
+        audit_log = base.AuditLog(
+            log=f"Doubles match recorded: {winner1.player_name} & {winner2.player_name} defeated {loser1.player_name} & {loser2.player_name}"
+        )
+    else:
+        # Singles match
+        new_winner_elo, new_loser_elo = elo.calculate_new_ratings(winner1.elo, loser1.elo)
+        
+        # Update player ratings
+        winner1.elo = new_winner_elo
+        loser1.elo = new_loser_elo
+        
+        # Create match record
+        match_record = base.Match(
+            is_doubles=False,
+            winner1_id=winner1.id,
+            winner1_starting_elo=original_winner1_elo,
+            winner1_elo_change=new_winner_elo - original_winner1_elo,
+            loser1_id=loser1.id,
+            loser1_starting_elo=original_loser1_elo,
+            loser1_elo_change=new_loser_elo - original_loser1_elo
+        )
+        db.add(match_record)
+        
+        # Create audit log
+        audit_log = base.AuditLog(
+            log=f"Match recorded: {winner1.player_name} ({winner1.elo}) defeated {loser1.player_name} ({loser1.elo})"
+        )
     
     # Save changes
     db.add(audit_log)
     db.commit()
     
-    return {
+    # Prepare response
+    response = {
         "message": "Match recorded successfully",
-        "winner": {
-            "id": winner.id,
-            "name": winner.player_name,
-            "new_elo": winner.elo,
-            "elo_change": winner.elo - original_winner_elo 
-        },
-        "loser": {
-            "id": loser.id,
-            "name": loser.player_name,
-            "new_elo": loser.elo,
-            "elo_change": loser.elo - original_loser_elo
-        }
+        "is_doubles": match.is_doubles,
+        "winners": [{
+            "id": winner1.id,
+            "name": winner1.player_name,
+            "new_elo": winner1.elo,
+            "elo_change": winner1.elo - original_winner1_elo
+        }],
+        "losers": [{
+            "id": loser1.id,
+            "name": loser1.player_name,
+            "new_elo": loser1.elo,
+            "elo_change": loser1.elo - original_loser1_elo
+        }]
     }
+    
+    if match.is_doubles:
+        response["winners"].append({
+            "id": winner2.id,
+            "name": winner2.player_name,
+            "new_elo": winner2.elo,
+            "elo_change": winner2.elo - original_winner2_elo
+        })
+        response["losers"].append({
+            "id": loser2.id,
+            "name": loser2.player_name,
+            "new_elo": loser2.elo,
+            "elo_change": loser2.elo - original_loser2_elo
+        })
+    
+    return response
 

@@ -48,6 +48,9 @@ function App() {
   const [winner, setWinner] = useState<string>('');
   const [loser, setLoser] = useState<string>('');
   const [randomText, setRandomText] = useState<string>('');
+  const [isDoubles, setIsDoubles] = useState(false);
+  const [winner2, setWinner2] = useState<string>('');
+  const [loser2, setLoser2] = useState<string>('');
 
   // Load initial data and check token
   useEffect(() => {
@@ -171,49 +174,103 @@ function App() {
 
   const recordMatch = async () => {
     try {
-      const winnerPlayer = players.find(p => p.player_name === winner);
-      const loserPlayer = players.find(p => p.player_name === loser);
+      const winner1Player = players.find(p => p.player_name === winner);
+      const loser1Player = players.find(p => p.player_name === loser);
       
-      if (!winnerPlayer || !loserPlayer) {
+      if (!winner1Player || !loser1Player) {
         setMatchError('Please select both winner and loser');
         return;
       }
 
-      if (winnerPlayer.id == loserPlayer.id) {
-        setMatchError('Winner and loser cannot be the same player');
-        return;
-      }
+      if (isDoubles) {
+        const winner2Player = players.find(p => p.player_name === winner2);
+        const loser2Player = players.find(p => p.player_name === loser2);
+        
+        if (!winner2Player || !loser2Player) {
+          setMatchError('Please select all players for doubles match');
+          return;
+        }
 
-      const response = await fetch(`${API_BASE_URL}/record-match`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          winner_id: winnerPlayer.id,
-          loser_id: loserPlayer.id
-        })
-      });
+        // Check for duplicate players
+        const playerIds = new Set([winner1Player.id, winner2Player.id, loser1Player.id, loser2Player.id]);
+        if (playerIds.size !== 4) {
+          setMatchError('Duplicate players not allowed in doubles match');
+          return;
+        }
 
-      if (response.ok) {
-        const data = await response.json();
-        setStatusMessage(
-          <Box>
-            <Typography>Match recorded successfully</Typography>
-            <Typography>
-              <Typography component="span" color="success.main">{winnerPlayer.player_name} (+{data.winner.elo_change})</Typography>
-              {' '}beat{' '}
-              <Typography component="span" color="error.main">{loserPlayer.player_name} ({data.loser.elo_change})</Typography>
-            </Typography>
-          </Box>
-        );
-        listPlayers();
-        listAuditLog();
-        setOpenMatchDialog(false);
-        setWinner('');
-        setLoser('');
-        setMatchError('');
+        const response = await fetch(`${API_BASE_URL}/record-match`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({
+            is_doubles: true,
+            winner1_id: winner1Player.id,
+            winner2_id: winner2Player.id,
+            loser1_id: loser1Player.id,
+            loser2_id: loser2Player.id
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setStatusMessage(
+            <Box>
+              <Typography>Doubles match recorded successfully</Typography>
+              <Typography>
+                <Typography component="span" color="success.main">
+                  {winner1Player.player_name}  (+{data.winner1.elo_change}) & {winner2Player.player_name} (+{data.winner2.elo_change})
+                </Typography>
+                {' '}beat{' '}
+                <Typography component="span" color="error.main">
+                  {loser1Player.player_name} ({data.loser1.elo_change}) & {loser2Player.player_name} ({data.loser2.elo_change})
+                </Typography>
+              </Typography>
+            </Box>
+          );
+        } else {
+          setStatusMessage('Error recording match');
+        }
       } else {
-        setStatusMessage('Error recording match');
+        if (winner1Player.id === loser1Player.id) {
+          setMatchError('Winner and loser cannot be the same player');
+          return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/record-match`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({
+            is_doubles: false,
+            winner1_id: winner1Player.id,
+            loser1_id: loser1Player.id
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setStatusMessage(
+            <Box>
+              <Typography>Match recorded successfully</Typography>
+              <Typography>
+                <Typography component="span" color="success.main">{winner1Player.player_name} (+{data.winner1.elo_change})</Typography>
+                {' '}beat{' '}
+                <Typography component="span" color="error.main">{loser1Player.player_name} ({data.loser1.elo_change})</Typography>
+              </Typography>
+            </Box>
+          );
+        } else {
+          setStatusMessage('Error recording match');
+        }
       }
+
+      listPlayers();
+      listAuditLog();
+      setOpenMatchDialog(false);
+      setWinner('');
+      setLoser('');
+      setWinner2('');
+      setLoser2('');
+      setIsDoubles(false);
+      setMatchError('');
     } catch (error) {
       setStatusMessage(`Error recording match: ${error}`);
     }
@@ -536,7 +593,7 @@ function App() {
               <AccordionDetails>
                 <Box id="auditlog">
                   {auditlog.map((log) => (
-                    <Typography key={log.id}>{log.timestamp} - {log.log}</Typography>
+                    <Typography key={log.id}>{new Date(log.timestamp).toLocaleString('en-AU', { timeZone: 'Australia/Sydney', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/\//g, '/').replace(',', ' -')} - {log.log}</Typography>
                   ))}
                 </Box>
               </AccordionDetails>
@@ -545,32 +602,84 @@ function App() {
             <Dialog open={openMatchDialog} onClose={() => setOpenMatchDialog(false)}>
               <DialogTitle>Record Match Outcome</DialogTitle>
               <DialogContent>
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <h2>Winner</h2>
-                  <Select
-                    value={winner}
-                    onChange={(e) => setWinner(e.target.value)}
-                    label="Winner"
-                  >
-                    {players.map((player) => (
-                      <MenuItem key={player.id} value={player.player_name}>
-                        {player.player_name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  <br />
-                  <h2>Loser</h2>
-                  <Select
-                    value={loser}
-                    onChange={(e) => setLoser(e.target.value)}
-                    label="Loser"
-                  >
-                    {players.map((player) => (
-                      <MenuItem key={player.id} value={player.player_name}>
-                        {player.player_name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography>Match Type:</Typography>
+                    <Button
+                      variant={isDoubles ? "contained" : "outlined"}
+                      onClick={() => setIsDoubles(true)}
+                    >
+                      Doubles
+                    </Button>
+                    <Button
+                      variant={!isDoubles ? "contained" : "outlined"}
+                      onClick={() => setIsDoubles(false)}
+                    >
+                      Singles
+                    </Button>
+                  </Box>
+
+                  <Box>
+                    <Typography variant="h6">Winners</Typography>
+                    <Select
+                      value={winner}
+                      onChange={(e) => setWinner(e.target.value)}
+                      label="Winner 1"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                    >
+                      {players.map((player) => (
+                        <MenuItem key={player.id} value={player.player_name}>
+                          {player.player_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {isDoubles && (
+                      <Select
+                        value={winner2}
+                        onChange={(e) => setWinner2(e.target.value)}
+                        label="Winner 2"
+                        fullWidth
+                      >
+                        {players.map((player) => (
+                          <MenuItem key={player.id} value={player.player_name}>
+                            {player.player_name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  </Box>
+
+                  <Box>
+                    <Typography variant="h6">Losers</Typography>
+                    <Select
+                      value={loser}
+                      onChange={(e) => setLoser(e.target.value)}
+                      label="Loser 1"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                    >
+                      {players.map((player) => (
+                        <MenuItem key={player.id} value={player.player_name}>
+                          {player.player_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {isDoubles && (
+                      <Select
+                        value={loser2}
+                        onChange={(e) => setLoser2(e.target.value)}
+                        label="Loser 2"
+                        fullWidth
+                      >
+                        {players.map((player) => (
+                          <MenuItem key={player.id} value={player.player_name}>
+                            {player.player_name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  </Box>
                 </Box>
               </DialogContent>
               <DialogActions>
@@ -578,14 +687,17 @@ function App() {
                   setOpenMatchDialog(false);
                   setWinner('');
                   setLoser('');
+                  setWinner2('');
+                  setLoser2('');
+                  setIsDoubles(false);
                   setMatchError('');
                 }}>Cancel</Button>
                 <Button onClick={recordMatch} variant="contained">Record Match</Button>
               </DialogActions>
               {matchError && (
-                    <Typography variant="h6" sx={{ mt: 2 , color: 'red'}}>
-                      {matchError}
-                    </Typography>
+                <Typography variant="h6" sx={{ mt: 2, color: 'red', px: 2, pb: 2 }}>
+                  {matchError}
+                </Typography>
               )}
             </Dialog>
           </div>

@@ -1,6 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from datetime import datetime
 
 Base = declarative_base()
@@ -18,6 +19,31 @@ class Player(Base):
     id = Column(Integer, primary_key=True, index=True)
     player_name = Column(String, unique=True, index=True)
     elo = Column(Integer, default=1000)  # Default ELO rating
+
+class Match(Base):
+    __tablename__ = "matches"
+
+    id = Column(Integer, primary_key=True, index=True)
+    is_doubles = Column(Boolean, default=False)
+    winner1_id = Column(Integer, ForeignKey('players.id'))
+    winner2_id = Column(Integer, ForeignKey('players.id'), nullable=True)
+    winner1_starting_elo = Column(Integer, default=0)
+    winner2_starting_elo = Column(Integer, default=0, nullable=True)
+    winner1_elo_change = Column(Integer, default=0)
+    winner2_elo_change = Column(Integer, default=0, nullable=True)
+    loser1_id = Column(Integer, ForeignKey('players.id'))
+    loser2_id = Column(Integer, ForeignKey('players.id'), nullable=True)
+    loser1_starting_elo = Column(Integer, default=0)
+    loser2_starting_elo = Column(Integer, default=0, nullable=True)
+    loser1_elo_change = Column(Integer, default=0)
+    loser2_elo_change = Column(Integer, default=0, nullable=True)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    winner1 = relationship("Player", foreign_keys=[winner1_id])
+    winner2 = relationship("Player", foreign_keys=[winner2_id])
+    loser1 = relationship("Player", foreign_keys=[loser1_id])
+    loser2 = relationship("Player", foreign_keys=[loser2_id])
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"
