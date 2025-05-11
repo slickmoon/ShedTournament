@@ -212,6 +212,8 @@ function App() {
 
         if (response.ok) {
           const data = await response.json();
+          console.log(data);
+          console.log("writing message");
           setStatusMessage(
             <Box>
               <Typography>Doubles match recorded successfully</Typography>
@@ -226,6 +228,7 @@ function App() {
               </Typography>
             </Box>
           );
+          console.log("finish writing message");
         } else {
           setStatusMessage('Error recording match');
         }
