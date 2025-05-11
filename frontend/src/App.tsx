@@ -212,23 +212,20 @@ function App() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
-          console.log("writing message");
           setStatusMessage(
             <Box>
               <Typography>Doubles match recorded successfully</Typography>
               <Typography>
                 <Typography component="span" color="success.main">
-                  {winner1Player.player_name}  (+{data.winner1.elo_change}) & {winner2Player.player_name} (+{data.winner2.elo_change})
+                  {winner1Player.player_name}  (+{data.winners[0].elo_change}) & {winner2Player.player_name} (+{data.winners[1].elo_change})
                 </Typography>
                 {' '}beat{' '}
                 <Typography component="span" color="error.main">
-                  {loser1Player.player_name} ({data.loser1.elo_change}) & {loser2Player.player_name} ({data.loser2.elo_change})
+                  {loser1Player.player_name} ({data.losers[0].elo_change}) & {loser2Player.player_name} ({data.losers[1].elo_change})
                 </Typography>
               </Typography>
             </Box>
           );
-          console.log("finish writing message");
         } else {
           setStatusMessage('Error recording match');
         }
@@ -254,9 +251,9 @@ function App() {
             <Box>
               <Typography>Match recorded successfully</Typography>
               <Typography>
-                <Typography component="span" color="success.main">{winner1Player.player_name} (+{data.winner1.elo_change})</Typography>
+                <Typography component="span" color="success.main">{winner1Player.player_name} (+{data.winners[0].elo_change})</Typography>
                 {' '}beat{' '}
-                <Typography component="span" color="error.main">{loser1Player.player_name} ({data.loser1.elo_change})</Typography>
+                <Typography component="span" color="error.main">{loser1Player.player_name} ({data.losers[0].elo_change})</Typography>
               </Typography>
             </Box>
           );
