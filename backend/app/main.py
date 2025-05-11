@@ -138,7 +138,7 @@ async def get_players(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    return db.query(base.Player).order_by(base.Player.elo.desc()).all()
+    return db.query(base.Player).filter(base.Player.deleted == False).order_by(base.Player.elo.desc()).all()
 
 @api.get("/players/{player_id}", response_model=PlayerResponse)
 async def get_player(
@@ -146,7 +146,7 @@ async def get_player(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    player = db.query(base.Player).filter(base.Player.id == player_id).first()
+    player = db.query(base.Player).filter(base.Player.id == player_id, base.Player.deleted == False).first()
     if player is None:
         raise HTTPException(status_code=404, detail="Player not found")
     return player
@@ -158,9 +158,13 @@ async def update_player(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    db_player = db.query(base.Player).filter(base.Player.id == player_id).first()
+    db_player = db.query(base.Player).filter(base.Player.id == player_id, base.Player.deleted == False).first()
     if db_player is None:
         raise HTTPException(status_code=404, detail="Player not found")
+    
+    if db_player.deleted:
+        raise HTTPException(status_code=400, detail="Cannot update a deleted player")
+    
     db_player.player_name = player.player_name
     db_player.elo = player.player_elo
     audit_log = base.AuditLog(log=f"Player {player.player_name} updated")
@@ -174,10 +178,15 @@ async def delete_player(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    player = db.query(base.Player).filter(base.Player.id == player_id).first()
+    player = db.query(base.Player).filter(base.Player.id == player_id, base.Player.deleted == False).first()
     if player is None:
         raise HTTPException(status_code=404, detail="Player not found")
-    db.delete(player)
+    
+    # Soft delete the player
+    player.deleted = True
+    player.deleted_at = datetime.now()
+    
+    # Create audit log
     audit_log = base.AuditLog(log=f"Player {player.player_name} deleted")
     db.add(audit_log)
     db.commit()
@@ -206,17 +215,17 @@ async def record_match(
         raise HTTPException(status_code=400, detail="Singles match cannot have winner2_id or loser2_id")
 
     # Get players
-    winner1 = db.query(base.Player).filter(base.Player.id == match.winner1_id).first()
-    loser1 = db.query(base.Player).filter(base.Player.id == match.loser1_id).first()
+    winner1 = db.query(base.Player).filter(base.Player.id == match.winner1_id, base.Player.deleted == False).first()
+    loser1 = db.query(base.Player).filter(base.Player.id == match.loser1_id, base.Player.deleted == False).first()
     
     if not winner1 or not loser1:
-        raise HTTPException(status_code=404, detail="One or both players not found")
+        raise HTTPException(status_code=404, detail="One or both players not found or have been deleted")
     
     if match.is_doubles:
-        winner2 = db.query(base.Player).filter(base.Player.id == match.winner2_id).first()
-        loser2 = db.query(base.Player).filter(base.Player.id == match.loser2_id).first()
+        winner2 = db.query(base.Player).filter(base.Player.id == match.winner2_id, base.Player.deleted == False).first()
+        loser2 = db.query(base.Player).filter(base.Player.id == match.loser2_id, base.Player.deleted == False).first()
         if not winner2 or not loser2:
-            raise HTTPException(status_code=404, detail="One or both players not found")
+            raise HTTPException(status_code=404, detail="One or both players not found or have been deleted")
         
         # Validate no duplicate players in doubles
         player_ids = {match.winner1_id, match.winner2_id, match.loser1_id, match.loser2_id}
