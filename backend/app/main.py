@@ -140,7 +140,7 @@ async def get_players(
 ):
     return db.query(base.Player).filter(base.Player.deleted == False).order_by(base.Player.elo.desc()).all()
 
-@api.get("/players/streaks", response_model=List[Dict])
+@api.get("/players/streaks", response_model=List[dict])
 async def get_player_streaks(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
