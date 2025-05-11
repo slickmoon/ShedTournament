@@ -7,7 +7,7 @@ import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
-import { randomTexts } from './data/shed-quotes.ts';
+import { randomTexts, wednesdayTexts } from './data/shed-quotes.ts';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -70,7 +70,11 @@ function App() {
     }
     setLoading(false);
     // Set random text on initial load
-    setRandomText(randomTexts[Math.floor(Math.random() * randomTexts.length)]);
+    if (new Date().getDay() === 3) {
+      setRandomText(wednesdayTexts[Math.floor(Math.random() * wednesdayTexts.length)]);
+    } else {
+      setRandomText(randomTexts[Math.floor(Math.random() * randomTexts.length)]);
+    }
   }, []);
 
   // Load players and audit log when token is available

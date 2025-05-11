@@ -3,7 +3,6 @@ export const randomTexts = [
     "| || || |_",
     "Better than a pizza dog",
     "The Norwood Eye",
-    "!CRIKEY!",
     "I'll get you next time Beer Baron!",
     "I call the big one 'Bitey'",
     "I'm not like the other girls",
@@ -12,7 +11,6 @@ export const randomTexts = [
     "Darts? Darts.",
     "How many goon bags can you count in the shed right now?",
     "Is your refridgerator running?",
-    "Beau's Last Chance",
     "How about a lil rip of the bingus?",
     "The Spins help me spin",
     "Shed is love",
@@ -25,3 +23,14 @@ export const randomTexts = [
     "You know what Wednesday rhymes with? Drugs!",
     "Imagine I'm the ant in a microwave"
   ];
+export const wednesdayTexts = [ 
+    "It's Wednesday my dudes",
+    "Beau's Last Chance",
+    "!CRIKEY!",
+    "Are you winning son?",
+    "If you won trivia this week you are directed to take rip of the bingus",
+    "Perhaps a lil ramekin on this fine weeknight?",
+    "If you lost trivia this week you are directed to take a rip of the bingus",
+    "Trivia, I hardly knew 'er",
+    "The shed feels Holmes alone without you"
+];
