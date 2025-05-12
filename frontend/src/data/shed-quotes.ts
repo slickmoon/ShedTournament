@@ -21,8 +21,22 @@ export const randomTexts = [
     "Hey I’m trying to eat lunch here",
     "That's game Hendrix!",
     "Imagine I'm the ant in a microwave",
-    "If you're reading this, tell my wife I said 'Hello'"
-  ];
+    "If you're reading this, tell my wife I said 'Hello'",
+    "I think I'm gonna... I think I'm gonna... zig-a-zig ahhhhh",
+    "Time to overclock my vape",
+    "....Picking back up from where we left off last time...",
+    "*yells loudly*",
+    "Let me honk on that bobo",
+    "'Pub rules!'",
+    "'Grace Mahoney!'",
+    "cum?",
+    "👀",
+    "🍆💦",
+    "💯 that's the real good shit 💯",
+    "💦🍑",
+    "'I love backshots!'"
+];
+
 export const wednesdayTexts = [ 
     "It's Wednesday my dudes",
     "Beau's Last Chance",
@@ -34,5 +48,6 @@ export const wednesdayTexts = [
     "If you didn't go to trivia this week, take a rip of the bingus",
     "Trivia, I hardly knew 'er",
     "The shed feels Holmes alone without you",
-    "You know what Wednesday rhymes with? Drugs!"
+    "You know what Wednesday rhymes with? Drugs!",
+    "Kick-ons to the shed!"
 ];
