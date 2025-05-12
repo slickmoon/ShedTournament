@@ -346,7 +346,7 @@ function App() {
                   </Button>
                 </Box>
 
-                <Typography 
+          <Typography 
                   variant="h5" 
                   sx={{ 
                     textAlign: 'center', 
@@ -355,22 +355,22 @@ function App() {
                     color: 'text.secondary'
                   }}
                 >
-                  {randomText}
-                </Typography>
+            {randomText}
+          </Typography>
 
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
-                  <Button 
-                    variant="contained" 
-                    color="primary"
-                    size="large"
-                    onClick={() => setOpenMatchDialog(true)}
-                  >
-                    Record Match Result
-                  </Button>
-                </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
+              <Button 
+                variant="contained" 
+                color="primary"
+                size="large"
+                onClick={() => setOpenMatchDialog(true)}
+              >
+                Record Match Result
+              </Button>
+            </Box>
 
-                <div style={{ margin: '1em', textAlign: 'center' }}>
-                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
+          <div style={{ margin: '1em', textAlign: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
                     <PlayerPodium players={players} />
                     <PlayerStreaks playerStreaks={playerStreaks} />
                   </Box>
@@ -392,13 +392,13 @@ function App() {
                 <MatchDialog
                   open={openMatchDialog}
                   onClose={() => {
-                    setOpenMatchDialog(false);
-                    setWinner('');
-                    setLoser('');
-                    setWinner2('');
-                    setLoser2('');
-                    setIsDoubles(false);
-                    setMatchError('');
+                  setOpenMatchDialog(false);
+                  setWinner('');
+                  setLoser('');
+                  setWinner2('');
+                  setLoser2('');
+                  setIsDoubles(false);
+                  setMatchError('');
                   }}
                   onRecordMatch={recordMatch}
                   players={players}
@@ -414,7 +414,7 @@ function App() {
                   setLoser2={setLoser2}
                   matchError={matchError}
                 />
-              </div>
+          </div>
             } />
           </Routes>
         </Router>
