@@ -1,0 +1,187 @@
+import React, { useState } from 'react';
+import { Box, Button, TextField, Select, MenuItem, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
+interface Player {
+  id: number;
+  player_name: string;
+  elo: number;
+}
+
+interface PlayerAdminProps {
+  players: Player[];
+  onAddPlayer: (playerName: string) => void;
+  onDeletePlayer: (playerId: number) => void;
+  onUpdatePlayer: (playerId: number, playerName: string, newElo: number) => void;
+  statusMessage: string | React.ReactNode;
+  updatePlayerMessage: string | React.ReactNode;
+}
+
+const PlayerAdmin: React.FC<PlayerAdminProps> = ({
+  players,
+  onAddPlayer,
+  onDeletePlayer,
+  onUpdatePlayer,
+  statusMessage,
+  updatePlayerMessage
+}) => {
+  const [selectedPlayer, setSelectedPlayer] = useState<string>('');
+  const [selectedUpdatePlayer, setSelectedUpdatePlayer] = useState<string>('');
+  const [selectedPlayerUpdateName, setSelectedPlayerUpdateName] = useState<string>('');
+  const [selectedPlayerUpdateElo, setSelectedPlayerUpdateElo] = useState<number>(1000);
+
+  return (
+    <>
+      <h2>Player Administration</h2>
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography>Add/Delete Players</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', md: 'row' },
+            justifyContent: 'center', 
+            gap: 4, 
+            mb: 3,
+            '& > *': {
+              mb: { xs: 4, md: 0 }
+            }
+          }}>
+            <Box sx={{ textAlign: 'center', width: { xs: '100%', md: 'auto' } }}>
+              <h2>Add Player</h2>
+              <TextField id="player-name-input" label="Player Name" variant="outlined" InputLabelProps={{ shrink: true }} fullWidth />
+              <Box sx={{ mt: 2 }}>
+                <Button 
+                  variant="contained"
+                  onClick={() => {
+                    const playerNameInput = document.getElementById('player-name-input') as HTMLInputElement;
+                    if (playerNameInput.value) {
+                      onAddPlayer(playerNameInput.value);
+                    }
+                  }}
+                >
+                  Add player
+                </Button>
+              </Box>
+            </Box>
+
+            <Box sx={{ textAlign: 'center', width: { xs: '100%', md: 'auto' } }}>
+              <h2>Delete Player</h2>
+              <Select
+                id="player-delete-input"
+                label="Player Name"
+                variant="outlined"
+                value={selectedPlayer}
+                onChange={(e) => setSelectedPlayer(e.target.value)}
+                sx={{ minWidth: { xs: '100%', md: 200 } }}
+                fullWidth
+              >
+                {players.map((player) => (
+                  <MenuItem key={player.id} value={player.player_name}>
+                    {player.player_name}
+                  </MenuItem>
+                ))}
+              </Select>
+              <Box sx={{ mt: 2 }}>
+                <Button
+                  variant="contained"
+                  color="error" 
+                  onClick={() => {
+                    const player = players.find(p => p.player_name.toLowerCase() === selectedPlayer.toLowerCase());
+                    if (player) {
+                      onDeletePlayer(player.id);
+                    }
+                  }}
+                >
+                  Delete player
+                </Button>
+              </Box>
+            </Box>
+
+            <Box sx={{ textAlign: 'center', width: { xs: '100%', md: 'auto' } }}>
+              <h2>Manually Update Player details</h2>
+              <Select
+                id="player-update-input"
+                label="Player Name"
+                variant="outlined"
+                value={selectedUpdatePlayer}
+                onChange={(e) => setSelectedUpdatePlayer(e.target.value)}
+                sx={{ minWidth: { xs: '100%', md: 200 } }}
+                fullWidth
+              >
+                {players.map((player) => (
+                  <MenuItem key={player.id} value={player.id} onClick={() => {
+                    const playerNameInput = document.getElementById('player-name-update-input') as HTMLInputElement;
+                    const playerEloInput = document.getElementById('player-elo-input') as HTMLInputElement;
+                    playerEloInput.value = player.elo.toString();
+                    playerNameInput.value = player.player_name;
+                    setSelectedPlayerUpdateName(player.player_name);
+                    setSelectedPlayerUpdateElo(player.elo);
+                  }}>
+                    {player.player_name}
+                  </MenuItem>
+                ))}
+              </Select>
+              <TextField 
+                id="player-id-read-only" 
+                label="Player ID" 
+                variant="outlined" 
+                value={selectedUpdatePlayer} 
+                disabled 
+                fullWidth
+                sx={{ mt: 2 }}
+              />
+              <TextField 
+                id="player-elo-input" 
+                label="New ELO" 
+                variant="outlined" 
+                InputLabelProps={{ shrink: true }} 
+                fullWidth
+                sx={{ mt: 2 }}
+              />
+              <TextField 
+                id="player-name-update-input" 
+                label="New Name" 
+                variant="outlined" 
+                InputLabelProps={{ shrink: true }} 
+                fullWidth
+                sx={{ mt: 2 }}
+              />
+              <Box sx={{ mt: 2 }}>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    const playerNameInput = document.getElementById('player-name-update-input') as HTMLInputElement;
+                    const playerEloInput = document.getElementById('player-elo-input') as HTMLInputElement;
+                    const player = players.find(p => p.id == parseInt(selectedUpdatePlayer));
+                    if (player) {
+                      onUpdatePlayer(player.id, playerNameInput.value, parseInt(playerEloInput.value));
+                      setSelectedUpdatePlayer('');
+                      playerNameInput.value = '';
+                      playerEloInput.value = '1000';
+                    }
+                  }}
+                >
+                  Update player
+                </Button>
+                {updatePlayerMessage && (
+                  <Typography variant="h6" sx={{ mt: 2 }}>
+                    {updatePlayerMessage}
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+          </Box>
+        </AccordionDetails>
+      </Accordion>
+      {statusMessage && (
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          {statusMessage}
+        </Typography>
+      )}
+    </>
+  );
+};
+
+export default PlayerAdmin; 

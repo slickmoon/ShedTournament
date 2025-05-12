@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, CssBaseline, Button, Typography, Box, TextField, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Accordion, AccordionSummary, AccordionDetails, Paper } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import { ThemeProvider, CssBaseline, Button, Typography, Box } from '@mui/material';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
 import FlyingWednesday from './components/FlyingWednesday.tsx';
+import PlayerPodium from './components/PlayerPodium.tsx';
+import PlayerStreaks from './components/PlayerStreaks.tsx';
+import PlayerAdmin from './components/PlayerAdmin.tsx';
+import AuditLog from './components/AuditLog.tsx';
+import MatchDialog from './components/MatchDialog.tsx';
 import { randomTexts, wednesdayTexts } from './data/shed-quotes.ts';
 import './App.css';
 
@@ -28,7 +31,7 @@ interface Player {
   elo: number;
 }
 
-interface AuditLog {
+interface AuditLogEntry {
   id: number;
   log: string;
   timestamp: string;
@@ -48,11 +51,7 @@ function App() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | React.ReactNode>('');
   const [updatePlayerMessage, setUpdatePlayerMessage] = useState<string | React.ReactNode>('');
-  const [selectedPlayer, setSelectedPlayer] = useState<string>('');
-  const [selectedUpdatePlayer, setSelectedUpdatePlayer] = useState<string>('');
-  const [selectedPlayerUpdateName, setSelectedPlayerUpdateName] = useState<string>('');
-  const [selectedPlayerUpdateElo, setSelectedPlayerUpdateElo] = useState<number>(0);
-  const [auditlog, setAuditLog] = useState<AuditLog[]>([]);
+  const [auditlog, setAuditLog] = useState<AuditLogEntry[]>([]);
   const [openMatchDialog, setOpenMatchDialog] = useState(false);
   const [matchError, setMatchError] = useState<string>('');
   const [winner, setWinner] = useState<string>('');
@@ -88,7 +87,6 @@ function App() {
       listPlayers();
       listAuditLog();
       listPlayerStreaks();
-      setSelectedPlayerUpdateElo(1000);
     }
   }, [token]);
 
@@ -101,19 +99,6 @@ function App() {
     setToken(null);
   };
 
-  if (loading) {
-    return null; // Or a loading spinner
-  }
-
-  if (!token) {
-    return (
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Login onLogin={handleLogin} />
-      </ThemeProvider>
-    );
-  }
-
   const addplayer = async (playerName: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/addplayer`, {
@@ -124,8 +109,8 @@ function App() {
       const data = await response.json();
       if (response.ok) {
         setStatusMessage(`Added ${playerName} successfully`);
-        listPlayers(); // Refresh the player list
-        listAuditLog(); // Refresh the audit log
+        listPlayers();
+        listAuditLog();
       } else {
         setStatusMessage(`Error adding player ${playerName}`);
       }
@@ -155,11 +140,8 @@ function App() {
       });
       if (response.ok) {
         setUpdatePlayerMessage(`Successfully updated player ${playerName} (ID: ${player_id})`);
-        setSelectedUpdatePlayer('');
-        setSelectedPlayerUpdateName('');
-        setSelectedPlayerUpdateElo(1000);
-        listPlayers(); // Refresh the player list
-        listAuditLog(); // Refresh the audit log
+        listPlayers();
+        listAuditLog();
       } else {
         setUpdatePlayerMessage(`Error updating player ${playerName} (ID: ${player_id})`);
       }
@@ -316,8 +298,8 @@ function App() {
       });
       if (response.ok) {
         setStatusMessage(`Successfully deleted player (ID: ${playerId})`);
-        listPlayers(); // Refresh the player list
-        listAuditLog(); // Refresh the audit log
+        listPlayers();
+        listAuditLog();
       } else {
         setStatusMessage(`Error deleting player (ID: ${playerId})`);
       }
@@ -325,6 +307,19 @@ function App() {
       setStatusMessage(`Error deleting player: ${error}`);
     }
   };
+
+  if (loading) {
+    return null;
+  }
+
+  if (!token) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Login onLogin={handleLogin} />
+      </ThemeProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -349,11 +344,8 @@ function App() {
                     Logout
                   </Button>
                 </Box>
-                {/* Rest of your app content */}
-              </div>
-            } />
-          </Routes>
-          <Typography 
+
+                <Typography 
                   variant="h5" 
                   sx={{ 
                     textAlign: 'center', 
@@ -362,464 +354,66 @@ function App() {
                     color: 'text.secondary'
                   }}
                 >
-            {randomText}
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
-              <Button 
-                variant="contained" 
-                color="primary"
-                size="large"
-                onClick={() => setOpenMatchDialog(true)}
-              >
-                Record Match Result
-              </Button>
-            </Box>
-            {statusMessage && (
-              <Typography variant="h6" sx={{ mt: 2 }}>
-                {statusMessage}
-              </Typography>
-            )}
-          <div style={{ margin: '1em', textAlign: 'center' }}>
-            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
-              {/* Main Players Section */}
-              <Box sx={{ flex: 1 }}>
-                <h2>Players</h2>
-                <Box sx={{ 
-                  display: 'flex', 
-                  flexDirection: { xs: 'column', md: 'row' },
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  gap: 2,
-                  mb: 4,
-                  minHeight: '200px'
-                }}>
-                  {players.slice(0, 3).map((player, index) => (
-                    <Box
-                      key={player.id}
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        order: { xs: 0, md: index === 1 ? 0 : index === 0 ? 1 : 2 },
-                        flex: { xs: 1, md: 'none' },
-                        width: { xs: '100%', md: '200px' },
-                        position: 'relative',
-                        '&::after': {
-                          content: '""',
-                          position: 'absolute',
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          height: index === 0 ? '120px' : index === 1 ? '80px' : '40px',
-                          backgroundColor: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
-                          borderRadius: '8px 8px 0 0',
-                          zIndex: 0
-                        }
-                      }}
-                    >
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          position: 'relative',
-                          zIndex: 1,
-                          mb: 1,
-                          fontWeight: 'bold',
-                          color: 'text.primary'
-                        }}
-                      >
-                        {player.player_name}
-                      </Typography>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{
-                          position: 'relative',
-                          zIndex: 1,
-                          color: 'text.secondary',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        ELO: {player.elo}
-                      </Typography>
-                      <Typography
-                        variant="h4"
-                        sx={{
-                          position: 'relative',
-                          zIndex: 1,
-                          color: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
-                          fontWeight: 'bold',
-                          mt: 1
-                        }}
-                      >
-                        #{index + 1}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-                <Box sx={{ mt: 4 }}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>Other Players</Typography>
-                  {players.slice(3).map((player) => (
-                    <Typography key={player.id} sx={{ mb: 1 }}>
-                      {player.player_name} (ELO: {player.elo})
-                    </Typography>
-                  ))}
-                </Box>
-              </Box>
-
-              {/* Streaks Panel */}
-              <Box sx={{ flex: 1 }}>
-                <h2>Current Winning Streaks</h2>
-                <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
-                  {playerStreaks.slice(0, 3).map((streak, index) => (
-                    <Box
-                      key={streak.player_id}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        p: 2,
-                        mb: 2,
-                        borderRadius: 1,
-                        bgcolor: index === 0 ? 'rgba(255, 215, 0, 0.1)' : 
-                                index === 1 ? 'rgba(192, 192, 192, 0.1)' : 
-                                'rgba(205, 127, 50, 0.1)',
-                        border: '1px solid',
-                        borderColor: index === 0 ? 'gold' : 
-                                    index === 1 ? 'silver' : 
-                                    '#cd7f32'
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <LocalFireDepartmentIcon 
-                          sx={{ 
-                            color: index === 0 ? 'gold' : 
-                                  index === 1 ? 'silver' : 
-                                  '#cd7f32',
-                            fontSize: 24
-                          }} 
-                        />
-                        <Typography variant="h6" sx={{ color: index === 0 ? 'gold' : 
-                                                                index === 1 ? 'silver' : 
-                                                                '#cd7f32' }}>
-                          {streak.current_streak}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                          {streak.player_name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          ELO Earned: (+{streak.elo_change})
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ))}
-                  {playerStreaks.slice(3).map((streak) => (
-                    <Box
-                      key={streak.player_id}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        p: 1,
-                        mb: 1,
-                        borderRadius: 1,
-                        '&:hover': {
-                          backgroundColor: 'action.hover'
-                        }
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <LocalFireDepartmentIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                        <Typography variant="body1" color="text.secondary">
-                          {streak.current_streak}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="body1">
-                          {streak.player_name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          ELO Earned: (+{streak.elo_change})
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ))}
-                </Paper>
-              </Box>
-            </Box>
-
-            <h2>Player Administration</h2>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Add/Delete Players</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Box sx={{ 
-                  display: 'flex', 
-                  flexDirection: { xs: 'column', md: 'row' }, // Stack vertically on mobile, horizontal on medium and up
-                  justifyContent: 'center', 
-                  gap: 4, 
-                  mb: 3,
-                  '& > *': { // Add margin between stacked items on mobile
-                    mb: { xs: 4, md: 0 }
-                  }
-                }}>
-                  <Box sx={{ textAlign: 'center', width: { xs: '100%', md: 'auto' } }}>
-                    <h2>Add Player</h2>
-                    <TextField id="player-name-input" label="Player Name" variant="outlined" InputLabelProps={{ shrink: true }} fullWidth />
-                    <Box sx={{ mt: 2 }}>
-                      <Button 
-                        variant="contained"
-                        onClick={() => {
-                          const playerNameInput = document.getElementById('player-name-input') as HTMLInputElement;
-                          if (playerNameInput.value) {
-                            addplayer(playerNameInput.value);
-                          } else {
-                            setStatusMessage('Please fill in a player name');
-                          }
-                        }}
-                      >
-                        Add player
-                      </Button>
-                    </Box>
-                  </Box>
-
-                  <Box sx={{ textAlign: 'center', width: { xs: '100%', md: 'auto' } }}>
-                    <h2>Delete Player</h2>
-                    <Select
-                      id="player-delete-input"
-                      label="Player Name"
-                      variant="outlined"
-                      value={selectedPlayer}
-                      onChange={(e) => setSelectedPlayer(e.target.value)}
-                      sx={{ minWidth: { xs: '100%', md: 200 } }}
-                      fullWidth
-                    >
-                      {players.map((player) => (
-                        <MenuItem key={player.id} value={player.player_name}>
-                          {player.player_name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    <Box sx={{ mt: 2 }}>
-                      <Button
-                        variant="contained"
-                        color="error" 
-                        onClick={async () => {
-                          try {
-                            const player = players.find(p => p.player_name.toLowerCase() === selectedPlayer.toLowerCase());
-                            if (!player) {
-                              setStatusMessage(`Player ${selectedPlayer} not found`);
-                              return;
-                            } else {
-                              const player_id = player.id;
-                              deletePlayer(player_id);
-                            }
-                          } catch (error) {
-                            setStatusMessage(`Error deleting player ${selectedPlayer}: ${error}`);
-                          }
-                        }}
-                      >
-                        Delete player
-                      </Button>
-                    </Box>
-                  </Box>
-
-                  <Box sx={{ textAlign: 'center', width: { xs: '100%', md: 'auto' } }}>
-                    <h2>Manually Update Player details</h2>
-                    <Select
-                      id="player-update-input"
-                      label="Player Name"
-                      variant="outlined"
-                      value={selectedUpdatePlayer}
-                      onChange={(e) => setSelectedUpdatePlayer(e.target.value)}
-                      sx={{ minWidth: { xs: '100%', md: 200 } }}
-                      fullWidth
-                    >
-                      {players.map((player) => (
-                        <MenuItem key={player.id} value={player.id} onClick={() => {
-                          const playerNameInput = document.getElementById('player-name-update-input') as HTMLInputElement;
-                          const playerEloInput = document.getElementById('player-elo-input') as HTMLInputElement;
-                          playerEloInput.value = player.elo.toString();
-                          playerNameInput.value = player.player_name;
-                          setSelectedPlayerUpdateName(player.player_name);
-                          setSelectedPlayerUpdateElo(player.elo);
-                        }}>
-                          {player.player_name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    <TextField 
-                      id="player-id-read-only" 
-                      label="Player ID" 
-                      variant="outlined" 
-                      value={selectedUpdatePlayer} 
-                      disabled 
-                      fullWidth
-                      sx={{ mt: 2 }}
-                    />
-                    <TextField 
-                      id="player-elo-input" 
-                      label="New ELO" 
-                      variant="outlined" 
-                      InputLabelProps={{ shrink: true }} 
-                      fullWidth
-                      sx={{ mt: 2 }}
-                    />
-                    <TextField 
-                      id="player-name-update-input" 
-                      label="New Name" 
-                      variant="outlined" 
-                      InputLabelProps={{ shrink: true }} 
-                      fullWidth
-                      sx={{ mt: 2 }}
-                    />
-                    <Box sx={{ mt: 2 }}>
-                      <Button
-                        variant="contained"
-                        onClick={() => {
-                          const playerNameInput = document.getElementById('player-name-update-input') as HTMLInputElement;
-                          const playerEloInput = document.getElementById('player-elo-input') as HTMLInputElement;
-                          const player = players.find(p => p.id == parseInt(selectedUpdatePlayer));
-                          if (player) {
-                            updatePlayer(player.id, playerNameInput.value, parseInt(playerEloInput.value));
-                            setSelectedUpdatePlayer('');
-                            playerNameInput.value = '';
-                            playerEloInput.value = '1000';
-                          } else {
-                            setUpdatePlayerMessage('No player selected to update');
-                          }
-                        }}
-                      >
-                        Update player
-                      </Button>
-                      {updatePlayerMessage && (
-                        <Typography variant="h6" sx={{ mt: 2 }}>
-                          {updatePlayerMessage}
-                        </Typography>
-                      )}
-                    </Box>
-                  </Box>
-                </Box>
-              </AccordionDetails>
-            </Accordion>
-            
-            <h2>Audit Log</h2>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>View Audit Log</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Box id="auditlog">
-                  {auditlog.map((log) => (
-                    <Typography key={log.id}>{new Date(log.timestamp).toLocaleString('en-AU', { timeZone: 'Australia/Sydney', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/\//g, '/').replace(',', ' -')} - {log.log}</Typography>
-                  ))}
-                </Box>
-              </AccordionDetails>
-            </Accordion>
-
-            <Dialog open={openMatchDialog} onClose={() => setOpenMatchDialog(false)}>
-              <DialogTitle>Record Match Outcome</DialogTitle>
-              <DialogContent>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Typography>Match Type:</Typography>
-                    <Button
-                      variant={isDoubles ? "contained" : "outlined"}
-                      onClick={() => setIsDoubles(true)}
-                    >
-                      Doubles
-                    </Button>
-                    <Button
-                      variant={!isDoubles ? "contained" : "outlined"}
-                      onClick={() => setIsDoubles(false)}
-                    >
-                      Singles
-                    </Button>
-                  </Box>
-
-                  <Box>
-                    <Typography variant="h6">Winners</Typography>
-                    <Select
-                      value={winner}
-                      onChange={(e) => setWinner(e.target.value)}
-                      label="Winner 1"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                    >
-                      {players.map((player) => (
-                        <MenuItem key={player.id} value={player.player_name}>
-                          {player.player_name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {isDoubles && (
-                      <Select
-                        value={winner2}
-                        onChange={(e) => setWinner2(e.target.value)}
-                        label="Winner 2"
-                        fullWidth
-                      >
-                        {players.map((player) => (
-                          <MenuItem key={player.id} value={player.player_name}>
-                            {player.player_name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    )}
-                  </Box>
-
-                  <Box>
-                    <Typography variant="h6">Losers</Typography>
-                    <Select
-                      value={loser}
-                      onChange={(e) => setLoser(e.target.value)}
-                      label="Loser 1"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                    >
-                      {players.map((player) => (
-                        <MenuItem key={player.id} value={player.player_name}>
-                          {player.player_name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {isDoubles && (
-                      <Select
-                        value={loser2}
-                        onChange={(e) => setLoser2(e.target.value)}
-                        label="Loser 2"
-                        fullWidth
-                      >
-                        {players.map((player) => (
-                          <MenuItem key={player.id} value={player.player_name}>
-                            {player.player_name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    )}
-                  </Box>
-                </Box>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => {
-                  setOpenMatchDialog(false);
-                  setWinner('');
-                  setLoser('');
-                  setWinner2('');
-                  setLoser2('');
-                  setIsDoubles(false);
-                  setMatchError('');
-                }}>Cancel</Button>
-                <Button onClick={recordMatch} variant="contained">Record Match</Button>
-              </DialogActions>
-              {matchError && (
-                <Typography variant="h6" sx={{ mt: 2, color: 'red', px: 2, pb: 2 }}>
-                  {matchError}
+                  {randomText}
                 </Typography>
-              )}
-            </Dialog>
-          </div>
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
+                  <Button 
+                    variant="contained" 
+                    color="primary"
+                    size="large"
+                    onClick={() => setOpenMatchDialog(true)}
+                  >
+                    Record Match Result
+                  </Button>
+                </Box>
+
+                <div style={{ margin: '1em', textAlign: 'center' }}>
+                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
+                    <PlayerPodium players={players} />
+                    <PlayerStreaks playerStreaks={playerStreaks} />
+                  </Box>
+
+                  <PlayerAdmin
+                    players={players}
+                    onAddPlayer={addplayer}
+                    onDeletePlayer={deletePlayer}
+                    onUpdatePlayer={updatePlayer}
+                    statusMessage={statusMessage}
+                    updatePlayerMessage={updatePlayerMessage}
+                  />
+
+                  <AuditLog auditLog={auditlog} />
+                </div>
+
+                <MatchDialog
+                  open={openMatchDialog}
+                  onClose={() => {
+                    setOpenMatchDialog(false);
+                    setWinner('');
+                    setLoser('');
+                    setWinner2('');
+                    setLoser2('');
+                    setIsDoubles(false);
+                    setMatchError('');
+                  }}
+                  onRecordMatch={recordMatch}
+                  players={players}
+                  isDoubles={isDoubles}
+                  setIsDoubles={setIsDoubles}
+                  winner={winner}
+                  setWinner={setWinner}
+                  loser={loser}
+                  setLoser={setLoser}
+                  winner2={winner2}
+                  setWinner2={setWinner2}
+                  loser2={loser2}
+                  setLoser2={setLoser2}
+                  matchError={matchError}
+                />
+              </div>
+            } />
+          </Routes>
         </Router>
       </ThemeProvider>
     </QueryClientProvider>
