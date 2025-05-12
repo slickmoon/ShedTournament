@@ -3,8 +3,9 @@ import styled from 'styled-components';
 
 const BouncingText = styled.div`
   position: fixed;
-  font-size: 24px;
-  color: rgba(0, 0, 0, 0.1);
+  font-size: 2rem;
+  font-weight: bold;
+  color: rgba(255, 215, 0, 0.2);
   pointer-events: none;
   user-select: none;
   z-index: -1;
@@ -14,6 +15,12 @@ const BouncingWednesday: React.FC = () => {
   const textRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef({ x: 0, y: 0 });
   const velocityRef = useRef({ x: 2, y: 2 });
+
+  const resetPosition = () => {
+    if (!textRef.current) return;
+    positionRef.current = { x: 0, y: 0 };
+    textRef.current.style.transform = 'translate(0px, 0px)';
+  };
 
   useEffect(() => {
     const animate = () => {
@@ -44,8 +51,12 @@ const BouncingWednesday: React.FC = () => {
 
     const animationId = requestAnimationFrame(animate);
 
+    // Add resize event listener
+    window.addEventListener('resize', resetPosition);
+
     return () => {
       cancelAnimationFrame(animationId);
+      window.removeEventListener('resize', resetPosition);
     };
   }, []);
 
