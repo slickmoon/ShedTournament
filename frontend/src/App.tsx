@@ -7,6 +7,7 @@ import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
+import FlyingWednesday from './components/FlyingWednesday.tsx';
 import { randomTexts, wednesdayTexts } from './data/shed-quotes.ts';
 import './App.css';
 
@@ -61,6 +62,7 @@ function App() {
   const [winner2, setWinner2] = useState<string>('');
   const [loser2, setLoser2] = useState<string>('');
   const [playerStreaks, setPlayerStreaks] = useState<PlayerStreak[]>([]);
+  const [isWednesday, setIsWednesday] = useState(false);
 
   // Load initial data and check token
   useEffect(() => {
@@ -70,7 +72,10 @@ function App() {
     }
     setLoading(false);
     // Set random text on initial load
-    if (new Date().getDay() === 3) {
+    const today = new Date();
+    const isWednesdayToday = today.getDay() === 3;
+    setIsWednesday(isWednesdayToday);
+    if (isWednesdayToday) {
       setRandomText(wednesdayTexts[Math.floor(Math.random() * wednesdayTexts.length)]);
     } else {
       setRandomText(randomTexts[Math.floor(Math.random() * randomTexts.length)]);
@@ -325,6 +330,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        {isWednesday && <FlyingWednesday />}
         <Router basename="/shed">
           <Routes>
             <Route path="/" element={
