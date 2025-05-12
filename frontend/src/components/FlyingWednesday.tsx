@@ -10,6 +10,7 @@ interface FlyingText {
 const FlyingWednesday: React.FC = () => {
   const [flyingTexts, setFlyingTexts] = useState<FlyingText[]>([]);
   const canAddText = useRef(true);
+  const timeoutsRef = useRef<number[]>([]);
 
   useEffect(() => {
     // Animation interval for moving texts
@@ -30,9 +31,11 @@ const FlyingWednesday: React.FC = () => {
           if (prevTexts.length < 20) {
             canAddText.current = false;
             // Reset the flag after 1-2 seconds
-            setTimeout(() => {
+            const timeoutId = window.setTimeout(() => {
               canAddText.current = true;
             }, 50 + Math.random() * 300); // Random delay between 0.05 and 0.3 seconds
+            
+            timeoutsRef.current.push(timeoutId);
 
             return [
               ...prevTexts,
@@ -51,6 +54,9 @@ const FlyingWednesday: React.FC = () => {
     return () => {
       clearInterval(moveInterval);
       clearInterval(generateInterval);
+      // Clear all timeouts
+      timeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
+      timeoutsRef.current = [];
     };
   }, []);
 
