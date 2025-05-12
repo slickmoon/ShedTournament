@@ -22,74 +22,61 @@ const FlyingWednesday: React.FC = () => {
   });
 
   const startTimeRef = useRef<number>(Date.now());
-  const timerRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number>();
 
   useEffect(() => {
     // Start the timer
     startTimeRef.current = Date.now();
     
-    const checkDelays = () => {
+    const animate = () => {
       const currentTime = Date.now();
       const elapsedTime = currentTime - startTimeRef.current;
 
-      setFlyingTexts(prevTexts => 
-        prevTexts.map(text => ({
-          ...text,
-          isMoving: text.initialDelay <= elapsedTime
-        }))
-      );
-
-      // Stop the timer after 5 seconds
-      if (elapsedTime >= 5000) {
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-          timerRef.current = null;
-        }
-        return;
-      }
-
-      timerRef.current = window.setTimeout(checkDelays, 16); // ~60fps
-    };
-
-    checkDelays();
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    // Animation interval for moving texts
-    const moveInterval = setInterval(() => {
       setFlyingTexts(prevTexts => {
-        return prevTexts.map(text => {
-          if (!text.isMoving) return text;
+        const newTexts = prevTexts.map(text => {
+          // Check if this text should start moving
+          if (!text.isMoving && text.initialDelay <= elapsedTime) {
+            return { ...text, isMoving: true };
+          }
 
-          const newX = text.x + 30; // Move right
-          const newY = text.y + (Math.random() - 0.5) * 2; // Slight vertical movement
+          // Only update position if the text is moving
+          if (text.isMoving) {
+            const newX = text.x + 30;
+            const newY = text.y + (Math.random() - 0.5) * 2;
 
-          // If text goes off screen, reset it to the left with new random height
-          if (newX > window.innerWidth + 200) {
+            if (newX > window.innerWidth + 200) {
+              return {
+                ...text,
+                x: -200,
+                y: Math.random() * window.innerHeight
+              };
+            }
+
             return {
               ...text,
-              x: -200,
-              y: Math.random() * window.innerHeight
+              x: newX,
+              y: newY
             };
           }
 
-          return {
-            ...text,
-            x: newX,
-            y: newY
-          };
+          return text;
         });
+
+        return newTexts;
       });
-    }, 50);
+
+      // Continue animation if any texts are still waiting to start or are moving
+      if (elapsedTime < 5000 || flyingTexts.some(text => text.isMoving)) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      clearInterval(moveInterval);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
   }, []);
 
