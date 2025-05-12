@@ -5,7 +5,7 @@ import { ThemeProvider, CssBaseline, Button, Typography, Box } from '@mui/materi
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
-import FlyingWednesday from './components/FlyingWednesday.tsx';
+import BouncingWednesday from './components/BouncingWednesday.tsx';
 import PlayerPodium from './components/PlayerPodium.tsx';
 import PlayerStreaks from './components/PlayerStreaks.tsx';
 import PlayerAdmin from './components/PlayerAdmin.tsx';
@@ -326,7 +326,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        {isWednesday && <FlyingWednesday />}
+        {isWednesday && <BouncingWednesday />}
         <Router basename="/shed">
           <Routes>
             <Route path="/" element={
