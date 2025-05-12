@@ -6,6 +6,7 @@ interface FlyingText {
   y: number;
   x: number;
   initialDelay: number;
+  isMoving: boolean;
 }
 
 const FlyingWednesday: React.FC = () => {
@@ -15,35 +16,57 @@ const FlyingWednesday: React.FC = () => {
       id: index,
       y: Math.random() * window.innerHeight,
       x: -200,
-      initialDelay: Math.random() * 2000 // Random delay between 0-2 seconds
+      initialDelay: Math.random() * 2000, // Random delay between 0-2 seconds
+      isMoving: false
     }));
   });
 
-  const [isInitialized, setIsInitialized] = useState(false);
-  const timeoutsRef = useRef<number[]>([]);
+  const startTimeRef = useRef<number>(Date.now());
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Set up initial delays for each text
-    flyingTexts.forEach(text => {
-      const timeoutId = window.setTimeout(() => {
-        setIsInitialized(true);
-      }, text.initialDelay);
-      timeoutsRef.current.push(timeoutId);
-    });
+    // Start the timer
+    startTimeRef.current = Date.now();
+    
+    const checkDelays = () => {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - startTimeRef.current;
+
+      setFlyingTexts(prevTexts => 
+        prevTexts.map(text => ({
+          ...text,
+          isMoving: text.initialDelay <= elapsedTime
+        }))
+      );
+
+      // Stop the timer after 5 seconds
+      if (elapsedTime >= 5000) {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+        return;
+      }
+
+      timerRef.current = window.setTimeout(checkDelays, 16); // ~60fps
+    };
+
+    checkDelays();
 
     return () => {
-      timeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
-      timeoutsRef.current = [];
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
     };
   }, []);
 
   useEffect(() => {
-    if (!isInitialized) return;
-
     // Animation interval for moving texts
     const moveInterval = setInterval(() => {
       setFlyingTexts(prevTexts => {
         return prevTexts.map(text => {
+          if (!text.isMoving) return text;
+
           const newX = text.x + 30; // Move right
           const newY = text.y + (Math.random() - 0.5) * 2; // Slight vertical movement
 
@@ -68,7 +91,7 @@ const FlyingWednesday: React.FC = () => {
     return () => {
       clearInterval(moveInterval);
     };
-  }, [isInitialized]);
+  }, []);
 
   return (
     <Box
@@ -107,7 +130,7 @@ const FlyingWednesday: React.FC = () => {
               userSelect: 'none',
               willChange: 'transform',
               backfaceVisibility: 'hidden',
-              opacity: isInitialized ? 1 : 0,
+              opacity: text.isMoving ? 1 : 0,
               transition: 'opacity 0.3s ease-in-out'
             }}
           >
