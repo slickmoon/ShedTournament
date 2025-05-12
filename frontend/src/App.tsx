@@ -11,6 +11,7 @@ import PlayerStreaks from './components/PlayerStreaks.tsx';
 import PlayerAdmin from './components/PlayerAdmin.tsx';
 import AuditLog from './components/AuditLog.tsx';
 import MatchDialog from './components/MatchDialog.tsx';
+import ScrabbleGame from './components/ScrabbleGame.tsx';
 import { randomTexts, wednesdayTexts } from './data/shed-quotes.ts';
 import './App.css';
 
@@ -373,6 +374,8 @@ function App() {
                     <PlayerPodium players={players} />
                     <PlayerStreaks playerStreaks={playerStreaks} />
                   </Box>
+
+                  {isWednesday && <ScrabbleGame />}
 
                   <PlayerAdmin
                     players={players}

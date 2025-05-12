@@ -1,0 +1,22 @@
+export const scrabbleWords = [
+  "QUIZZICAL",
+  "JAZZ",
+  "PUZZLE",
+  "WHIZZ",
+  "BUZZ",
+  "FUZZ",
+  "JAZZY",
+  "QUIZ",
+  "ZEBRA",
+  "ZENITH",
+  "ZODIAC",
+  "ZOMBIE",
+  "ZONE",
+  "ZOOM",
+  "ZEST",
+  "ZERO",
+  "ZINC",
+  "ZIP",
+  "ZONE",
+  "ZOOM"
+]; 
