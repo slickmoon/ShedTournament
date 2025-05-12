@@ -16,10 +16,25 @@ const BouncingWednesday: React.FC = () => {
   const positionRef = useRef({ x: 0, y: 0 });
   const velocityRef = useRef({ x: 2, y: 2 });
 
-  const resetPosition = () => {
+  const adjustPosition = () => {
     if (!textRef.current) return;
-    positionRef.current = { x: 0, y: 0 };
-    textRef.current.style.transform = 'translate(0px, 0px)';
+    const text = textRef.current;
+    const rect = text.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    // Adjust position if text is outside bounds
+    if (positionRef.current.x < 0) positionRef.current.x = 0;
+    if (positionRef.current.y < 0) positionRef.current.y = 0;
+    if (positionRef.current.x + rect.width > windowWidth) {
+      positionRef.current.x = windowWidth - rect.width;
+    }
+    if (positionRef.current.y + rect.height > windowHeight) {
+      positionRef.current.y = windowHeight - rect.height;
+    }
+
+    // Update transform
+    text.style.transform = `translate(${positionRef.current.x}px, ${positionRef.current.y}px)`;
   };
 
   useEffect(() => {
@@ -52,11 +67,11 @@ const BouncingWednesday: React.FC = () => {
     const animationId = requestAnimationFrame(animate);
 
     // Add resize event listener
-    window.addEventListener('resize', resetPosition);
+    window.addEventListener('resize', adjustPosition);
 
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', resetPosition);
+      window.removeEventListener('resize', adjustPosition);
     };
   }, []);
 
