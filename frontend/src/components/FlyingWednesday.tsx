@@ -5,69 +5,73 @@ interface FlyingText {
   id: number;
   y: number;
   x: number;
+  initialDelay: number;
 }
 
 const FlyingWednesday: React.FC = () => {
-  const [flyingTexts, setFlyingTexts] = useState<FlyingText[]>([]);
-  const canAddText = useRef(true);
+  const [flyingTexts, setFlyingTexts] = useState<FlyingText[]>(() => {
+    // Initialize with 20 texts, each with a random initial delay
+    return Array.from({ length: 20 }, (_, index) => ({
+      id: index,
+      y: Math.random() * window.innerHeight,
+      x: -200,
+      initialDelay: Math.random() * 2000 // Random delay between 0-2 seconds
+    }));
+  });
+
+  const [isInitialized, setIsInitialized] = useState(false);
   const timeoutsRef = useRef<number[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Animation interval for moving texts
-    const moveInterval = setInterval(() => {
-      setFlyingTexts(prevTexts => {
-        const newTexts = prevTexts.map(text => ({
-          ...text,
-          x: text.x + 30, // Move right
-          y: text.y + (Math.random() - 0.5) * 2 // Slight vertical movement
-        }));
-
-        // Only keep texts that are within a reasonable range
-        return newTexts.filter(text => {
-          const isOffScreen = text.x > window.innerWidth + 200;
-          return !isOffScreen;
-        });
-      });
-    }, 50);
-
-    // Text generation interval
-    const generateInterval = setInterval(() => {
-      if (canAddText.current) {
-        setFlyingTexts(prevTexts => {
-          if (prevTexts.length < 20) {
-            canAddText.current = false;
-            const timeoutId = window.setTimeout(() => {
-              canAddText.current = true;
-            }, 50 + Math.random() * 300);
-            
-            timeoutsRef.current.push(timeoutId);
-
-            return [
-              ...prevTexts,
-              {
-                id: Date.now(),
-                y: Math.random() * window.innerHeight,
-                x: -200
-              }
-            ];
-          }
-          return prevTexts;
-        });
-      }
-    }, 100);
+    // Set up initial delays for each text
+    flyingTexts.forEach(text => {
+      const timeoutId = window.setTimeout(() => {
+        setIsInitialized(true);
+      }, text.initialDelay);
+      timeoutsRef.current.push(timeoutId);
+    });
 
     return () => {
-      clearInterval(moveInterval);
-      clearInterval(generateInterval);
       timeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
       timeoutsRef.current = [];
     };
   }, []);
 
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    // Animation interval for moving texts
+    const moveInterval = setInterval(() => {
+      setFlyingTexts(prevTexts => {
+        return prevTexts.map(text => {
+          const newX = text.x + 30; // Move right
+          const newY = text.y + (Math.random() - 0.5) * 2; // Slight vertical movement
+
+          // If text goes off screen, reset it to the left with new random height
+          if (newX > window.innerWidth + 200) {
+            return {
+              ...text,
+              x: -200,
+              y: Math.random() * window.innerHeight
+            };
+          }
+
+          return {
+            ...text,
+            x: newX,
+            y: newY
+          };
+        });
+      });
+    }, 50);
+
+    return () => {
+      clearInterval(moveInterval);
+    };
+  }, [isInitialized]);
+
   return (
     <Box
-      ref={containerRef}
       sx={{
         position: 'fixed',
         top: 0,
@@ -103,6 +107,8 @@ const FlyingWednesday: React.FC = () => {
               userSelect: 'none',
               willChange: 'transform',
               backfaceVisibility: 'hidden',
+              opacity: isInitialized ? 1 : 0,
+              transition: 'opacity 0.3s ease-in-out'
             }}
           >
             wednesday
