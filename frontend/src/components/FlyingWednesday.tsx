@@ -12,14 +12,6 @@ const FlyingWednesday: React.FC = () => {
   const canAddText = useRef(true);
 
   useEffect(() => {
-    // Create initial flying texts
-    const initialTexts = Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      y: Math.random() * window.innerHeight,
-      x: -200 // Start off-screen
-    }));
-    setFlyingTexts(initialTexts);
-
     // Animation interval for moving texts
     const moveInterval = setInterval(() => {
       setFlyingTexts(prevTexts => {
@@ -82,7 +74,7 @@ const FlyingWednesday: React.FC = () => {
             position: 'absolute',
             left: text.x,
             top: text.y,
-            color: 'rgba(255, 215, 0, 0.2)', // Semi-transparent gold
+            color: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
             fontSize: '2rem',
             fontWeight: 'bold',
             transform: 'rotate(-15deg)',
