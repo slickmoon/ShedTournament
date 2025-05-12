@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper } from '@mui/material';
-import { scrabbleWords } from '../data/scrabble_words';
+import { scrabbleWords } from '../data/scrabble_words.ts';
 
 const ScrabbleGame: React.FC = () => {
   const [currentWord, setCurrentWord] = useState<string>('');
