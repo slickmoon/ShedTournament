@@ -11,16 +11,23 @@ const FlyingWednesday: React.FC = () => {
   const [flyingTexts, setFlyingTexts] = useState<FlyingText[]>([]);
   const canAddText = useRef(true);
   const timeoutsRef = useRef<number[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Animation interval for moving texts
     const moveInterval = setInterval(() => {
       setFlyingTexts(prevTexts => {
-        return prevTexts.map(text => ({
+        const newTexts = prevTexts.map(text => ({
           ...text,
           x: text.x + 30, // Move right
           y: text.y + (Math.random() - 0.5) * 2 // Slight vertical movement
-        })).filter(text => text.x < window.innerWidth + 200); // Remove texts that have moved off-screen
+        }));
+
+        // Only keep texts that are within a reasonable range
+        return newTexts.filter(text => {
+          const isOffScreen = text.x > window.innerWidth + 200;
+          return !isOffScreen;
+        });
       });
     }, 50);
 
@@ -30,10 +37,9 @@ const FlyingWednesday: React.FC = () => {
         setFlyingTexts(prevTexts => {
           if (prevTexts.length < 20) {
             canAddText.current = false;
-            // Reset the flag after 1-2 seconds
             const timeoutId = window.setTimeout(() => {
               canAddText.current = true;
-            }, 50 + Math.random() * 300); // Random delay between 0.05 and 0.3 seconds
+            }, 50 + Math.random() * 300);
             
             timeoutsRef.current.push(timeoutId);
 
@@ -49,12 +55,11 @@ const FlyingWednesday: React.FC = () => {
           return prevTexts;
         });
       }
-    }, 100); // Check every 100ms if we can add a new text
+    }, 100);
 
     return () => {
       clearInterval(moveInterval);
       clearInterval(generateInterval);
-      // Clear all timeouts
       timeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
       timeoutsRef.current = [];
     };
@@ -62,6 +67,7 @@ const FlyingWednesday: React.FC = () => {
 
   return (
     <Box
+      ref={containerRef}
       sx={{
         position: 'fixed',
         top: 0,
@@ -70,27 +76,39 @@ const FlyingWednesday: React.FC = () => {
         bottom: 0,
         pointerEvents: 'none',
         zIndex: 0,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        willChange: 'transform',
       }}
     >
-      {flyingTexts.map(text => (
-        <Typography
-          key={text.id}
-          sx={{
-            position: 'absolute',
-            left: text.x,
-            top: text.y,
-            color: 'rgba(255, 215, 0, 0.2)', // Semi-transparent gold
-            fontSize: '2rem',
-            fontWeight: 'bold',
-            transform: 'rotate(-15deg)',
-            whiteSpace: 'nowrap',
-            userSelect: 'none'
-          }}
-        >
-          wednesday
-        </Typography>
-      ))}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          willChange: 'transform',
+        }}
+      >
+        {flyingTexts.map(text => (
+          <Typography
+            key={text.id}
+            sx={{
+              position: 'absolute',
+              transform: `translate3d(${text.x}px, ${text.y}px, 0) rotate(-15deg)`,
+              color: 'rgba(255, 215, 0, 0.2)',
+              fontSize: '2rem',
+              fontWeight: 'bold',
+              whiteSpace: 'nowrap',
+              userSelect: 'none',
+              willChange: 'transform',
+              backfaceVisibility: 'hidden',
+            }}
+          >
+            wednesday
+          </Typography>
+        ))}
+      </Box>
     </Box>
   );
 };
