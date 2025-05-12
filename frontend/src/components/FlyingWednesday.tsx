@@ -12,7 +12,7 @@ const FlyingWednesday: React.FC = () => {
 
   useEffect(() => {
     // Create initial flying texts
-    const initialTexts = Array.from({ length: 5 }, (_, i) => ({
+    const initialTexts = Array.from({ length: 3 }, (_, i) => ({
       id: i,
       y: Math.random() * window.innerHeight,
       x: -200 // Start off-screen
@@ -22,24 +22,26 @@ const FlyingWednesday: React.FC = () => {
     // Animation interval
     const interval = setInterval(() => {
       setFlyingTexts(prevTexts => {
-        return prevTexts.map(text => ({
+        const updatedTexts = prevTexts.map(text => ({
           ...text,
-          x: text.x + 20, // Move right
+          x: text.x + 30, // Move right
           y: text.y + (Math.random() - 0.5) * 2 // Slight vertical movement
         })).filter(text => text.x < window.innerWidth + 200); // Remove texts that have moved off-screen
-      });
 
-      // Add new text if we have less than 5
-      if (flyingTexts.length < 5) {
-        setFlyingTexts(prevTexts => [
-          ...prevTexts,
-          {
-            id: Date.now(),
-            y: Math.random() * window.innerHeight,
-            x: -200
-          }
-        ]);
-      }
+        // Add new text if we have less than 3 texts
+        if (updatedTexts.length < 3) {
+          return [
+            ...updatedTexts,
+            {
+              id: Date.now(),
+              y: Math.random() * window.innerHeight,
+              x: -200
+            }
+          ];
+        }
+
+        return updatedTexts;
+      });
     }, 50);
 
     return () => clearInterval(interval);
