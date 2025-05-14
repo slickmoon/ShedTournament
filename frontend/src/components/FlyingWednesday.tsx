@@ -13,7 +13,7 @@ const FlyingWednesday: React.FC = () => {
 
   useEffect(() => {
     // Create initial flying texts
-    const initialTexts = Array.from({ length: 5 }, (_, i) => ({
+    const initialTexts = Array.from({ length: 8 }, (_, i) => ({
       id: i,
       y: Math.random() * window.innerHeight,
       x: -200 // Start off-screen
@@ -35,12 +35,12 @@ const FlyingWednesday: React.FC = () => {
     const generateInterval = setInterval(() => {
       if (canAddText.current) {
         setFlyingTexts(prevTexts => {
-          if (prevTexts.length < 3) {
+          if (prevTexts.length < 8) {
             canAddText.current = false;
             // Reset the flag after 1-2 seconds
             setTimeout(() => {
               canAddText.current = true;
-            }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+            }, 50 + Math.random() * 300); // Random delay between 0.05 and 0.3 seconds
 
             return [
               ...prevTexts,
