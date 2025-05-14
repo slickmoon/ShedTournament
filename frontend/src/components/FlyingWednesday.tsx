@@ -24,7 +24,7 @@ const FlyingWednesday: React.FC = () => {
       setFlyingTexts(prevTexts => {
         return prevTexts.map(text => ({
           ...text,
-          x: text.x + 2, // Move right
+          x: text.x + 20, // Move right
           y: text.y + (Math.random() - 0.5) * 2 // Slight vertical movement
         })).filter(text => text.x < window.innerWidth + 200); // Remove texts that have moved off-screen
       });
@@ -73,7 +73,7 @@ const FlyingWednesday: React.FC = () => {
             userSelect: 'none'
           }}
         >
-          Wednesday
+          wednesday
         </Typography>
       ))}
     </Box>
