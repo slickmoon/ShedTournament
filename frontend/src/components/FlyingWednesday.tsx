@@ -16,7 +16,7 @@ const FlyingWednesday: React.FC = () => {
       id: index,
       y: Math.random() * window.innerHeight,
       x: -200,
-      initialDelay: Math.random() * 2000, // Random delay between 0-2 seconds
+      initialDelay: Math.random() * 5000, // Random delay between 0-5 seconds
       isMoving: false
     }));
   });
