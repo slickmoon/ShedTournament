@@ -74,7 +74,7 @@ const FlyingWednesday: React.FC = () => {
             position: 'absolute',
             left: text.x,
             top: text.y,
-            color: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
+            color: 'rgba(255, 215, 0, 0.2)', // Semi-transparent gold
             fontSize: '2rem',
             fontWeight: 'bold',
             transform: 'rotate(-15deg)',
