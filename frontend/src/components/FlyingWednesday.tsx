@@ -27,7 +27,7 @@ const FlyingWednesday: React.FC = () => {
     const generateInterval = setInterval(() => {
       if (canAddText.current) {
         setFlyingTexts(prevTexts => {
-          if (prevTexts.length < 8) {
+          if (prevTexts.length < 20) {
             canAddText.current = false;
             // Reset the flag after 1-2 seconds
             setTimeout(() => {
