@@ -24,7 +24,10 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
         mb: 4,
         minHeight: '200px'
       }}>
-        {players.slice(0, 3).map((player, index) => (
+        {[...players]
+          .sort((a, b) => b.elo - a.elo)
+          .slice(0, 3)
+          .map((player, index) => (
           <Box
             key={player.id}
             sx={{
@@ -88,7 +91,10 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
       </Box>
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>Other Players</Typography>
-        {players.slice(3).map((player) => (
+        {[...players]
+          .sort((a, b) => b.elo - a.elo)
+          .slice(3)
+          .map((player) => (
           <Typography key={player.id} sx={{ mb: 1 }}>
             {player.player_name} (ELO: {player.elo})
           </Typography>
