@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Box, Button, Paper, TextField, Select, MenuItem, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-
 interface PlayerStreakLongest {
   player_id: number;
   player_name: string;
@@ -11,13 +10,22 @@ interface PlayerStreakLongest {
   streak_type: string;
 }
 
+interface MostMatchesInDay {
+  player_id: number;
+  player_name: string;
+  date: string;
+  matches_played: number;
+}
+
 interface PlayerStatsProps {
   playerStreakLongest: PlayerStreakLongest[];
+  mostMatchesInDay: MostMatchesInDay;
 }
 
 const PlayerStats: React.FC<PlayerStatsProps> = ({
-  playerStreakLongest
-  }) => {
+  playerStreakLongest,
+  mostMatchesInDay
+}) => {
   return (
     <>
       <h2>Player Statistics</h2>
@@ -25,7 +33,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography>View Player Stats</Typography>
         </AccordionSummary>
-        <AccordionDetails sx={{ display: 'flex' }}>
+        <AccordionDetails sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
           {/* Winning Streak Record box */}
           <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
             {[...playerStreakLongest]
@@ -95,6 +103,35 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
                 </Box>
               </Box>
             ))}
+          </Paper>
+          {/* Most Matches in a Day box */}
+          <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                p: 1,
+                mb: 1,
+                borderRadius: 1,
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    Most Matches in a Day
+                  </Typography>
+                  <Typography component="span">{mostMatchesInDay.player_name} played </Typography>
+                  <Typography component="span" sx={{ color: 'info.main' }}>
+                    {mostMatchesInDay.matches_played} matches
+                  </Typography>
+                  <Typography component="span"> on {new Date(mostMatchesInDay.date).toLocaleDateString()}</Typography>
+                </Typography>
+              </Box>
+            </Box>
           </Paper>
         </AccordionDetails>
       </Accordion>

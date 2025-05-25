@@ -66,6 +66,13 @@ interface PlayerKD {
   kd: number;
 }
 
+interface MostMatchesInDay {
+  player_id: number;
+  player_name: string;
+  date: string;
+  matches_played: number;
+}
+
 function App() {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,6 +93,12 @@ function App() {
   const [playerKd, setPlayerKD] = useState<PlayerKD[]>([]);
   const [isWednesday, setIsWednesday] = useState(false);
   const [specialMatchResults, setSpecialMatchResults] = useState<Array<{ message: string; color: string }>>([]);
+  const [mostMatchesInDay, setMostMatchesInDay] = useState<MostMatchesInDay>({
+    player_id: 0,
+    player_name: '',
+    date: '',
+    matches_played: 0
+  });
 
   // Load initial data and check token
   useEffect(() => {
@@ -243,6 +256,17 @@ function App() {
       setPlayerKD(data);
     } catch (error) {
       setStatusMessage(`Error fetching player KD: ${error}`);
+    }
+
+    // Most matches in a day
+    try {
+      const response = await fetch(`${API_BASE_URL}/matches/most`, {
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      setMostMatchesInDay(data);
+    } catch (error) {
+      setStatusMessage(`Error fetching most matches in day: ${error}`);
     }
   };
   
@@ -440,7 +464,8 @@ function App() {
                   {isWednesday && <ScrabbleGame />}
                   
                   <PlayerStats 
-                    playerStreakLongest={playerStreakLongest} 
+                    playerStreakLongest={playerStreakLongest}
+                    mostMatchesInDay={mostMatchesInDay}
                   />
 
                   <PlayerAdmin
