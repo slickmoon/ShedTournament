@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import jwt
 import os
 from dotenv import load_dotenv
+from sqlalchemy import func, or_
 
 # Load environment variables
 load_dotenv()
@@ -92,6 +93,7 @@ class PlayerResponse(BaseModel):
     id: int
     player_name: str
     elo: int
+    total_matches: int
 
     class Config:
         orm_mode = True
@@ -138,7 +140,43 @@ async def get_players(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    return db.query(base.Player).filter(base.Player.deleted == False).order_by(base.Player.player_name.asc()).all()
+    # Create a subquery to count matches for each player
+    match_counts = db.query(
+        base.Player.id,
+        func.count(base.Match.id).label('total_matches')
+    ).outerjoin(
+        base.Match,
+        or_(
+            base.Match.winner1_id == base.Player.id,
+            base.Match.winner2_id == base.Player.id,
+            base.Match.loser1_id == base.Player.id,
+            base.Match.loser2_id == base.Player.id
+        )
+    ).group_by(base.Player.id).subquery()
+
+    # Get players with their match counts
+    players = db.query(
+        base.Player,
+        match_counts.c.total_matches
+    ).outerjoin(
+        match_counts,
+        base.Player.id == match_counts.c.id
+    ).filter(
+        base.Player.deleted == False
+    ).order_by(
+        base.Player.player_name.asc()
+    ).all()
+
+    # Convert to response format
+    return [
+        {
+            "id": player.id,
+            "player_name": player.player_name,
+            "elo": player.elo,
+            "total_matches": total_matches or 0
+        }
+        for player, total_matches in players
+    ]
 
 @api.get("/players/streaks", response_model=List[dict])
 async def get_player_streaks(

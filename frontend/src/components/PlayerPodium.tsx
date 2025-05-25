@@ -5,6 +5,7 @@ interface Player {
   id: number;
   player_name: string;
   elo: number;
+  total_matches: number;
 }
 
 interface PlayerPodiumProps {
@@ -72,7 +73,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
                 fontWeight: 'bold'
               }}
             >
-              ELO: {player.elo}
+              ELO: {player.elo} (Matches: {player.total_matches})
             </Typography>
             <Typography
               variant="h4"
@@ -96,7 +97,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
           .slice(3)
           .map((player) => (
           <Typography key={player.id} sx={{ mb: 1 }}>
-            {player.player_name} (ELO: {player.elo})
+            {player.player_name} (ELO: {player.elo}) (Matches: {player.total_matches})
           </Typography>
         ))}
       </Box>

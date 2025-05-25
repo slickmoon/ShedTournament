@@ -32,6 +32,7 @@ interface Player {
   id: number;
   player_name: string;
   elo: number;
+  total_matches: number;
 }
 
 interface AuditLogEntry {
@@ -52,6 +53,7 @@ interface PlayerStreakLongest {
   player_name: string;
   longest_streak: number;
   longest_streak_elo_change: number;
+  streak_type: string;
 }
 
 interface PlayerKD {
