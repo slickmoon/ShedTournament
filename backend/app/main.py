@@ -204,7 +204,7 @@ async def get_player_kds(
         ).all()
 
         # Calculate current ratio
-        kdratio = len(wins) / len(losses)
+        kdratio = len(wins) / len(losses) if len(losses) > 0 else 1
         player_kds.append({
             "player_id": player.id,
             "player_name": player.player_name,
