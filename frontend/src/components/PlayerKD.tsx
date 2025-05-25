@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Typography, Paper, Accordion, AccordionSummary, AccordionDetails, ExpandMoreIcon } from '@mui/material';
-import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import { Box, Typography, Paper, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 interface PlayerKD {
   player_id: number;
