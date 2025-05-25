@@ -100,19 +100,19 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
         gap: 3
       }}>
         <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>Other Players</Typography>
+          <Typography variant="h6" sx={{ mb: 2 }}>Ranked Players</Typography>
           {[...players]
             .filter(player => player.total_matches >= 3)
             .sort((a, b) => b.elo - a.elo)
             .slice(3)
-            .map((player) => (
+            .map((player, index) => (
             <Typography key={player.id} sx={{ mb: 1 }}>
-              {player.player_name} (ELO: {player.elo}) (Games: {player.total_matches})
+              #{index + 4}. {player.player_name} (ELO: {player.elo}) (Games: {player.total_matches})
             </Typography>
           ))}
         </Box>
         <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>Qualifying Players</Typography>
+          <Typography variant="h6" sx={{ mb: 2 }}>Qualifying</Typography>
           {[...players]
             .filter(player => player.total_matches < 3)
             .sort((a, b) => b.elo - a.elo)
