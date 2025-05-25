@@ -15,7 +15,7 @@ import AuditLog from './components/AuditLog.tsx';
 import MatchDialog from './components/MatchDialog.tsx';
 import ScrabbleGame from './components/ScrabbleGame.tsx';
 import { randomTexts, wednesdayTexts } from './data/shed-quotes.ts';
-import { checkSpecialMatchResult } from './utils/matchChecks';
+import { checkSpecialMatchResult } from './utils/matchChecks.ts';
 import SpecialMatchGraphic from './components/SpecialMatchGraphic.tsx';
 import './App.css';
 
