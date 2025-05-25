@@ -91,7 +91,14 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
           </Box>
         ))}
       </Box>
-      <Box sx={{ mt: 4, display: "flex" }}>
+      <Box sx={{ 
+        mt: 4, 
+        display: "flex", 
+        flexDirection: { xs: 'column', md: 'row' },
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        gap: 2 
+      }}>
         <Box>
           <Typography variant="h6" sx={{ mb: 2 }}>Other Players</Typography>
           {[...players]
