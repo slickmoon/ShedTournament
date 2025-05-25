@@ -158,8 +158,8 @@ async def get_players(
     players = db.query(
         base.Player,
         match_counts.c.total_matches
-    ).outerjoin(
-        match_counts,
+    ).outerjoin( # this is a LEFT JOIN for SQL (LEFT OUTER JOIN), .join() is an inner join
+        match_counts, 
         base.Player.id == match_counts.c.id
     ).filter(
         base.Player.deleted == False
