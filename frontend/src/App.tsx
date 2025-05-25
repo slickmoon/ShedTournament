@@ -407,6 +407,7 @@ function App() {
                   sx={{ 
                     textAlign: 'center', 
                     mb: 3,
+                    mx: 2,
                     fontStyle: 'italic',
                     color: 'text.secondary'
                   }}
