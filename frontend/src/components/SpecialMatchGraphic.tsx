@@ -53,11 +53,11 @@ const SpecialMatchGraphic: React.FC<SpecialMatchGraphicProps> = ({ message, colo
           ? `${fadeIn} 100ms ease-out forwards`
           : `${fadeOut} 300ms ease-in forwards`,
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        borderRadius: 2,
-        padding: { xs: 2, sm: 3 },
+        borderRadius: 1,
+        padding: { xs: 1, sm: 2 },
         textAlign: 'center',
         minWidth: { xs: '150px', sm: '200px' },
-        maxWidth: { xs: '90vw', sm: '80vw', md: '600px' },
+        maxWidth: { xs: '95vw', sm: '85vw', md: '600px' },
         width: 'auto'
       }}
     >
@@ -67,9 +67,7 @@ const SpecialMatchGraphic: React.FC<SpecialMatchGraphicProps> = ({ message, colo
           color: color,
           fontWeight: 'bold',
           textShadow: '0 0 10px rgba(0,0,0,0.5)',
-          fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' },
-          wordBreak: 'break-word',
-          whiteSpace: 'pre-wrap'
+          fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }
         }}
       >
         {message}
