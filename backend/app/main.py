@@ -134,7 +134,7 @@ async def addplayer(
     
     return db_player
 
-@api.get("/players", response_model=List[PlayerResponse])
+@api.get("/players", response_model=List[dict])
 async def get_players(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
