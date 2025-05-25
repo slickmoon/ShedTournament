@@ -19,7 +19,7 @@ const PlayerStreaks: React.FC<PlayerKDProps> = ({ playerKd }) => {
     <Box sx={{ flex: 1 }}>
       <h2>Current K/D Ratios</h2>
       <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
-        {playerKd.slice(3).map((kdplayer) => (
+        {playerKd.map((kdplayer) => (
           <Box
             key={kdplayer.player_id}
             sx={{
