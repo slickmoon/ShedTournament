@@ -37,7 +37,7 @@ const SpecialMatchGraphic: React.FC<SpecialMatchGraphicProps> = ({ message, colo
     const timer = setTimeout(() => {
       setIsVisible(false);
       setTimeout(onComplete, 300); // Wait for fade out animation
-    }, 1100); // 100ms fade in + 1000ms display
+    }, 2100); // 100ms fade in + 1000ms display
 
     return () => clearTimeout(timer);
   }, [onComplete]);
