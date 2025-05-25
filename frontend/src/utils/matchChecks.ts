@@ -75,8 +75,8 @@ export const checkUpset = (data: MatchData): SpecialMatchResult | null => {
 
 export const checkSpecialMatchResult = (data: MatchData, players: Player[]): SpecialMatchResult[] => {
   const checks = [
-    
-    checkAssassination(data,players)
+    checkAssassination(data,players),
+    checkMassiveGain(data)
   ];
 
   return checks.filter((result): result is SpecialMatchResult => result !== null);
