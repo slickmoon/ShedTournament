@@ -58,7 +58,8 @@ const SpecialMatchGraphic: React.FC<SpecialMatchGraphicProps> = ({ message, colo
         textAlign: 'center',
         minWidth: { xs: '150px', sm: '200px' },
         maxWidth: { xs: '95vw', sm: '85vw', md: '600px' },
-        width: 'auto'
+        width: 'fit-content',
+        display: 'inline-block'
       }}
     >
       <Typography
@@ -67,7 +68,8 @@ const SpecialMatchGraphic: React.FC<SpecialMatchGraphicProps> = ({ message, colo
           color: color,
           fontWeight: 'bold',
           textShadow: '0 0 10px rgba(0,0,0,0.5)',
-          fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }
+          fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' },
+          whiteSpace: 'nowrap'
         }}
       >
         {message}
