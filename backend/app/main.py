@@ -218,7 +218,7 @@ async def get_player_kds(
         })
     
     # Sort by kd (descending) and then by wins (descending) for tiebreaker
-    player_kds.sort(key=lambda x: (-x["kd"], -x["wins"]))
+    player_kds.sort(key=lambda x: (-x["kd"], -x["wins"], +x["losses"]))
     player_kds = player_kds[:10]
 
     return player_kds
