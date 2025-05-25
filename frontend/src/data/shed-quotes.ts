@@ -34,7 +34,9 @@ export const randomTexts = [
     "🍆💦",
     "💯 that's the real good shit 💯",
     "💦🍑",
-    "'I love backshots!'"
+    "'I love backshots!'",
+    "'Ooooh, arrrrghhh, fuck ooooooff, get out of town!' - Sounds from The Shed",
+    "She can't keep getting away with it!"
 ];
 
 export const wednesdayTexts = [ 
