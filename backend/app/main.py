@@ -183,6 +183,41 @@ async def get_player_streaks(
 
     return player_streaks
 
+@api.get("/players/kds", response_model=List[dict])
+async def get_player_kds(
+    db: Session = Depends(database.get_db),
+    token: dict = Depends(verify_token)
+):
+    # Get all non-deleted players
+    players = db.query(base.Player).filter(base.Player.deleted == False).all()
+    
+    player_kds = []
+    for player in players:
+        # Get all matches involving this player
+        wins = db.query(base.Match).filter(
+            (base.Match.winner1_id == player.id) | 
+            (base.Match.winner2_id == player.id)
+        ).all()
+        losses = db.query(base.Match).filter(
+            (base.Match.loser1_id == player.id) | 
+            (base.Match.loser2_id == player.id)
+        ).all()
+
+        # Calculate current ratio
+        kdratio = len(wins) / len(losses)
+        player_kds.append({
+            "player_id": player.id,
+            "player_name": player.player_name,
+            "wins": len(wins),
+            "losses": len(losses),
+            "kd": kdratio
+        })
+    
+    # Sort by kd (descending) and then by wins (descending) for tiebreaker
+    player_kds.sort(key=lambda x: (-x["kd"], -x["wins"]))
+    player_kds = player_kds[:5]
+
+    return player_kds
 
 @api.get("/players/{player_id}", response_model=PlayerResponse)
 async def get_player(

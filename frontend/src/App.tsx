@@ -8,6 +8,7 @@ import { Login } from './components/Login.tsx';
 import BouncingWednesday from './components/BouncingWednesday.tsx';
 import PlayerPodium from './components/PlayerPodium.tsx';
 import PlayerStreaks from './components/PlayerStreaks.tsx';
+import PlayerKD from './components/PlayerKD.tsx';
 import PlayerAdmin from './components/PlayerAdmin.tsx';
 import AuditLog from './components/AuditLog.tsx';
 import MatchDialog from './components/MatchDialog.tsx';
@@ -46,6 +47,14 @@ interface PlayerStreak {
   elo_change: number;
 }
 
+interface PlayerKD {
+  player_id: number;
+  player_name: string;
+  wins: number;
+  losses: number;
+  kd: number;
+}
+
 function App() {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,6 +71,7 @@ function App() {
   const [winner2, setWinner2] = useState<string>('');
   const [loser2, setLoser2] = useState<string>('');
   const [playerStreaks, setPlayerStreaks] = useState<PlayerStreak[]>([]);
+  const [playerKd, setPlayerKD] = useState<PlayerKD[]>([]);
   const [isWednesday, setIsWednesday] = useState(false);
 
   // Load initial data and check token
@@ -88,6 +98,7 @@ function App() {
       listPlayers();
       listAuditLog();
       listPlayerStreaks();
+      listPlayerKD();
     }
   }, [token]);
 
@@ -186,6 +197,19 @@ function App() {
       setStatusMessage(`Error fetching player streaks: ${error}`);
     }
   };
+
+  const listPlayerKD = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/players/kds`, {
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      setPlayerKD(data);
+    } catch (error) {
+      setStatusMessage(`Error fetching player KD: ${error}`);
+    }
+  };
+  
 
   const recordMatch = async () => {
     try {
@@ -373,6 +397,7 @@ function App() {
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
                     <PlayerPodium players={players} />
                     <PlayerStreaks playerStreaks={playerStreaks} />
+                    <PlayerKD playerKd={playerKd} />
                   </Box>
 
                   {isWednesday && <ScrabbleGame />}
