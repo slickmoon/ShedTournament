@@ -15,6 +15,8 @@ import AuditLog from './components/AuditLog.tsx';
 import MatchDialog from './components/MatchDialog.tsx';
 import ScrabbleGame from './components/ScrabbleGame.tsx';
 import { randomTexts, wednesdayTexts } from './data/shed-quotes.ts';
+import { checkSpecialMatchResult } from './utils/matchChecks';
+import SpecialMatchGraphic from './components/SpecialMatchGraphic.tsx';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -83,6 +85,7 @@ function App() {
   const [playerStreakLongest, setPlayerStreakLongest] = useState<PlayerStreakLongest[]>([]);
   const [playerKd, setPlayerKD] = useState<PlayerKD[]>([]);
   const [isWednesday, setIsWednesday] = useState(false);
+  const [specialMatchResults, setSpecialMatchResults] = useState<Array<{ message: string; color: string }>>([]);
 
   // Load initial data and check token
   useEffect(() => {
@@ -298,6 +301,7 @@ function App() {
               </Typography>
             </Box>
           );
+          setSpecialMatchResults(checkSpecialMatchResult(data, players));
         } else {
           setStatusMessage('Error recording match');
         }
@@ -329,6 +333,7 @@ function App() {
               </Typography>
             </Box>
           );
+          setSpecialMatchResults(checkSpecialMatchResult(data, players));
         } else {
           setStatusMessage('Error recording match');
         }
@@ -366,6 +371,10 @@ function App() {
     }
   };
 
+  const handleSpecialMatchComplete = () => {
+    setSpecialMatchResults(prev => prev.slice(1));
+  };
+
   if (loading) {
     return null;
   }
@@ -378,6 +387,8 @@ function App() {
       </ThemeProvider>
     );
   }
+
+  const currentSpecialMatch = specialMatchResults[0];
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -479,6 +490,13 @@ function App() {
             } />
           </Routes>
         </Router>
+        {currentSpecialMatch && (
+          <SpecialMatchGraphic
+            message={currentSpecialMatch.message}
+            color={currentSpecialMatch.color}
+            onComplete={handleSpecialMatchComplete}
+          />
+        )}
       </ThemeProvider>
     </QueryClientProvider>
   );
