@@ -14,7 +14,7 @@ interface PlayerKDProps {
   playerKd: PlayerKD[];
 }
 
-const PlayerStreaks: React.FC<PlayerKDProps> = ({ playerKd }) => {
+const PlayerKDs: React.FC<PlayerKDProps> = ({ playerKd }) => {
   return (
     <Box sx={{ flex: 1 }}>
       <h2>Current K/D Ratios</h2>
@@ -57,4 +57,4 @@ const PlayerStreaks: React.FC<PlayerKDProps> = ({ playerKd }) => {
   );
 };
 
-export default PlayerStreaks; 
+export default PlayerKDs; 

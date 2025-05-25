@@ -183,6 +183,54 @@ async def get_player_streaks(
 
     return player_streaks
 
+@api.get("/players/streaks/longest", response_model=List[dict])
+async def get_best_streak(
+    db: Session = Depends(database.get_db),
+    token: dict = Depends(verify_token)
+):
+    # Get all non-deleted players
+    players = db.query(base.Player).filter(base.Player.deleted == False).all()
+    
+    players_longest_streaks = []
+    for player in players:
+        # Get all matches involving this player
+        matches = db.query(base.Match).filter(
+            (base.Match.winner1_id == player.id) | 
+            (base.Match.winner2_id == player.id) |
+            (base.Match.loser1_id == player.id) |
+            (base.Match.loser2_id == player.id)
+        ).order_by(base.Match.timestamp.desc()).all()
+        
+        # Calculate current streak
+        current_streak = 0
+        streak_elo_change = 0
+        longest_streak = 0
+        longest_streak_elo_change = 0
+        for match in matches:
+            # Check if player won
+            if match.winner1_id == player.id or match.winner2_id == player.id:
+                current_streak += 1
+                streak_elo_change += match.winner1_elo_change
+            else:
+                longest_streak = current_streak
+                longest_streak_elo_change = streak_elo_change
+                current_streak = 0
+                streak_elo_change = 0
+
+        if longest_streak > 0:
+            players_longest_streaks.append({
+                "player_id": player.id,
+                "player_name": player.player_name,
+                "longest_streak": longest_streak,
+                "longest_streak_elo_change": longest_streak_elo_change
+            })
+    
+    # Sort by streak (descending) and then by elo (descending) for tiebreaker
+    players_longest_streaks.sort(key=lambda x: (-x["longest_streak"], -x["longest_streak_elo_change"]))
+    players_longest_streaks = players_longest_streaks[:1]
+
+    return players_longest_streaks
+
 @api.get("/players/kds", response_model=List[dict])
 async def get_player_kds(
     db: Session = Depends(database.get_db),

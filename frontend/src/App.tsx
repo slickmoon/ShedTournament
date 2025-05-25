@@ -8,6 +8,7 @@ import { Login } from './components/Login.tsx';
 import BouncingWednesday from './components/BouncingWednesday.tsx';
 import PlayerPodium from './components/PlayerPodium.tsx';
 import PlayerStreaks from './components/PlayerStreaks.tsx';
+import PlayerStats from './components/PlayerStats.tsx';
 import PlayerKD from './components/PlayerKD.tsx';
 import PlayerAdmin from './components/PlayerAdmin.tsx';
 import AuditLog from './components/AuditLog.tsx';
@@ -46,6 +47,12 @@ interface PlayerStreak {
   elo: number;
   elo_change: number;
 }
+interface PlayerStreakLongest {
+  player_id: number;
+  player_name: string;
+  longest_streak: number;
+  longest_streak_elo_change: number;
+}
 
 interface PlayerKD {
   player_id: number;
@@ -71,6 +78,7 @@ function App() {
   const [winner2, setWinner2] = useState<string>('');
   const [loser2, setLoser2] = useState<string>('');
   const [playerStreaks, setPlayerStreaks] = useState<PlayerStreak[]>([]);
+  const [playerStreakLongest, setPlayerStreakLongest] = useState<PlayerStreakLongest[]>([]);
   const [playerKd, setPlayerKD] = useState<PlayerKD[]>([]);
   const [isWednesday, setIsWednesday] = useState(false);
 
@@ -98,7 +106,7 @@ function App() {
       listPlayers();
       listAuditLog();
       listPlayerStreaks();
-      listPlayerKD();
+      getPlayerStats();
     }
   }, [token]);
 
@@ -198,7 +206,30 @@ function App() {
     }
   };
 
-  const listPlayerKD = async () => {
+  const getPlayerStats = async () => {
+    // Player Streaks
+    try {
+      const response = await fetch(`${API_BASE_URL}/players/streaks`, {
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      setPlayerStreaks(data);
+    } catch (error) {
+      setStatusMessage(`Error fetching player streaks: ${error}`);
+    }
+    
+    // Longest player streaks
+    try {
+      const response = await fetch(`${API_BASE_URL}/players/streaks/longest`, {
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      setPlayerStreakLongest(data);
+    } catch (error) {
+      setStatusMessage(`Error fetching longest player streak: ${error}`);
+    }
+
+    // Player KD Ratios
     try {
       const response = await fetch(`${API_BASE_URL}/players/kds`, {
         headers: getAuthHeaders()
@@ -401,6 +432,10 @@ function App() {
                   </Box>
 
                   {isWednesday && <ScrabbleGame />}
+                  
+                  <PlayerStats 
+                    playerStreakLongest={playerStreakLongest} 
+                  />
 
                   <PlayerAdmin
                     players={players}
