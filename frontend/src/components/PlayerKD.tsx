@@ -36,7 +36,7 @@ const PlayerStreaks: React.FC<PlayerKDProps> = ({ playerKd }) => {
           >
             <Box sx={{ flex: 1 }}>
               <Typography variant="body1">
-              {kdplayer.player_name}: {kdplayer.kd} (W: {kdplayer.wins}/ L: {kdplayer.losses})
+              {kdplayer.player_name}: {kdplayer.kd} ({kdplayer.wins}/{kdplayer.losses})
               </Typography>
             </Box>
           </Box>
