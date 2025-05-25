@@ -17,7 +17,7 @@ class Player(Base):
     __tablename__ = "players"
 
     id = Column(Integer, primary_key=True, index=True)
-    player_name = Column(String, unique=True, index=True)
+    player_name = Column(String)
     elo = Column(Integer, default=1000)  # Default ELO rating
     deleted = Column(Boolean, default=False)  # Soft delete flag
     deleted_at = Column(DateTime(timezone=True), nullable=True)  # When the player was deleted
