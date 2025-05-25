@@ -46,7 +46,6 @@ export const checkAssassination = (data: MatchData, players: Player[]): SpecialM
   return null;
 };
 
-
 export const checkMassiveGain = (data: MatchData): SpecialMatchResult | null => {
   const massiveGain = data.winners.some(winner => winner.elo_change >= 20);
   if (massiveGain) {
@@ -58,16 +57,19 @@ export const checkMassiveGain = (data: MatchData): SpecialMatchResult | null => 
   return null;
 };
 
-export const checkUpset = (data: MatchData): SpecialMatchResult | null => {
-  const upset = data.winners.some(winner => 
-    data.losers.some(loser => 
-      winner.new_elo - winner.elo_change < loser.new_elo - loser.elo_change
-    )
-  );
-  if (upset) {
+export const checkLowestLostAgain = (data: MatchData, players: Player[]): SpecialMatchResult | null => {
+  // Sort players by ELO in ascending order and filter for those with 3+ matches
+  const eligiblePlayers = players.filter(player => player.total_matches >= 3);
+  const sortedPlayers = [...eligiblePlayers].sort((a, b) => a.elo - b.elo);
+  const lowestEloPlayer = sortedPlayers[0];
+
+  // Check if any of the losers is the highest ELO player
+  const isLowestLost = lowestEloPlayer && data.losers.some(loser => loser.id === lowestEloPlayer.id);
+
+  if (isLowestLost) {
     return {
-      message: "Upset Alert!",
-      color: "#ff9800" // warning.main
+      message: "😭 Stop, stop, they're already dead! 😭",
+      color: "#02d4db"
     };
   }
   return null;
@@ -76,7 +78,8 @@ export const checkUpset = (data: MatchData): SpecialMatchResult | null => {
 export const checkSpecialMatchResult = (data: MatchData, players: Player[]): SpecialMatchResult[] => {
   const checks = [
     checkAssassination(data,players),
-    checkMassiveGain(data)
+    checkMassiveGain(data),
+    checkLowestLostAgain(data,players)
   ];
 
   return checks.filter((result): result is SpecialMatchResult => result !== null);
