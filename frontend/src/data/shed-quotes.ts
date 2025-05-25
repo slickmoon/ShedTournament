@@ -37,7 +37,8 @@ export const randomTexts = [
     "'I love backshots!'",
     "'Ooooh, arrrrghhh, fuck ooooooff, get out of town!' - Sounds from The Shed",
     "She can't keep getting away with it!",
-    "'Once you pop you can’t stop!' - Blake while observing Loz Beeby’s pringles underwear"
+    "'Once you pop you can’t stop!' - Blake while observing Loz Beeby’s pringles underwear",
+    "Enhanced league when???"
 ];
 
 export const wednesdayTexts = [ 
