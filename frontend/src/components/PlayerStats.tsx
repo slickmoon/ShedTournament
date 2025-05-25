@@ -47,7 +47,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
                       Longest Streak
                     </Typography>
                     {playerStreakLongest.player_name} with 
-                    <Typography sx={{ color: 'success.main' }}>
+                    <Typography component="span" sx={{ color: 'success.main' }}>
                       {playerStreakLongest.longest_streak} wins (+{playerStreakLongest.longest_streak_elo_change})
                     </Typography>
                   </Typography>
