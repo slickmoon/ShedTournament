@@ -389,18 +389,6 @@ function App() {
                 <h1 className="wave-text">
                   Welcome to the Shed tournament
                 </h1>
-                
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
-                  <Button 
-                    variant="contained" 
-                    color="secondary"
-                    size="large"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </Button>
-                </Box>
-
           <Typography 
                   variant="h5" 
                   sx={{ 
@@ -448,6 +436,16 @@ function App() {
 
                   <AuditLog auditLog={auditlog} />
                 </div>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
+                  <Button 
+                    variant="contained" 
+                    color="secondary"
+                    size="large"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Button>
+                </Box>
 
                 <MatchDialog
                   open={openMatchDialog}
@@ -474,6 +472,7 @@ function App() {
                   setLoser2={setLoser2}
                   matchError={matchError}
                 />
+                
           </div>
             } />
           </Routes>
