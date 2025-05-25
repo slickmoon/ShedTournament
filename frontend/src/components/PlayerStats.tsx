@@ -25,9 +25,9 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography>View Player Stats</Typography>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails sx={{ display: 'flex' }}>
           {/* Winning Streak Record box */}
-          <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto', display: 'flex' }}>
+          <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
             {[...playerStreakLongest]
               .filter(streak => streak.streak_type === "win")
               .sort((a, b) => b.longest_streak - a.longest_streak)
@@ -62,7 +62,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
             ))}
           </Paper>
           {/* Losing Streak Record box */}
-          <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' ,display: 'flex' }}>
+          <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
             {[...playerStreakLongest]
               .filter(streak => streak.streak_type === "loss")
               .sort((a, b) => b.longest_streak - a.longest_streak)
