@@ -29,12 +29,30 @@ export const checkPerfectWin = (data: MatchData): SpecialMatchResult | null => {
   return null;
 };
 
+export const checkAssassination = (data: MatchData, players: Player[]): SpecialMatchResult | null => {
+  // Sort players by ELO in descending order
+  const sortedPlayers = [...players].sort((a, b) => b.elo - a.elo);
+  const highestEloPlayer = sortedPlayers[0];
+
+  // Check if any of the losers is the highest ELO player
+  const isAssassination = data.losers.some(loser => loser.id === highestEloPlayer.id);
+
+  if (isAssassination) {
+    return {
+      message: "💥🎯🥇 !HEADSHOT! 🥇🎯💥",
+      color: "#e30202"
+    };
+  }
+  return null;
+};
+
+
 export const checkMassiveGain = (data: MatchData): SpecialMatchResult | null => {
   const massiveGain = data.winners.some(winner => winner.elo_change >= 20);
   if (massiveGain) {
     return {
-      message: "Massive ELO Gain!",
-      color: "#4caf50" // success.main
+      message: "🎉 !HUGE WIN! 🎉",
+      color: "#02d90b"
     };
   }
   return null;
@@ -55,30 +73,11 @@ export const checkUpset = (data: MatchData): SpecialMatchResult | null => {
   return null;
 };
 
-export const checkFirstMatch = (data: MatchData, players: Player[]): SpecialMatchResult | null => {
-  const firstMatch = data.winners.some(winner => {
-    const player = players.find(p => p.id === winner.id);
-    return player?.total_matches === 0;
-  }) || data.losers.some(loser => {
-    const player = players.find(p => p.id === loser.id);
-    return player?.total_matches === 0;
-  });
-
-  if (firstMatch) {
-    return {
-      message: "First Match!",
-      color: "#2196f3" // info.main
-    };
-  }
-  return null;
-};
-
 export const checkSpecialMatchResult = (data: MatchData, players: Player[]): SpecialMatchResult[] => {
   const checks = [
-    checkPerfectWin(data),
-    checkMassiveGain(data),
-    checkUpset(data),
-    checkFirstMatch(data, players)
+    
+    checkAssassination(data,players),
+    checkMassiveGain(data)
   ];
 
   return checks.filter((result): result is SpecialMatchResult => result !== null);
