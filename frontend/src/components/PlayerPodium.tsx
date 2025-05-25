@@ -73,7 +73,8 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
                 fontWeight: 'bold'
               }}
             >
-              ELO: {player.elo}
+              ELO: {player.elo} 
+              <br />
               Games: {player.total_matches}
             </Typography>
             <Typography
