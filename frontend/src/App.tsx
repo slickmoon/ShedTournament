@@ -424,7 +424,11 @@ function App() {
                 Record Match Result
               </Button>
             </Box>
-
+            {statusMessage && (
+            <Typography variant="h6" sx={{ mb: 3 }}>
+              {statusMessage}
+            </Typography>
+          )}
           <div style={{ margin: '1em', textAlign: 'center' }}>
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
                     <PlayerPodium players={players} />
@@ -443,7 +447,6 @@ function App() {
                     onAddPlayer={addplayer}
                     onDeletePlayer={deletePlayer}
                     onUpdatePlayer={updatePlayer}
-                    statusMessage={statusMessage}
                     updatePlayerMessage={updatePlayerMessage}
                   />
 

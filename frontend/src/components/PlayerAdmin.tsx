@@ -13,7 +13,6 @@ interface PlayerAdminProps {
   onAddPlayer: (playerName: string) => void;
   onDeletePlayer: (playerId: number) => void;
   onUpdatePlayer: (playerId: number, playerName: string, newElo: number) => void;
-  statusMessage: string | React.ReactNode;
   updatePlayerMessage: string | React.ReactNode;
 }
 
@@ -22,7 +21,6 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
   onAddPlayer,
   onDeletePlayer,
   onUpdatePlayer,
-  statusMessage,
   updatePlayerMessage
 }) => {
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
@@ -175,11 +173,6 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
           </Box>
         </AccordionDetails>
       </Accordion>
-      {statusMessage && (
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          {statusMessage}
-        </Typography>
-      )}
     </>
   );
 };
