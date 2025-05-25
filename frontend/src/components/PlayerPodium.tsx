@@ -102,8 +102,6 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
             {player.player_name} (ELO: {player.elo}) (Games: {player.total_matches})
           </Typography>
         ))}
-      </Box>
-      <Box sx={{ mt: 4 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>Qualifying Players</Typography>
         {[...players]
           .filter(player => player.total_matches < 3)
@@ -114,6 +112,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
           </Typography>
         ))}
       </Box>
+        
     </Box>
   );
 };
