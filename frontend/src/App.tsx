@@ -424,12 +424,12 @@ function App() {
                 Record Match Result
               </Button>
             </Box>
-            {statusMessage && (
-            <Typography variant="h6" sx={{ mb: 3 }}>
-              {statusMessage}
-            </Typography>
-          )}
           <div style={{ margin: '1em', textAlign: 'center' }}>
+            {statusMessage && (
+              <Typography variant="h6" sx={{ mb: 3 }}>
+                {statusMessage}
+              </Typography>
+            )}
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
                     <PlayerPodium players={players} />
                     <PlayerStreaks playerStreaks={playerStreaks} />
