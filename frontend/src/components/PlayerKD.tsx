@@ -54,49 +54,51 @@ const PlayerKDs: React.FC<PlayerKDProps> = ({ playerKd }) => {
             </Box>
           </Box>
         ))}
-        {[...playerKd]
-          .slice(3)
-          .map((kdplayer) => (
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>Show more</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Box
-                key={kdplayer.player_id}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  p: 1,
-                  mb: 1,
-                  borderRadius: 1,
-                  '&:hover': {
-                    backgroundColor: 'action.hover'
-                  }
-                }}
-              >
-                
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="body1">
-                    <Typography component="span" variant="body1" sx={{ fontWeight: 'bold' }}>
-                      {kdplayer.player_name}
-                    </Typography>
-                    : {kdplayer.kd} (
-                    <Typography component="span" sx={{ color: 'success.main' }}>
-                      {kdplayer.wins}
-                    </Typography>
-                    /
-                    <Typography component="span" sx={{ color: 'error.main' }}>
-                      {kdplayer.losses}
-                    </Typography>
-                    )
-                  </Typography>
-                </Box>
-              </Box>
-            </AccordionDetails>
-          </Accordion>
-        ))}
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography>Show more</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            {[...playerKd]
+              .slice(3)
+              .map((kdplayer) => (
+
+                  <Box
+                    key={kdplayer.player_id}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      p: 1,
+                      mb: 1,
+                      borderRadius: 1,
+                      '&:hover': {
+                        backgroundColor: 'action.hover'
+                      }
+                    }}
+                  >
+                    
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body1">
+                        <Typography component="span" variant="body1" sx={{ fontWeight: 'bold' }}>
+                          {kdplayer.player_name}
+                        </Typography>
+                        : {kdplayer.kd} (
+                        <Typography component="span" sx={{ color: 'success.main' }}>
+                          {kdplayer.wins}
+                        </Typography>
+                        /
+                        <Typography component="span" sx={{ color: 'error.main' }}>
+                          {kdplayer.losses}
+                        </Typography>
+                        )
+                      </Typography>
+                    </Box>
+                  </Box>
+
+            ))}
+          </AccordionDetails>
+        </Accordion>
       </Paper>
     </Box>
   );
