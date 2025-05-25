@@ -37,7 +37,7 @@ const SpecialMatchGraphic: React.FC<SpecialMatchGraphicProps> = ({ message, colo
     const timer = setTimeout(() => {
       setIsVisible(false);
       setTimeout(onComplete, 300); // Wait for fade out animation
-    }, 2100); // 100ms fade in + 1000ms display
+    }, 2100); // 100ms fade in + 2000ms display
 
     return () => clearTimeout(timer);
   }, [onComplete]);
@@ -54,9 +54,11 @@ const SpecialMatchGraphic: React.FC<SpecialMatchGraphicProps> = ({ message, colo
           : `${fadeOut} 300ms ease-in forwards`,
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         borderRadius: 2,
-        padding: 3,
+        padding: { xs: 2, sm: 3 },
         textAlign: 'center',
-        minWidth: '200px'
+        minWidth: { xs: '150px', sm: '200px' },
+        maxWidth: { xs: '90vw', sm: '80vw', md: '600px' },
+        width: 'auto'
       }}
     >
       <Typography
@@ -64,7 +66,10 @@ const SpecialMatchGraphic: React.FC<SpecialMatchGraphicProps> = ({ message, colo
         sx={{
           color: color,
           fontWeight: 'bold',
-          textShadow: '0 0 10px rgba(0,0,0,0.5)'
+          textShadow: '0 0 10px rgba(0,0,0,0.5)',
+          fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' },
+          wordBreak: 'break-word',
+          whiteSpace: 'pre-wrap'
         }}
       >
         {message}
