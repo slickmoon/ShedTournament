@@ -138,7 +138,7 @@ async def get_players(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    return db.query(base.Player).filter(base.Player.deleted == False).order_by(base.Player.player_name.desc()).all()
+    return db.query(base.Player).filter(base.Player.deleted == False).order_by(base.Player.player_name.asc()).all()
 
 @api.get("/players/streaks", response_model=List[dict])
 async def get_player_streaks(
