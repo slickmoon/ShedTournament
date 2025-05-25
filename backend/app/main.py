@@ -93,7 +93,6 @@ class PlayerResponse(BaseModel):
     id: int
     player_name: str
     elo: int
-    total_matches: int
 
     class Config:
         orm_mode = True
