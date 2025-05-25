@@ -72,7 +72,7 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
               fullWidth
               sx={{ mb: 2 }}
             >
-              {players
+              {[...players]
                 .sort((a, b) => a.player_name.localeCompare(b.player_name))
                 .map((player) => (
                 <MenuItem key={player.id} value={player.player_name}>
@@ -87,7 +87,7 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
                 label="Winner 2"
                 fullWidth
               >
-                {players
+                {[...players]
                   .sort((a, b) => a.player_name.localeCompare(b.player_name))
                   .map((player) => (
                   <MenuItem key={player.id} value={player.player_name}>
@@ -107,7 +107,7 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
               fullWidth
               sx={{ mb: 2 }}
             >
-              {players
+              {[...players]
                 .sort((a, b) => a.player_name.localeCompare(b.player_name))
                 .map((player) => (
                 <MenuItem key={player.id} value={player.player_name}>
@@ -122,7 +122,7 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
                 label="Loser 2"
                 fullWidth
               >
-                {players
+                {[...players]
                   .sort((a, b) => a.player_name.localeCompare(b.player_name))
                   .map((player) => (
                   <MenuItem key={player.id} value={player.player_name}>
