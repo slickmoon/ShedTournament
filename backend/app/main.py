@@ -222,7 +222,7 @@ async def get_best_streak(
                 "player_id": player.id,
                 "player_name": player.player_name,
                 "longest_streak": longest_streak,
-                "longest_streak_elo_change": longest_streak_elo_change
+                "longest_streak_elo_change": longest_streak_elo_change,
                 "streak_type": "win"
             })
     for player in players:
@@ -255,7 +255,7 @@ async def get_best_streak(
                 "player_id": player.id,
                 "player_name": player.player_name,
                 "longest_streak": longest_streak,
-                "longest_streak_elo_change": longest_streak_elo_change
+                "longest_streak_elo_change": longest_streak_elo_change,
                 "streak_type": "loss"
             })
     
