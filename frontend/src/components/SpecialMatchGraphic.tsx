@@ -5,22 +5,22 @@ import { keyframes } from '@mui/system';
 const fadeIn = keyframes`
   from {
     opacity: 0;
-    transform: scale(0.8);
+    transform: translate(-50%, -50%) scale(0.8);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
   }
 `;
 
 const fadeOut = keyframes`
   from {
     opacity: 1;
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
   }
   to {
     opacity: 0;
-    transform: scale(0.8);
+    transform: translate(-50%, -50%) scale(0.8);
   }
 `;
 
@@ -48,7 +48,6 @@ const SpecialMatchGraphic: React.FC<SpecialMatchGraphicProps> = ({ message, colo
         position: 'fixed',
         top: '50%',
         left: '50%',
-        transform: 'translate(-50%, -50%)',
         zIndex: 1000,
         animation: isVisible 
           ? `${fadeIn} 100ms ease-out forwards`
