@@ -40,7 +40,6 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
         bottom: 0,
         width: windowSize.width / 2,
         height: windowSize.height,
-        transform: 'rotate(180deg)',
         pointerEvents: 'none',
       }}>
         <Confetti
@@ -48,8 +47,8 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
           height={windowSize.height}
           numberOfPieces={100}
           gravity={0.4}
-          initialVelocityY={10}
-          initialVelocityX={-5}
+          initialVelocityY={-10}
+          initialVelocityX={5}
           recycle={false}
         />
       </div>
@@ -60,7 +59,6 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
         bottom: 0,
         width: windowSize.width / 2,
         height: windowSize.height,
-        transform: 'rotate(180deg)',
         pointerEvents: 'none',
       }}>
         <Confetti
@@ -68,8 +66,8 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
           height={windowSize.height}
           numberOfPieces={100}
           gravity={0.4}
-          initialVelocityY={10}
-          initialVelocityX={5}
+          initialVelocityY={-10}
+          initialVelocityX={-5}
           recycle={false}
         />
       </div>
