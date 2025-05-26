@@ -78,7 +78,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [players, setPlayers] = useState<Player[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | React.ReactNode>('');
-  const [updatePlayerMessage, setUpdatePlayerMessage] = useState<string | React.ReactNode>('');
+  const [updatePlayerMessage, setPlayerAdminMessage] = useState<string | React.ReactNode>('');
   const [auditlog, setAuditLog] = useState<AuditLogEntry[]>([]);
   const [openMatchDialog, setOpenMatchDialog] = useState(false);
   const [matchError, setMatchError] = useState<string>('');
@@ -236,26 +236,26 @@ function App() {
       });
       const data = await response.json();
       if (response.ok) {
-        setStatusMessage(`Added ${playerName} successfully`);
+        setPlayerAdminMessage(`Added ${playerName} successfully`);
         updatePageData();
       } else {
         const errorData = await response.json();
-        setStatusMessage(`Error adding player ${playerName}: ${errorData.detail}`);
+        setPlayerAdminMessage(`Error adding player ${playerName}: ${errorData.detail}`);
       }
     } catch (error) {
-      setStatusMessage(`Error adding player ${playerName}: ${error}`);
+      setPlayerAdminMessage(`Error adding player ${playerName}: ${error}`);
     }
   };
 
   const updatePlayer = async (player_id: number, playerName: string, newElo: number, access_password: string) => {
     try {
       if (!player_id) {
-        setUpdatePlayerMessage('No player selected');
+        setPlayerAdminMessage('No player selected');
         return;
       }
 
       if (!playerName || !newElo) {
-        setUpdatePlayerMessage('Please fill in both name and ELO fields');
+        setPlayerAdminMessage('Please fill in both name and ELO fields');
         return;
       }
       const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
@@ -270,14 +270,35 @@ function App() {
         })
       });
       if (response.ok) {
-        setUpdatePlayerMessage(`Successfully updated player ${playerName} (#${player_id})`);
+        setPlayerAdminMessage(`Successfully updated player ${playerName} (#${player_id})`);
         updatePageData();
       } else {
         const errorData = await response.json();
-        setUpdatePlayerMessage(`Error updating player ${playerName} (#${player_id}): ${errorData.detail}`);
+        setPlayerAdminMessage(`Error updating player ${playerName} (#${player_id}): ${errorData.detail}`);
       }
     } catch (error) {
-      setUpdatePlayerMessage(`Error updating player ${playerName} (#${player_id}): ${error}`);
+      setPlayerAdminMessage(`Error updating player ${playerName} (#${player_id}): ${error}`);
+    }
+  };
+  
+  const deletePlayer = async (playerId: number, access_password: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/players/${playerId}`, {
+        method: 'DELETE',
+        headers: {
+          ...getAuthHeaders(),
+          'X-Admin-Password': access_password
+        }
+      });
+      if (response.ok) {
+        setPlayerAdminMessage(`Successfully deleted player (ID: ${playerId})`);
+        updatePageData();
+      } else {
+        const errorData = await response.json();
+        setPlayerAdminMessage(`Error deleting player (ID: ${playerId}): ${errorData.detail}`);
+      }
+    } catch (error) {
+      setPlayerAdminMessage(`Error deleting player: ${error}`);
     }
   };
 
@@ -389,27 +410,6 @@ function App() {
     }
   };
 
-  const deletePlayer = async (playerId: number, access_password: string) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/players/${playerId}`, {
-        method: 'DELETE',
-        headers: {
-          ...getAuthHeaders(),
-          'X-Admin-Password': access_password
-        }
-      });
-      if (response.ok) {
-        setStatusMessage(`Successfully deleted player (ID: ${playerId})`);
-        updatePageData();
-      } else {
-        const errorData = await response.json();
-        setStatusMessage(`Error deleting player (ID: ${playerId}): ${errorData.detail}`);
-      }
-    } catch (error) {
-      setStatusMessage(`Error deleting player: ${error}`);
-    }
-  };
-
   const handleSpecialMatchComplete = () => {
     setSpecialMatchResults(prev => prev.slice(1));
   };
@@ -488,7 +488,7 @@ function App() {
                     onAddPlayer={addplayer}
                     onDeletePlayer={deletePlayer}
                     onUpdatePlayer={updatePlayer}
-                    updatePlayerMessage={updatePlayerMessage}
+                    playerAdminMessage={updatePlayerMessage}
                   />
 
                   <AuditLog auditLog={auditlog} />
