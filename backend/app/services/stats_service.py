@@ -49,8 +49,9 @@ class StatsService:
                 (base.Match.winner2_id == player.id) |
                 (base.Match.loser1_id == player.id) |
                 (base.Match.loser2_id == player.id)
-            ).order_by(base.Match.timestamp.desc()).all()
+            ).order_by(base.Match.timestamp.asc()).all()
             
+            # Winning streak
             current_streak = 0
             streak_elo_change = 0
             longest_streak = 0
@@ -66,6 +67,11 @@ class StatsService:
                     current_streak = 0
                     streak_elo_change = 0
 
+            if current_streak > longest_streak:
+                longest_streak = current_streak
+                longest_streak_elo_change = streak_elo_change
+            
+
             if longest_streak > 0:
                 players_longest_streaks.append({
                     "player_id": player.id,
@@ -74,15 +80,8 @@ class StatsService:
                     "longest_streak_elo_change": longest_streak_elo_change,
                     "streak_type": "win"
                 })
-        
-        for player in players:
-            matches = db.query(base.Match).filter(
-                (base.Match.winner1_id == player.id) | 
-                (base.Match.winner2_id == player.id) |
-                (base.Match.loser1_id == player.id) |
-                (base.Match.loser2_id == player.id)
-            ).order_by(base.Match.timestamp.desc()).all()
             
+            # losing streaks
             current_streak = 0
             streak_elo_change = 0
             longest_streak = 0
@@ -98,6 +97,10 @@ class StatsService:
                     current_streak = 0
                     streak_elo_change = 0
 
+            if current_streak > longest_streak:
+                longest_streak = current_streak
+                longest_streak_elo_change = streak_elo_change
+
             if longest_streak > 0:
                 players_longest_streaks.append({
                     "player_id": player.id,
@@ -107,7 +110,7 @@ class StatsService:
                     "streak_type": "loss"
                 })
         
-        players_longest_streaks.sort(key=lambda x: (-x["longest_streak"], -x["longest_streak_elo_change"]))
+        #players_longest_streaks.sort(key=lambda x: (-x["longest_streak"], -x["longest_streak_elo_change"])) # do sorting and filtering in frontend
         return players_longest_streaks
 
     @staticmethod
