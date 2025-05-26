@@ -121,10 +121,7 @@ function App() {
   // Load players and audit log when token is available
   useEffect(() => {
     if (token) {
-      listPlayers();
-      listAuditLog();
-      listPlayerStreaks();
-      getPlayerStats();
+      updatePageData();
     }
   }, [token]);
 
@@ -137,60 +134,7 @@ function App() {
     setToken(null);
   };
 
-  const addplayer = async (playerName: string) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/addplayer`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ player_name: playerName })
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setStatusMessage(`Added ${playerName} successfully`);
-        listPlayers();
-        listAuditLog();
-      } else {
-        setStatusMessage(`Error adding player ${playerName}`);
-      }
-    } catch (error) {
-      setStatusMessage(`Error adding player ${playerName}: ${error}`);
-    }
-  };
-
-  const updatePlayer = async (player_id: number, playerName: string, newElo: number, access_password: string) => {
-    try {
-      if (!player_id) {
-        setUpdatePlayerMessage('No player selected');
-        return;
-      }
-
-      if (!playerName || !newElo) {
-        setUpdatePlayerMessage('Please fill in both name and ELO fields');
-        return;
-      }
-      const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
-        method: 'PUT',
-        headers: {
-          ...getAuthHeaders(),
-          'X-Admin-Password': access_password
-        },
-        body: JSON.stringify({
-          player_name: playerName,
-          player_elo: newElo
-        })
-      });
-      if (response.ok) {
-        setUpdatePlayerMessage(`Successfully updated player ${playerName} (ID: ${player_id})`);
-        listPlayers();
-        listAuditLog();
-      } else {
-        setUpdatePlayerMessage(`Error updating player ${playerName} (ID: ${player_id})`);
-      }
-    } catch (error) {
-      setUpdatePlayerMessage(`Error updating player ${playerName} (ID: ${player_id}): ${error}`);
-    }
-  };
-
+  {/* Data view functions */}
   const listPlayers = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/players`, {
@@ -273,6 +217,71 @@ function App() {
     }
   };
   
+  {/* Called to refresh the page data after data modifications occur */}
+  const updatePageData = () => { 
+    listPlayers();
+    listAuditLog();
+    listPlayerStreaks();
+    getPlayerStats();
+  };
+
+
+  {/* Data edit functions */}
+  const addplayer = async (playerName: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/addplayer`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ player_name: playerName })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setStatusMessage(`Added ${playerName} successfully`);
+        listPlayers();
+        listAuditLog();
+      } else {
+        const errorData = await response.json();
+        setStatusMessage(`Error adding player ${playerName}: ${errorData.detail}`);
+      }
+    } catch (error) {
+      setStatusMessage(`Error adding player ${playerName}: ${error}`);
+    }
+  };
+
+  const updatePlayer = async (player_id: number, playerName: string, newElo: number, access_password: string) => {
+    try {
+      if (!player_id) {
+        setUpdatePlayerMessage('No player selected');
+        return;
+      }
+
+      if (!playerName || !newElo) {
+        setUpdatePlayerMessage('Please fill in both name and ELO fields');
+        return;
+      }
+      const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          'X-Admin-Password': access_password
+        },
+        body: JSON.stringify({
+          player_name: playerName,
+          player_elo: newElo
+        })
+      });
+      if (response.ok) {
+        setUpdatePlayerMessage(`Successfully updated player ${playerName} (#${player_id})`);
+        listPlayers();
+        listAuditLog();
+      } else {
+        const errorData = await response.json();
+        setUpdatePlayerMessage(`Error updating player ${playerName} (#${player_id}): ${errorData.detail}`);
+      }
+    } catch (error) {
+      setUpdatePlayerMessage(`Error updating player ${playerName} (#${player_id}): ${error}`);
+    }
+  };
 
   const recordMatch = async () => {
     try {
@@ -330,7 +339,8 @@ function App() {
           );
           setSpecialMatchResults(checkSpecialMatchResult(data, players));
         } else {
-          setStatusMessage('Error recording match');
+          const errorData = await response.json();
+          setStatusMessage(`Error recording match: ${errorData.detail}`);
         }
       } else {
         if (winner1Player.id === loser1Player.id) {
@@ -362,12 +372,13 @@ function App() {
           );
           setSpecialMatchResults(checkSpecialMatchResult(data, players));
         } else {
-          setStatusMessage('Error recording match');
+          const errorData = await response.json();
+          setStatusMessage(`Error recording match: ${errorData.detail}`);
         }
       }
 
-      listPlayers();
-      listAuditLog();
+      updatePageData();
+
       setOpenMatchDialog(false);
       setWinner('');
       setLoser('');
@@ -391,10 +402,10 @@ function App() {
       });
       if (response.ok) {
         setStatusMessage(`Successfully deleted player (ID: ${playerId})`);
-        listPlayers();
-        listAuditLog();
+        updatePageData();
       } else {
-        setStatusMessage(`Error deleting player (ID: ${playerId})`);
+        const errorData = await response.json();
+        setStatusMessage(`Error deleting player (ID: ${playerId}): ${errorData.detail}`);
       }
     } catch (error) {
       setStatusMessage(`Error deleting player: ${error}`);
