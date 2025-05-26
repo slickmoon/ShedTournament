@@ -38,7 +38,7 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
         width={windowSize.width / 2}
         height={windowSize.height}
         numberOfPieces={100}
-        gravity={0.2}
+        gravity={0.4}
         initialVelocityY={-10}
         initialVelocityX={5}
         recycle={false}
@@ -54,7 +54,7 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
         width={windowSize.width / 2}
         height={windowSize.height}
         numberOfPieces={100}
-        gravity={0.2}
+        gravity={0.4}
         initialVelocityY={-10}
         initialVelocityX={-5}
         recycle={false}
