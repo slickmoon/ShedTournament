@@ -13,8 +13,6 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_DAYS: int = 365
     
-    # CORS
-    CORS_ALLOWED_ORIGINS: List[str] = ["http://localhost", "http://localhost:8000"]
     CUSTOM_HOSTNAME: str
     
     class Config:

@@ -25,8 +25,9 @@ if not settings.APP_PASSWORD:
 if not settings.ADMIN_PASSWORD:
     raise ValueError("ADMIN_PASSWORD environment variable is not set")
 
+CORS_ALLOWED_ORIGINS = ["http://localhost", "http://localhost:8000"]
 if settings.CUSTOM_HOSTNAME:
-    settings.CORS_ALLOWED_ORIGINS.extend([
+    CORS_ALLOWED_ORIGINS.extend([
         f"http://{settings.CUSTOM_HOSTNAME}",
         f"https://{settings.CUSTOM_HOSTNAME}"
     ])
@@ -38,7 +39,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ALLOWED_ORIGINS,
+    allow_origins=CORS_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
