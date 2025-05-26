@@ -62,8 +62,9 @@ class StatsService:
                     current_streak += 1
                     streak_elo_change += match.winner1_elo_change
                 else:
-                    longest_streak = current_streak
-                    longest_streak_elo_change = streak_elo_change
+                    if current_streak > longest_streak:
+                        longest_streak = current_streak
+                        longest_streak_elo_change = streak_elo_change
                     current_streak = 0
                     streak_elo_change = 0
 
@@ -92,8 +93,9 @@ class StatsService:
                     current_streak += 1
                     streak_elo_change += match.loser1_elo_change
                 else:
-                    longest_streak = current_streak
-                    longest_streak_elo_change = streak_elo_change
+                    if current_streak > longest_streak:
+                        longest_streak = current_streak
+                        longest_streak_elo_change = streak_elo_change
                     current_streak = 0
                     streak_elo_change = 0
 
