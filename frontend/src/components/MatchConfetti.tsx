@@ -34,37 +34,45 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
   return (
     <>
       {/* Left cannon */}
-      <Confetti
-        width={windowSize.width / 2}
-        height={windowSize.height}
-        numberOfPieces={100}
-        gravity={0.4}
-        initialVelocityY={-10}
-        initialVelocityX={5}
-        recycle={false}
-        style={{
-          position: 'fixed',
-          left: 0,
-          bottom: 0,
-          pointerEvents: 'none',
-        }}
-      />
+      <div style={{
+        position: 'fixed',
+        left: 0,
+        bottom: 0,
+        width: windowSize.width / 2,
+        height: windowSize.height,
+        transform: 'rotate(180deg)',
+        pointerEvents: 'none',
+      }}>
+        <Confetti
+          width={windowSize.width / 2}
+          height={windowSize.height}
+          numberOfPieces={100}
+          gravity={0.4}
+          initialVelocityY={10}
+          initialVelocityX={-5}
+          recycle={false}
+        />
+      </div>
       {/* Right cannon */}
-      <Confetti
-        width={windowSize.width / 2}
-        height={windowSize.height}
-        numberOfPieces={100}
-        gravity={0.4}
-        initialVelocityY={-10}
-        initialVelocityX={-5}
-        recycle={false}
-        style={{
-          position: 'fixed',
-          right: 0,
-          bottom: 0,
-          pointerEvents: 'none',
-        }}
-      />
+      <div style={{
+        position: 'fixed',
+        right: 0,
+        bottom: 0,
+        width: windowSize.width / 2,
+        height: windowSize.height,
+        transform: 'rotate(180deg)',
+        pointerEvents: 'none',
+      }}>
+        <Confetti
+          width={windowSize.width / 2}
+          height={windowSize.height}
+          numberOfPieces={100}
+          gravity={0.4}
+          initialVelocityY={10}
+          initialVelocityX={5}
+          recycle={false}
+        />
+      </div>
     </>
   );
 };
