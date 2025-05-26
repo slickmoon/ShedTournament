@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Confetti from 'react-confetti';
+import { drawCustomConfetti } from '../utils/confettiShapes.ts';
 
 interface MatchConfettiProps {
   onComplete: () => void;
@@ -62,6 +63,8 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
           initialVelocityY={-10}
           initialVelocityX={5}
           recycle={false}
+          drawShape={drawCustomConfetti}
+          colors={['#FFD700', '#FFA500', '#FF69B4', '#00BFFF', '#98FB98']}
         />
       </div>
       {/* Right cannon */}
@@ -83,6 +86,8 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
           initialVelocityY={-10}
           initialVelocityX={-5}
           recycle={false}
+          drawShape={drawCustomConfetti}
+          colors={['#FFD700', '#FFA500', '#FF69B4', '#00BFFF', '#98FB98']}
         />
       </div>
     </>
