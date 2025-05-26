@@ -23,6 +23,10 @@ APP_PASSWORD = os.getenv("APP_PASSWORD")
 if not APP_PASSWORD:
     raise ValueError("APP_PASSWORD environment variable is not set")
 
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+if not ADMIN_PASSWORD:
+    raise ValueError("ADMIN_PASSWORD environment variable is not set")
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 365
 
