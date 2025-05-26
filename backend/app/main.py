@@ -144,7 +144,7 @@ async def update_player(
     
     AuditLogService.create_log(
         db,
-        f"Player #{player_id}  updated: Name changed from {original_player.player_name} to {player.player_name}. ELO Changed from {original_player.player_elo} to {player.player_elo}"
+        f"Player #{player_id}  updated: Name changed from {original_player.player_name} to {player.player_name}. ELO Changed from {original_player.elo} to {player.player_elo}"
     )
     return {"message": f"Player {player_id} updated successfully"}
 
