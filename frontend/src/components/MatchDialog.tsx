@@ -23,6 +23,7 @@ interface MatchDialogProps {
   loser2: string;
   setLoser2: (loser2: string) => void;
   matchError: string;
+  isLoading?: boolean;
 }
 
 const MatchDialog: React.FC<MatchDialogProps> = ({
@@ -40,7 +41,8 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
   setWinner2,
   loser2,
   setLoser2,
-  matchError
+  matchError,
+  isLoading = false
 }) => {
   return (
     <Dialog open={open} onClose={onClose}>
@@ -127,8 +129,10 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={onRecordMatch} variant="contained">Record Match</Button>
+        <Button onClick={onClose} disabled={isLoading}>Cancel</Button>
+        <Button onClick={onRecordMatch} variant="contained" disabled={isLoading}>
+          {isLoading ? 'Recording...' : 'Record Match'}
+        </Button>
       </DialogActions>
       {matchError && (
         <Typography variant="h6" sx={{ mt: 2, color: 'red', px: 2, pb: 2 }}>

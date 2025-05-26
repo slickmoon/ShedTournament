@@ -88,6 +88,7 @@ function App() {
   const [isDoubles, setIsDoubles] = useState(false);
   const [winner2, setWinner2] = useState<string>('');
   const [loser2, setLoser2] = useState<string>('');
+  const [isRecordingMatch, setIsRecordingMatch] = useState(false);
   const [playerStreaks, setPlayerStreaks] = useState<PlayerStreak[]>([]);
   const [playerStreakLongest, setPlayerStreakLongest] = useState<PlayerStreakLongest[]>([]);
   const [playerKd, setPlayerKD] = useState<PlayerKD[]>([]);
@@ -304,6 +305,7 @@ function App() {
 
   const recordMatch = async () => {
     try {
+      setIsRecordingMatch(true);
       const winner1Player = players.find(p => p.player_name === winner);
       const loser1Player = players.find(p => p.player_name === loser);
       
@@ -407,6 +409,8 @@ function App() {
       setMatchError('');
     } catch (error) {
       setStatusMessage(`Error recording match: ${error}`);
+    } finally {
+      setIsRecordingMatch(false);
     }
   };
 
@@ -507,13 +511,13 @@ function App() {
                 <MatchDialog
                   open={openMatchDialog}
                   onClose={() => {
-                  setOpenMatchDialog(false);
-                  setWinner('');
-                  setLoser('');
-                  setWinner2('');
-                  setLoser2('');
-                  setIsDoubles(false);
-                  setMatchError('');
+                    setOpenMatchDialog(false);
+                    setWinner('');
+                    setLoser('');
+                    setWinner2('');
+                    setLoser2('');
+                    setIsDoubles(false);
+                    setMatchError('');
                   }}
                   onRecordMatch={recordMatch}
                   players={players}
@@ -528,6 +532,7 @@ function App() {
                   loser2={loser2}
                   setLoser2={setLoser2}
                   matchError={matchError}
+                  isLoading={isRecordingMatch}
                 />
                 
           </div>
