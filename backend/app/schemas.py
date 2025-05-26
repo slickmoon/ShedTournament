@@ -33,6 +33,10 @@ class MatchCreate(MatchBase):
 class MatchResponse(MatchBase):
     id: int
     timestamp: datetime
+    winner1_id: int
+    winner2_id: Optional[int] = None
+    loser1_id: int
+    loser2_id: Optional[int] = None
     winner1_starting_elo: int
     winner2_starting_elo: Optional[int]
     winner1_elo_change: int
