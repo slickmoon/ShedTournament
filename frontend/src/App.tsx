@@ -17,6 +17,7 @@ import ScrabbleGame from './components/ScrabbleGame.tsx';
 import { randomTexts, wednesdayTexts } from './data/shed-quotes.ts';
 import { checkSpecialMatchResult } from './utils/matchChecks.ts';
 import SpecialMatchGraphic from './components/SpecialMatchGraphic.tsx';
+import MatchConfetti from './components/MatchConfetti.tsx';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -100,6 +101,7 @@ function App() {
     date: '',
     matches_played: 0
   });
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Load initial data and check token
   useEffect(() => {
@@ -359,6 +361,7 @@ function App() {
             </Box>
           );
           setSpecialMatchResults(checkSpecialMatchResult(data, players));
+          setShowConfetti(true);
         } else {
           const errorData = await response.json();
           setStatusMessage(`Error recording match: ${errorData.detail}`);
@@ -392,6 +395,7 @@ function App() {
             </Box>
           );
           setSpecialMatchResults(checkSpecialMatchResult(data, players));
+          setShowConfetti(true);
         } else {
           const errorData = await response.json();
           setStatusMessage(`Error recording match: ${errorData.detail}`);
@@ -438,6 +442,9 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {isWednesday && <BouncingWednesday />}
+        {showConfetti && (
+          <MatchConfetti onComplete={() => setShowConfetti(false)} />
+        )}
         <Router basename="/shed">
           <Routes>
             <Route path="/" element={
