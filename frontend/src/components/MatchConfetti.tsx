@@ -46,8 +46,6 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
       {/* Left cannon */}
       <div style={{
         position: 'fixed',
-        left: 0,
-        bottom: 0,
         width: windowSize.width / 2,
         height: windowSize.height,
         pointerEvents: 'none',
@@ -57,7 +55,7 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
         <Confetti
           width={windowSize.width / 2}
           height={windowSize.height}
-          numberOfPieces={100}
+          numberOfPieces={150}
           gravity={0.4}
           initialVelocityY={-10}
           initialVelocityX={5}
@@ -67,8 +65,6 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
       {/* Right cannon */}
       <div style={{
         position: 'fixed',
-        right: 0,
-        bottom: 0,
         width: windowSize.width / 2,
         height: windowSize.height,
         pointerEvents: 'none',
@@ -78,7 +74,7 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
         <Confetti
           width={windowSize.width / 2}
           height={windowSize.height}
-          numberOfPieces={100}
+          numberOfPieces={150}
           gravity={0.4}
           initialVelocityY={-10}
           initialVelocityX={-5}
