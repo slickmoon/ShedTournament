@@ -11,8 +11,8 @@ interface Player {
 interface PlayerAdminProps {
   players: Player[];
   onAddPlayer: (playerName: string) => void;
-  onDeletePlayer: (playerId: number) => void;
-  onUpdatePlayer: (playerId: number, playerName: string, newElo: number) => void;
+  onDeletePlayer: (playerId: number, access_password: string) => void;
+  onUpdatePlayer: (playerId: number, playerName: string, newElo: number, access_password: string) => void;
   updatePlayerMessage: string | React.ReactNode;
 }
 
@@ -27,6 +27,7 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
   const [selectedUpdatePlayer, setSelectedUpdatePlayer] = useState<string>('');
   const [selectedPlayerUpdateName, setSelectedPlayerUpdateName] = useState<string>('');
   const [selectedPlayerUpdateElo, setSelectedPlayerUpdateElo] = useState<number>(1000);
+  const [accessPassword, setAccessPassword] = useState<string>('');
 
   return (
     <>
@@ -82,13 +83,24 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
                 ))}
               </Select>
               <Box sx={{ mt: 2 }}>
+                <TextField
+                  id="delete-access-password"
+                  label="Admin Password"
+                  type="password"
+                  variant="outlined"
+                  value={accessPassword}
+                  onChange={(e) => setAccessPassword(e.target.value)}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
                 <Button
                   variant="contained"
                   color="error" 
                   onClick={() => {
                     const player = players.find(p => p.player_name.toLowerCase() === selectedPlayer.toLowerCase());
                     if (player) {
-                      onDeletePlayer(player.id);
+                      onDeletePlayer(player.id, accessPassword);
+                      setAccessPassword('');
                     }
                   }}
                 >
@@ -147,6 +159,16 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
                 sx={{ mt: 2 }}
               />
               <Box sx={{ mt: 2 }}>
+                <TextField
+                  id="update-access-password"
+                  label="Admin Password"
+                  type="password"
+                  variant="outlined"
+                  value={accessPassword}
+                  onChange={(e) => setAccessPassword(e.target.value)}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
                 <Button
                   variant="contained"
                   onClick={() => {
@@ -154,10 +176,11 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
                     const playerEloInput = document.getElementById('player-elo-input') as HTMLInputElement;
                     const player = players.find(p => p.id == parseInt(selectedUpdatePlayer));
                     if (player) {
-                      onUpdatePlayer(player.id, playerNameInput.value, parseInt(playerEloInput.value));
+                      onUpdatePlayer(player.id, playerNameInput.value, parseInt(playerEloInput.value), accessPassword);
                       setSelectedUpdatePlayer('');
                       playerNameInput.value = '';
                       playerEloInput.value = '1000';
+                      setAccessPassword('');
                     }
                   }}
                 >

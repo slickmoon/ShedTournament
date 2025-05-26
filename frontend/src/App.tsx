@@ -157,7 +157,7 @@ function App() {
     }
   };
 
-  const updatePlayer = async (player_id: number, playerName: string, newElo: number) => {
+  const updatePlayer = async (player_id: number, playerName: string, newElo: number, access_password: string) => {
     try {
       if (!player_id) {
         setUpdatePlayerMessage('No player selected');
@@ -173,7 +173,8 @@ function App() {
         headers: getAuthHeaders(),
         body: JSON.stringify({
           player_name: playerName,
-          player_elo: newElo
+          player_elo: newElo,
+          access_password: access_password
         })
       });
       if (response.ok) {
@@ -377,11 +378,12 @@ function App() {
     }
   };
 
-  const deletePlayer = async (playerId: number) => {
+  const deletePlayer = async (playerId: number, access_password: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/players/${playerId}`, {
         method: 'DELETE',
-        headers: getAuthHeaders()
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ access_password: access_password })
       });
       if (response.ok) {
         setStatusMessage(`Successfully deleted player (ID: ${playerId})`);

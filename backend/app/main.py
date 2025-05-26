@@ -359,10 +359,13 @@ async def get_player(
 @api.put("/players/{player_id}")
 async def update_player(
     player: PlayerUpdateRequest, 
-    player_id: int = Path(..., description="The ID of the player to update"), 
+    player_id: int,
+    access_password: str, 
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
+    if access_password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Please provide the correct admin password")
     db_player = db.query(base.Player).filter(base.Player.id == player_id, base.Player.deleted == False).first()
     if db_player is None:
         raise HTTPException(status_code=404, detail="Player #{player_id} not found")
@@ -381,9 +384,12 @@ async def update_player(
 @api.delete("/players/{player_id}")
 async def delete_player(
     player_id: int, 
+    access_password: str,
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
+    if access_password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Please provide the correct admin password")
     player = db.query(base.Player).filter(base.Player.id == player_id, base.Player.deleted == False).first()
     if player is None:
         raise HTTPException(status_code=404, detail="Player not found")
