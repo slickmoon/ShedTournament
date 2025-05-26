@@ -184,15 +184,15 @@ async def record_match(
     if error:
         raise HTTPException(status_code=400, detail=error)
     
-    winner1, error = PlayerService.get_player(db,match.winner1_id)
-    loser1, error = PlayerService.get_player(db,match.loser1_id)
+    winner1 = PlayerService.get_player(db,match.winner1_id)
+    loser1 = PlayerService.get_player(db,match.loser1_id)
     winner2 = None
     loser2 = None
 
     # Create audit log
     if match.is_doubles:
-        winner2, error = PlayerService.get_player(db,match.winner2_id)
-        loser2, error = PlayerService.get_player(db,match.loser2_id)
+        winner2 = PlayerService.get_player(db,match.winner2_id)
+        loser2 = PlayerService.get_player(db,match.loser2_id)
         AuditLogService.create_log(
             db,
             f"Doubles match recorded: Players {winner1.player_name} ({winner1.elo}) & {winner2.player_name} ({winner2.elo}) defeated {loser1.player_name} ({loser1.elo}) & {loser2.player_name} ({loser2.elo})"
