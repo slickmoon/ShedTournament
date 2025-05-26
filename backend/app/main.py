@@ -184,22 +184,56 @@ async def record_match(
     if error:
         raise HTTPException(status_code=400, detail=error)
     
+    winner1, error = PlayerService.get_player(db,match.winner1_id)
+    loser1, error = PlayerService.get_player(db,match.loser1_id)
+    winner2 = None
+    loser2 = None
+
     # Create audit log
     if match.is_doubles:
+        winner2, error = PlayerService.get_player(db,match.winner2_id)
+        loser2, error = PlayerService.get_player(db,match.loser2_id)
         AuditLogService.create_log(
             db,
-            f"Doubles match recorded: Players {match.winner1_id} & {match.winner2_id} defeated {match.loser1_id} & {match.loser2_id}"
+            f"Doubles match recorded: Players {winner1.player_name} ({winner1.elo}) & {winner2.player_name} ({winner2.elo}) defeated {loser1.player_name} ({loser1.elo}) & {loser2.player_name} ({loser2.elo})"
         )
     else:
         AuditLogService.create_log(
             db,
-            f"Match recorded: Player {match.winner1_id} defeated {match.loser1_id}"
+            f"Match recorded: {winner1.player_name} ({winner1.elo}) defeated {loser1.player_name} ({loser1.elo})"
         )
-    
-    return {
+
+    # Prepare response
+    response = {
         "message": "Match recorded successfully",
-        "match": match_record
+        "is_doubles": match.is_doubles,
+        "winners": [{
+            "id": winner1.id,
+            "name": winner1.player_name,
+            "new_elo": winner1.elo,
+            "elo_change": winner1.elo - match.winner1_elo_change
+        }],
+        "losers": [{
+            "id": loser1.id,
+            "name": loser1.player_name,
+            "new_elo": loser1.elo,
+            "elo_change": loser1.elo - match.loser1_elo_change
+        }]
     }
+    if match.is_doubles:
+        response["winners"].append({
+            "id": winner2.id,
+            "name": winner2.player_name,
+            "new_elo": winner2.elo,
+            "elo_change": winner2.elo - match.winner2_elo_change
+        })
+        response["losers"].append({
+            "id": loser2.id,
+            "name": loser2.player_name,
+            "new_elo": loser2.elo,
+            "elo_change": loser2.elo - match.loser2_elo_change
+        })
+    return response
 
 @api.get("/matches/most", response_model=dict)
 async def get_most_matches_in_day(
