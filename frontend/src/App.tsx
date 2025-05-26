@@ -237,8 +237,7 @@ function App() {
       const data = await response.json();
       if (response.ok) {
         setStatusMessage(`Added ${playerName} successfully`);
-        listPlayers();
-        listAuditLog();
+        updatePageData();
       } else {
         const errorData = await response.json();
         setStatusMessage(`Error adding player ${playerName}: ${errorData.detail}`);
@@ -272,8 +271,7 @@ function App() {
       });
       if (response.ok) {
         setUpdatePlayerMessage(`Successfully updated player ${playerName} (#${player_id})`);
-        listPlayers();
-        listAuditLog();
+        updatePageData();
       } else {
         const errorData = await response.json();
         setUpdatePlayerMessage(`Error updating player ${playerName} (#${player_id}): ${errorData.detail}`);
