@@ -16,7 +16,7 @@ from .services import PlayerService, MatchService, AuditLogService, StatsService
 from .config import get_settings
 
 settings = get_settings()
-if not settings.SECRET_KEY:
+if not settings.AUTH_SECRET_KEY:
     raise ValueError("AUTH_SECRET_KEY environment variable is not set")
 
 if not settings.APP_PASSWORD:
