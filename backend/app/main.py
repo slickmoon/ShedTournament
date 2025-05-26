@@ -140,7 +140,7 @@ async def update_player(
     if not original_player:
         raise HTTPException(status_code=404, detail=f"Player #{player_id} not found")
     if not PlayerService.update_player(db, player_id, player):
-        raise HTTPException(status_code=500, detail=f"Failed to update player #{player_id} {original_player.player_name}"
+        raise HTTPException(status_code=500, detail=f"Failed to update player #{player_id} {original_player.player_name}")
     
     AuditLogService.create_log(
         db,
