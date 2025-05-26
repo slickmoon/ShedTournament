@@ -211,13 +211,13 @@ async def record_match(
             "id": winner1.id,
             "name": winner1.player_name,
             "new_elo": winner1.elo,
-            "elo_change": winner1.elo - match_record.winner1_elo_change
+            "elo_change": match_record.winner1_elo_change
         }],
         "losers": [{
             "id": loser1.id,
             "name": loser1.player_name,
             "new_elo": loser1.elo,
-            "elo_change": loser1.elo - match_record.loser1_elo_change
+            "elo_change": match_record.loser1_elo_change
         }]
     }
     if match.is_doubles:
@@ -225,13 +225,13 @@ async def record_match(
             "id": winner2.id,
             "name": winner2.player_name,
             "new_elo": winner2.elo,
-            "elo_change": winner2.elo - match_record.winner2_elo_change
+            "elo_change": match_record.winner2_elo_change
         })
         response["losers"].append({
             "id": loser2.id,
             "name": loser2.player_name,
             "new_elo": loser2.elo,
-            "elo_change": loser2.elo - match_record.loser2_elo_change
+            "elo_change": match_record.loser2_elo_change
         })
     return response
 
