@@ -361,14 +361,15 @@ async def update_player(
 ):
     db_player = db.query(base.Player).filter(base.Player.id == player_id, base.Player.deleted == False).first()
     if db_player is None:
-        raise HTTPException(status_code=404, detail="Player not found")
+        raise HTTPException(status_code=404, detail="Player #{player_id} not found")
     
     if db_player.deleted:
-        raise HTTPException(status_code=400, detail="Cannot update a deleted player")
-    
+        raise HTTPException(status_code=400, detail="Player #{player_id} cannot be updated because they have been deleted")
+    orig_player_name = db_player.player_name
+    orig_player_elo = db_player.elo
     db_player.player_name = player.player_name
     db_player.elo = player.player_elo
-    audit_log = base.AuditLog(log=f"Player {player.player_name} updated")
+    audit_log = base.AuditLog(log=f"Player #{player_id} updated: Name changed from {orig_player_name} to {player.player_name}. ELO Changed from {orig_player_elo} to {player.player_elo}")
     db.add(audit_log)
     db.commit()
     return {"message": f"Player {player_id} updated successfully"}
