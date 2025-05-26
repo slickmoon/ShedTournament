@@ -10,6 +10,7 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -24,11 +25,20 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onComplete();
-    }, 3000); // Stop confetti after 3 seconds
+    // Start fading out after 2.5 seconds
+    const fadeTimer = setTimeout(() => {
+      setIsFading(true);
+    }, 2500);
 
-    return () => clearTimeout(timer);
+    // Complete the effect after 3 seconds
+    const completeTimer = setTimeout(() => {
+      onComplete();
+    }, 3000);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(completeTimer);
+    };
   }, [onComplete]);
 
   return (
@@ -41,6 +51,8 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
         width: windowSize.width / 2,
         height: windowSize.height,
         pointerEvents: 'none',
+        opacity: isFading ? 0 : 1,
+        transition: 'opacity 0.5s ease-out',
       }}>
         <Confetti
           width={windowSize.width / 2}
@@ -60,6 +72,8 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
         width: windowSize.width / 2,
         height: windowSize.height,
         pointerEvents: 'none',
+        opacity: isFading ? 0 : 1,
+        transition: 'opacity 0.5s ease-out',
       }}>
         <Confetti
           width={windowSize.width / 2}
