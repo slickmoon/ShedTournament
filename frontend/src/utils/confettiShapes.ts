@@ -1,5 +1,5 @@
 // Custom confetti shapes using emojis
-const shapes = ['🎱', '🏆', '⭐'];
+const shapes = ['🎱'];
 
 export const drawCustomConfetti = (ctx: CanvasRenderingContext2D) => {
   const shape = shapes[Math.floor(Math.random() * shapes.length)];
