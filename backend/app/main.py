@@ -136,14 +136,15 @@ async def update_player(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Please provide the correct admin password"
         )
-    
-    db_player = PlayerService.update_player(db, player_id, player)
-    if not db_player:
+    original_player = PlayerService.get_player(db,player_id)
+    if not original_player:
         raise HTTPException(status_code=404, detail=f"Player #{player_id} not found")
+    if not PlayerService.update_player(db, player_id, player):
+        raise HTTPException(status_code=500, detail=f"Failed to update player #{player_id} {original_player.player_name}"
     
     AuditLogService.create_log(
         db,
-        f"Player #{player_id} updated: Name changed to {player.player_name}. ELO Changed to {player.player_elo}"
+        f"Player #{player_id}  updated: Name changed from {original_player.player_name} to {player.player_name}. ELO Changed from {original_player.player_elo} to {player.player_elo}"
     )
     return {"message": f"Player {player_id} updated successfully"}
 
@@ -160,12 +161,15 @@ async def delete_player(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Please provide the correct admin password"
         )
-    
+    player = PlayerService.get_player(db,player_id)
+    if not player:
+        raise HTTPException(status_code=404, detail=f"Player #{player_id} not found")
     if not PlayerService.delete_player(db, player_id):
-        raise HTTPException(status_code=404, detail="Player not found")
+        raise HTTPException(status_code=500, detail=f"Failed to delete #{player_id} {player.player_name}")
+        
     
-    AuditLogService.create_log(db, f"Player #{player_id} deleted")
-    return {"message": f"Player {player_id} deleted successfully"}
+    AuditLogService.create_log(db, f"Player #{player_id} {player.player_name} deleted")
+    return {"message": f"Player #{player_id} {player.player_name} deleted successfully"}
 
 @api.get("/auditlog", response_model=list[AuditLogResponse])
 async def get_audit_log(
