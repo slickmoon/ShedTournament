@@ -27,6 +27,14 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 if not ADMIN_PASSWORD:
     raise ValueError("ADMIN_PASSWORD environment variable is not set")
 
+CORS_ALLOWED_ORIGINS = ["http://localhost", "http://localhost:8000"]
+CUSTOM_HOSTNAME = os.getenv("CUSTOM_HOSTNAME")
+if CUSTOM_HOSTNAME:
+    CORS_ALLOWED_ORIGINS.extend([
+        f"http://{CUSTOM_HOSTNAME}",
+        f"https://{CUSTOM_HOSTNAME}"
+    ])
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 365
 
@@ -37,7 +45,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://slkmn.k.vu", "https://slkmn.k.vu", "http://localhost", "http://localhost:8000"],
+    allow_origins=CORS_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -360,11 +368,12 @@ async def get_player(
 async def update_player(
     player: PlayerUpdateRequest, 
     player_id: int,
-    access_password: str, 
+    request: Request,
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    if access_password != ADMIN_PASSWORD:
+    access_password = request.headers.get('X-Admin-Password')
+    if not access_password or access_password != ADMIN_PASSWORD:
         raise HTTPException(status_code=401, detail="Please provide the correct admin password")
     db_player = db.query(base.Player).filter(base.Player.id == player_id, base.Player.deleted == False).first()
     if db_player is None:
@@ -384,11 +393,12 @@ async def update_player(
 @api.delete("/players/{player_id}")
 async def delete_player(
     player_id: int, 
-    access_password: str,
+    request: Request,
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    if access_password != ADMIN_PASSWORD:
+    access_password = request.headers.get('X-Admin-Password')
+    if not access_password or access_password != ADMIN_PASSWORD:
         raise HTTPException(status_code=401, detail="Please provide the correct admin password")
     player = db.query(base.Player).filter(base.Player.id == player_id, base.Player.deleted == False).first()
     if player is None:

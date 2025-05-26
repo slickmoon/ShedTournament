@@ -170,11 +170,13 @@ function App() {
       }
       const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
         method: 'PUT',
-        headers: getAuthHeaders(),
+        headers: {
+          ...getAuthHeaders(),
+          'X-Admin-Password': access_password
+        },
         body: JSON.stringify({
           player_name: playerName,
-          player_elo: newElo,
-          access_password: access_password
+          player_elo: newElo
         })
       });
       if (response.ok) {
@@ -382,8 +384,10 @@ function App() {
     try {
       const response = await fetch(`${API_BASE_URL}/players/${playerId}`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ access_password: access_password })
+        headers: {
+          ...getAuthHeaders(),
+          'X-Admin-Password': access_password
+        }
       });
       if (response.ok) {
         setStatusMessage(`Successfully deleted player (ID: ${playerId})`);
