@@ -15,7 +15,7 @@ interface PlayerPodiumProps {
 const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
   return (
     <Box sx={{ flex: 1 }}>
-      <h2>Players</h2>
+      <h2>Shed Podium</h2>
       <Box sx={{ 
         display: 'flex', 
         flexDirection: { xs: 'column', md: 'row' },
