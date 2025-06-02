@@ -88,9 +88,10 @@ async def get_players(
             "id": player.id,
             "player_name": player.player_name,
             "elo": player.elo,
-            "total_matches": total_matches or 0
+            "total_matches": total_matches or 0,
+            "recently_pantsed": recently_pantsed
         }
-        for player, total_matches in players
+        for player, total_matches, recently_pantsed in players
     ]
 
 @api.get("/stats/streaks", response_model=list[dict])

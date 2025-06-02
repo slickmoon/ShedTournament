@@ -6,6 +6,7 @@ interface Player {
   player_name: string;
   elo: number;
   total_matches: number;
+  recently_pantsed: boolean;
 }
 
 interface PlayerPodiumProps {
@@ -26,6 +27,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
         minHeight: '200px'
       }}>
         {[...players]
+          .filter(player => player.total_matches >= 3)
           .sort((a, b) => b.elo - a.elo)
           .slice(0, 3)
           .map((player, index) => (
@@ -62,7 +64,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
                 color: 'text.primary'
               }}
             >
-              {player.player_name}
+              {player.player_name}{player.recently_pantsed ? ' 👖' : ''}
             </Typography>
             <Typography
               variant="subtitle1"
@@ -107,7 +109,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
             .slice(3)
             .map((player, index) => (
             <Typography key={player.id} sx={{ mb: 1 }}>
-              #{index + 4}. {player.player_name} (ELO: {player.elo}) (Games: {player.total_matches})
+              #{index + 4}. {player.player_name}{player.recently_pantsed ? ' 👖' : ''} (ELO: {player.elo}) (Games: {player.total_matches})
             </Typography>
           ))}
         </Box>
@@ -118,12 +120,11 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players }) => {
             .sort((a, b) => b.elo - a.elo)
             .map((player) => (
             <Typography key={player.id} sx={{ mb: 1 }}>
-              {player.player_name} (ELO: {player.elo}) (Games: {player.total_matches})
+              {player.player_name}{player.recently_pantsed ? ' 👖' : ''} (ELO: {player.elo}) (Games: {player.total_matches})
             </Typography>
           ))}
         </Box>
       </Box>
-        
     </Box>
   );
 };

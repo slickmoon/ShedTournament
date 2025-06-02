@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, or_
-from datetime import datetime
+from sqlalchemy import func, or_, and_
+from datetime import datetime, timedelta
 from typing import List, Optional, Tuple
 from .. import base
 from ..schemas import PlayerCreate, PlayerUpdate
@@ -22,7 +22,8 @@ class PlayerService:
         ).first()
 
     @staticmethod
-    def get_players(db: Session) -> List[Tuple[base.Player, int]]:
+    def get_players(db: Session) -> List[Tuple[base.Player, int, bool]]:
+        # Get match counts
         match_counts = db.query(
             base.Player.id,
             func.count(base.Match.id).label('total_matches')
@@ -36,9 +37,20 @@ class PlayerService:
             )
         ).group_by(base.Player.id).subquery()
 
+        # Get pantsed event type
+        pantsed_event = db.query(base.EventType).filter(base.EventType.name == "pantsed").first()
+        
+        # Get recent pantsing events (last 90 days)
+        ninety_days_ago = datetime.now() - timedelta(days=90)
+        recent_pantsed_players = db.query(base.PlayerEvent.player_id).filter(
+            base.PlayerEvent.event_id == pantsed_event.id,
+            base.PlayerEvent.timestamp >= ninety_days_ago
+        ).subquery()
+
         return db.query(
             base.Player,
-            match_counts.c.total_matches
+            match_counts.c.total_matches,
+            base.Player.id.in_(recent_pantsed_players).label('recently_pantsed')
         ).outerjoin(
             match_counts,
             base.Player.id == match_counts.c.id
