@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider, CssBaseline, Button, Typography, Box } from '@mui/material';
+import PullToRefresh from 'react-pull-to-refresh';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
@@ -87,6 +88,7 @@ function App() {
   const [isPantsed, setIsPantsed] = useState(false);
   const [isAwayGame, setIsAwayGame] = useState(false);
   const [isLostByFoul, setIsLostByFoul] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [playerStreaks, setPlayerStreaks] = useState<PlayerStreak[]>([]);
   const [playerStreakLongest, setPlayerStreakLongest] = useState<PlayerStreakLongest[]>([]);
   const [playerKd, setPlayerKD] = useState<PlayerKD[]>([]);
@@ -99,6 +101,20 @@ function App() {
     matches_played: 0
   });
   const [showConfetti, setShowConfetti] = useState(false);
+
+  // Add online/offline status listener
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Load initial data and check token
   useEffect(() => {
@@ -415,6 +431,24 @@ function App() {
     setSpecialMatchResults(prev => prev.slice(1));
   };
 
+  const handleRefresh = async () => {
+    try {
+      await updatePageData();
+      return Promise.resolve();
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      return Promise.reject();
+    }
+  };
+
+  const handleOpenMatchDialog = () => {
+    if (!isOnline) {
+      setStatusMessage('Cannot record matches while offline. Please check your internet connection.');
+      return;
+    }
+    setOpenMatchDialog(true);
+  };
+
   if (loading) {
     return null;
   }
@@ -441,110 +475,128 @@ function App() {
         <Router basename="/shed">
           <Routes>
             <Route path="/" element={
-              <div>
-                <h1 className="wave-text">
-                  Welcome to the Shed tournament
-                </h1>
-          <Typography 
-                  variant="h5" 
-                  sx={{ 
-                    textAlign: 'center', 
-                    mb: 3,
-                    mx: 2,
-                    fontStyle: 'italic',
-                    color: 'text.secondary'
-                  }}
-                >
-            {randomText}
-          </Typography>
-
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
-              <Button 
-                variant="contained" 
-                color="primary"
-                size="large"
-                onClick={() => setOpenMatchDialog(true)}
+              <PullToRefresh
+                onRefresh={handleRefresh}
+                style={{
+                  minHeight: '100vh',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
               >
-                Record Match Result
-              </Button>
-            </Box>
-          <div style={{ margin: '1em', textAlign: 'center' }}>
-            {statusMessage && (
-              <Typography variant="h6" sx={{ mb: 3 }}>
-                {statusMessage}
-              </Typography>
-            )}
-            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
-                    <PlayerPodium players={players} />
-                    <PlayerStreaks playerStreaks={playerStreaks} />
-                    <PlayerKD playerKd={playerKd} />
+                <div>
+                  <h1 className="wave-text">
+                    Welcome to the Shed tournament
+                  </h1>
+                  <Typography 
+                    variant="h5" 
+                    sx={{ 
+                      textAlign: 'center', 
+                      mb: 3,
+                      mx: 2,
+                      fontStyle: 'italic',
+                      color: 'text.secondary'
+                    }}
+                  >
+                    {randomText}
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
+                    <Button 
+                      variant="contained" 
+                      color="primary"
+                      size="large"
+                      onClick={handleOpenMatchDialog}
+                      disabled={!isOnline}
+                    >
+                      Record Match Result
+                    </Button>
+                  </Box>
+                  {!isOnline && (
+                    <Typography 
+                      variant="body2" 
+                      color="error" 
+                      sx={{ textAlign: 'center', mb: 2 }}
+                    >
+                      You are currently offline. Match recording is disabled.
+                    </Typography>
+                  )}
+                  <div style={{ margin: '1em', textAlign: 'center' }}>
+                    {statusMessage && (
+                      <Typography variant="h6" sx={{ mb: 3 }}>
+                        {statusMessage}
+                      </Typography>
+                    )}
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
+                      <PlayerPodium players={players} />
+                      <PlayerStreaks playerStreaks={playerStreaks} />
+                      <PlayerKD playerKd={playerKd} />
+                    </Box>
+
+                    {isWednesday && <ScrabbleGame />}
+                    
+                    <PlayerStats 
+                      playerStreakLongest={playerStreakLongest}
+                      mostMatchesInDay={mostMatchesInDay}
+                    />
+
+                    <PlayerAdmin
+                      players={players}
+                      onAddPlayer={addplayer}
+                      onDeletePlayer={deletePlayer}
+                      onUpdatePlayer={updatePlayer}
+                      playerAdminMessage={updatePlayerMessage}
+                    />
+
+                    <AuditLog auditLog={auditlog} />
+                  </div>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
+                    <Button 
+                      variant="contained" 
+                      color="secondary"
+                      size="large"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </Button>
                   </Box>
 
-                  {isWednesday && <ScrabbleGame />}
-                  
-                  <PlayerStats 
-                    playerStreakLongest={playerStreakLongest}
-                    mostMatchesInDay={mostMatchesInDay}
-                  />
-
-                  <PlayerAdmin
+                  <MatchDialog
+                    open={openMatchDialog}
+                    onClose={() => {
+                      setOpenMatchDialog(false);
+                      setWinner('');
+                      setLoser('');
+                      setWinner2('');
+                      setLoser2('');
+                      setIsDoubles(false);
+                      setIsPantsed(false);
+                      setIsAwayGame(false);
+                      setIsLostByFoul(false);
+                      setMatchError('');
+                    }}
+                    onRecordMatch={recordMatch}
                     players={players}
-                    onAddPlayer={addplayer}
-                    onDeletePlayer={deletePlayer}
-                    onUpdatePlayer={updatePlayer}
-                    playerAdminMessage={updatePlayerMessage}
+                    isDoubles={isDoubles}
+                    setIsDoubles={setIsDoubles}
+                    winner={winner}
+                    setWinner={setWinner}
+                    loser={loser}
+                    setLoser={setLoser}
+                    winner2={winner2}
+                    setWinner2={setWinner2}
+                    loser2={loser2}
+                    setLoser2={setLoser2}
+                    matchError={matchError}
+                    isLoading={isRecordingMatch}
+                    isPantsed={isPantsed}
+                    setIsPantsed={setIsPantsed}
+                    isAwayGame={isAwayGame}
+                    setIsAwayGame={setIsAwayGame}
+                    isLostByFoul={isLostByFoul}
+                    setIsLostByFoul={setIsLostByFoul}
                   />
-
-                  <AuditLog auditLog={auditlog} />
                 </div>
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
-                  <Button 
-                    variant="contained" 
-                    color="secondary"
-                    size="large"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </Button>
-                </Box>
-
-                <MatchDialog
-                  open={openMatchDialog}
-                  onClose={() => {
-                    setOpenMatchDialog(false);
-                    setWinner('');
-                    setLoser('');
-                    setWinner2('');
-                    setLoser2('');
-                    setIsDoubles(false);
-                    setIsPantsed(false);
-                    setIsAwayGame(false);
-                    setIsLostByFoul(false);
-                    setMatchError('');
-                  }}
-                  onRecordMatch={recordMatch}
-                  players={players}
-                  isDoubles={isDoubles}
-                  setIsDoubles={setIsDoubles}
-                  winner={winner}
-                  setWinner={setWinner}
-                  loser={loser}
-                  setLoser={setLoser}
-                  winner2={winner2}
-                  setWinner2={setWinner2}
-                  loser2={loser2}
-                  setLoser2={setLoser2}
-                  matchError={matchError}
-                  isLoading={isRecordingMatch}
-                  isPantsed={isPantsed}
-                  setIsPantsed={setIsPantsed}
-                  isAwayGame={isAwayGame}
-                  setIsAwayGame={setIsAwayGame}
-                  isLostByFoul={isLostByFoul}
-                  setIsLostByFoul={setIsLostByFoul}
-                />
-                
-          </div>
+              </PullToRefresh>
             } />
           </Routes>
         </Router>
