@@ -1,6 +1,6 @@
 -- Initialize event types table with initial values
-INSERT INTO event_types (name)
+INSERT INTO EventTypes (name)
 SELECT 'pantsed'
 WHERE NOT EXISTS (
-    SELECT 1 FROM event_types WHERE name = 'pantsed'
+    SELECT 1 FROM EventTypes WHERE name = 'pantsed'
 ); 
