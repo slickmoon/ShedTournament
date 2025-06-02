@@ -16,7 +16,10 @@ const InstallPrompt: React.FC = () => {
   useEffect(() => {
     // Check if the app is already installed
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
-    if (isInstalled) return;
+    if (isInstalled) {
+      console.log('App is already installed');
+      return;
+    }
 
     // Check if it's iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
@@ -24,15 +27,28 @@ const InstallPrompt: React.FC = () => {
 
     // Handle the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('beforeinstallprompt event fired');
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsVisible(true);
     };
 
+    // Check if the event has already fired
+    const checkPrompt = async () => {
+      const promptEvent = (window as any).deferredPrompt;
+      if (promptEvent) {
+        console.log('Found existing deferred prompt');
+        setDeferredPrompt(promptEvent);
+        setIsVisible(true);
+      }
+    };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    checkPrompt();
 
     // Show iOS prompt if it's an iOS device
     if (isIOSDevice) {
+      console.log('iOS device detected');
       setIsVisible(true);
     }
 
@@ -42,9 +58,13 @@ const InstallPrompt: React.FC = () => {
   }, []);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      console.log('No deferred prompt available');
+      return;
+    }
 
     try {
+      console.log('Prompting for installation');
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       
@@ -67,7 +87,8 @@ const InstallPrompt: React.FC = () => {
     localStorage.setItem('installPromptDismissed', 'true');
   };
 
-  if (!isVisible) return null;
+  // Don't show if user has dismissed before
+  if (!isVisible || localStorage.getItem('installPromptDismissed') === 'true') return null;
 
   return (
     <Paper
