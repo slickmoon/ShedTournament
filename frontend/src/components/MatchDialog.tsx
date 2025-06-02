@@ -56,21 +56,21 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography>Match Type:</Typography>
             <Button
-              variant={isDoubles ? "contained" : "outlined"}
-              onClick={() => setIsDoubles(true)}
-            >
-              Doubles
-            </Button>
-            <Button
               variant={!isDoubles ? "contained" : "outlined"}
               onClick={() => setIsDoubles(false)}
             >
               Singles
             </Button>
+            <Button
+              variant={isDoubles ? "contained" : "outlined"}
+              onClick={() => setIsDoubles(true)}
+            >
+              Doubles
+            </Button>
           </Box>
 
           <Box>
-            <Typography variant="h6">Winners</Typography>
+            <Typography variant="h6">Winner(s)</Typography>
             <Select
               value={winner}
               onChange={(e) => setWinner(e.target.value)}
@@ -101,7 +101,7 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
           </Box>
 
           <Box>
-            <Typography variant="h6">Losers</Typography>
+            <Typography variant="h6">Loser(s)</Typography>
             <Select
               value={loser}
               onChange={(e) => setLoser(e.target.value)}
