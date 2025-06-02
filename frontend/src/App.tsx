@@ -494,11 +494,15 @@ function App() {
                   WebkitOverflowScrolling: 'touch',
                   overscrollBehavior: 'auto',
                   position: 'relative',
-                  touchAction: 'pan-y'
+                  touchAction: 'pan-y',
+                  paddingTop: 'env(safe-area-inset-top)',
+                  paddingBottom: 'env(safe-area-inset-bottom)',
+                  paddingLeft: 'env(safe-area-inset-left)',
+                  paddingRight: 'env(safe-area-inset-right)'
                 }}
               >
                 <div style={{ minHeight: '100vh' }}>
-                  <h1 className="wave-text">
+                  <h1 className="wave-text" style={{ marginTop: 'env(safe-area-inset-top)' }}>
                     Welcome to the Shed tournament
                   </h1>
                   <Typography 
