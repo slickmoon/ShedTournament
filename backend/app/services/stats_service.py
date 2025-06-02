@@ -35,7 +35,7 @@ class StatsService:
                     "elo_change": streak_elo_change
                 })
         
-        player_streaks.sort(key=lambda x: (-x["current_streak"], -x["elo"]))
+        player_streaks.sort(key=lambda x: (-x["current_streak"], -x["elo_change"]))
         return player_streaks[:5]
 
     @staticmethod
