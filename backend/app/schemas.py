@@ -26,6 +26,7 @@ class MatchBase(BaseModel):
     winner2_id: Optional[int] = None
     loser1_id: int
     loser2_id: Optional[int] = None
+    is_pantsed: bool = False
 
 class MatchCreate(MatchBase):
     pass
@@ -68,4 +69,30 @@ class PlayerStats(BaseModel):
     kd_ratio: float
     current_streak: int
     longest_streak: int
-    elo: int 
+    elo: int
+
+class EventTypeBase(BaseModel):
+    name: str
+
+class EventTypeCreate(EventTypeBase):
+    pass
+
+class EventType(EventTypeBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class PlayerEventBase(BaseModel):
+    player_id: int
+    event_id: int
+
+class PlayerEventCreate(PlayerEventBase):
+    pass
+
+class PlayerEvent(PlayerEventBase):
+    id: int
+    timestamp: datetime
+
+    class Config:
+        from_attributes = True 

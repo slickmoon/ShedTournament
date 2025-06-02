@@ -52,4 +52,18 @@ class AuditLog(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
-    log = Column(String) 
+    log = Column(String)
+
+class EventType(Base):
+    __tablename__ = "event_type"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50), unique=True, nullable=False)
+    events = relationship("PlayerEvent", back_populates="event_type")
+
+class PlayerEvent(Base):
+    __tablename__ = "player_events"
+    id = Column(Integer, primary_key=True, index=True)
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=False)
+    event_id = Column(Integer, ForeignKey("event_type.id"), nullable=False)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    event_type = relationship("EventType", back_populates="events") 
