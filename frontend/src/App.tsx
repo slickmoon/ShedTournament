@@ -29,7 +29,7 @@ import {
   SportsScore as SportsScoreIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import InstallPrompt from './components/InstallPrompt';
+import InstallPrompt from './components/InstallPrompt.tsx';
 import './App.css';
 
 const queryClient = new QueryClient();
