@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, CssBaseline, Button, Typography, Box, CircularProgress } from '@mui/material';
+import { ThemeProvider, CssBaseline, Button, Typography, Box, CircularProgress, Container, TextField, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Checkbox, Snackbar, Alert, Divider, Paper, useMediaQuery, useTheme } from '@mui/material';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
@@ -19,6 +19,18 @@ import { checkSpecialMatchResult } from './utils/matchChecks.ts';
 import SpecialMatchGraphic from './components/SpecialMatchGraphic.tsx';
 import MatchConfetti from './components/MatchConfetti.tsx';
 import { Player } from './types/Player.ts';
+import PlayerDialog from './components/PlayerDialog.tsx';
+import { 
+  Add as AddIcon, 
+  Edit as EditIcon, 
+  Delete as DeleteIcon,
+  Refresh as RefreshIcon,
+  Person as PersonIcon,
+  EmojiEvents as EmojiEventsIcon,
+  SportsScore as SportsScoreIcon,
+  Close as CloseIcon
+} from '@mui/icons-material';
+import InstallPrompt from './components/InstallPrompt';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -102,6 +114,13 @@ function App() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
+  const [isPlayerDialogOpen, setIsPlayerDialogOpen] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [isMatchDialogOpen, setIsMatchDialogOpen] = useState(false);
+  const [winnerId, setWinnerId] = useState<number | null>(null);
+  const [loserId, setLoserId] = useState<number | null>(null);
+  const [winnerPartnerId, setWinnerPartnerId] = useState<number | null>(null);
+  const [loserPartnerId, setLoserPartnerId] = useState<number | null>(null);
 
   // Add online/offline status listener
   useEffect(() => {
@@ -450,6 +469,31 @@ function App() {
     setOpenMatchDialog(true);
   };
 
+  const handleOpenPlayerDialog = (player?: Player) => {
+    setIsPlayerDialogOpen(true);
+    if (player) {
+      setSelectedPlayer(player);
+    }
+  };
+
+  const handleClosePlayerDialog = () => {
+    setIsPlayerDialogOpen(false);
+    setSelectedPlayer(null);
+  };
+
+  const handleSavePlayer = async (playerName: string, newElo: number, access_password: string) => {
+    if (selectedPlayer) {
+      await updatePlayer(selectedPlayer.id, playerName, newElo, access_password);
+    } else {
+      await addplayer(playerName);
+    }
+    handleClosePlayerDialog();
+  };
+
+  const handleDeletePlayer = async (playerId: number) => {
+    await deletePlayer(playerId, '');
+  };
+
   if (loading) {
     return null;
   }
@@ -544,9 +588,9 @@ function App() {
 
                     <PlayerAdmin
                       players={players}
-                      onAddPlayer={addplayer}
-                      onDeletePlayer={deletePlayer}
-                      onUpdatePlayer={updatePlayer}
+                      onAddPlayer={handleOpenPlayerDialog}
+                      onDeletePlayer={handleDeletePlayer}
+                      onUpdatePlayer={handleSavePlayer}
                       playerAdminMessage={updatePlayerMessage}
                     />
 
