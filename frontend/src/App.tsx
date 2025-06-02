@@ -495,14 +495,17 @@ function App() {
                   overscrollBehavior: 'auto',
                   position: 'relative',
                   touchAction: 'pan-y',
-                  paddingTop: 'env(safe-area-inset-top)',
+                  paddingTop: 'max(env(safe-area-inset-top), 20px)',
                   paddingBottom: 'env(safe-area-inset-bottom)',
                   paddingLeft: 'env(safe-area-inset-left)',
                   paddingRight: 'env(safe-area-inset-right)'
                 }}
               >
                 <div style={{ minHeight: '100vh' }}>
-                  <h1 className="wave-text" style={{ marginTop: 'env(safe-area-inset-top)' }}>
+                  <h1 className="wave-text" style={{ 
+                    marginTop: 'max(env(safe-area-inset-top), 20px)',
+                    paddingTop: '20px'
+                  }}>
                     Welcome to the Shed tournament
                   </h1>
                   <Typography 
