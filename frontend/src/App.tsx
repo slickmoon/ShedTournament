@@ -19,7 +19,6 @@ import { checkSpecialMatchResult } from './utils/matchChecks.ts';
 import SpecialMatchGraphic from './components/SpecialMatchGraphic.tsx';
 import MatchConfetti from './components/MatchConfetti.tsx';
 import { Player } from './types/Player.ts';
-import PlayerDialog from './components/PlayerDialog.tsx';
 import { 
   Add as AddIcon, 
   Edit as EditIcon, 
@@ -114,13 +113,6 @@ function App() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
-  const [isPlayerDialogOpen, setIsPlayerDialogOpen] = useState(false);
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const [isMatchDialogOpen, setIsMatchDialogOpen] = useState(false);
-  const [winnerId, setWinnerId] = useState<number | null>(null);
-  const [loserId, setLoserId] = useState<number | null>(null);
-  const [winnerPartnerId, setWinnerPartnerId] = useState<number | null>(null);
-  const [loserPartnerId, setLoserPartnerId] = useState<number | null>(null);
 
   // Add online/offline status listener
   useEffect(() => {
@@ -469,31 +461,6 @@ function App() {
     setOpenMatchDialog(true);
   };
 
-  const handleOpenPlayerDialog = (player?: Player) => {
-    setIsPlayerDialogOpen(true);
-    if (player) {
-      setSelectedPlayer(player);
-    }
-  };
-
-  const handleClosePlayerDialog = () => {
-    setIsPlayerDialogOpen(false);
-    setSelectedPlayer(null);
-  };
-
-  const handleSavePlayer = async (playerName: string, newElo: number, access_password: string) => {
-    if (selectedPlayer) {
-      await updatePlayer(selectedPlayer.id, playerName, newElo, access_password);
-    } else {
-      await addplayer(playerName);
-    }
-    handleClosePlayerDialog();
-  };
-
-  const handleDeletePlayer = async (playerId: number) => {
-    await deletePlayer(playerId, '');
-  };
-
   if (loading) {
     return null;
   }
@@ -588,9 +555,9 @@ function App() {
 
                     <PlayerAdmin
                       players={players}
-                      onAddPlayer={handleOpenPlayerDialog}
-                      onDeletePlayer={handleDeletePlayer}
-                      onUpdatePlayer={handleSavePlayer}
+                      onAddPlayer={addplayer}
+                      onDeletePlayer={deletePlayer}
+                      onUpdatePlayer={updatePlayer}
                       playerAdminMessage={updatePlayerMessage}
                     />
 
