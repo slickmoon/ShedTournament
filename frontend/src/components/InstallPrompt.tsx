@@ -18,6 +18,8 @@ const InstallPrompt: React.FC = () => {
     console.log('InstallPrompt mounted');
     console.log('Display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
     console.log('User agent:', navigator.userAgent);
+    console.log('Is secure context:', window.isSecureContext);
+    console.log('Service worker:', 'serviceWorker' in navigator ? 'supported' : 'not supported');
 
     // Check if the app is already installed
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
