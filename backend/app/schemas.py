@@ -27,6 +27,8 @@ class MatchBase(BaseModel):
     loser1_id: int
     loser2_id: Optional[int] = None
     is_pantsed: bool = False
+    is_away_game: bool = False
+    is_lost_by_foul: bool = False
 
 class MatchCreate(MatchBase):
     pass

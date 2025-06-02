@@ -37,26 +37,33 @@ class MatchService:
         if match.is_doubles and len(set(players.keys())) != 4:
             return None, "Duplicate players not allowed in doubles match"
         
-        # Handle pantsed event
-        if match.is_pantsed:
-            # Get ID for pantsed event type
-            pantsed_event = db.query(base.EventType).filter(base.EventType.name == "pantsed").first()
-            if not pantsed_event:
-                return None, "DB Error: Pantsed event type not found in EventType table"
+        # Handle events
+        event_types = {
+            "pantsed": match.is_pantsed,
+            "away_game": match.is_away_game,
+            "lost_by_foul": match.is_lost_by_foul
+        }
 
-            # Create player events for losers
-            loser1_event = base.PlayerEvent(
-                player_id=match.loser1_id,
-                event_id=pantsed_event.id
-            )
-            db.add(loser1_event)
+        for event_name, is_active in event_types.items():
+            if is_active:
+                # Get ID for event type
+                event = db.query(base.EventType).filter(base.EventType.name == event_name).first()
+                if not event:
+                    return None, f"DB Error: {event_name} event type not found in EventType table"
 
-            if match.is_doubles:
-                loser2_event = base.PlayerEvent(
-                    player_id=match.loser2_id,
-                    event_id=pantsed_event.id
+                # Create player events for losers
+                loser1_event = base.PlayerEvent(
+                    player_id=match.loser1_id,
+                    event_id=event.id
                 )
-                db.add(loser2_event)
+                db.add(loser1_event)
+
+                if match.is_doubles:
+                    loser2_event = base.PlayerEvent(
+                        player_id=match.loser2_id,
+                        event_id=event.id
+                    )
+                    db.add(loser2_event)
 
         if match.is_doubles:
             team1_elo = (players[match.winner1_id].elo + players[match.winner2_id].elo) / 2

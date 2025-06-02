@@ -26,6 +26,10 @@ interface MatchDialogProps {
   isLoading?: boolean;
   isPantsed: boolean;
   setIsPantsed: (isPantsed: boolean) => void;
+  isAwayGame: boolean;
+  setIsAwayGame: (isAwayGame: boolean) => void;
+  isLostByFoul: boolean;
+  setIsLostByFoul: (isLostByFoul: boolean) => void;
 }
 
 const MatchDialog: React.FC<MatchDialogProps> = ({
@@ -46,7 +50,11 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
   matchError,
   isLoading = false,
   isPantsed,
-  setIsPantsed
+  setIsPantsed,
+  isAwayGame,
+  setIsAwayGame,
+  isLostByFoul,
+  setIsLostByFoul
 }) => {
   return (
     <Dialog open={open} onClose={onClose}>
@@ -131,15 +139,35 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
             )}
           </Box>
 
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={isPantsed}
-                onChange={(e) => setIsPantsed(e.target.checked)}
-              />
-            }
-            label="Pantsed?"
-          />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isPantsed}
+                  onChange={(e) => setIsPantsed(e.target.checked)}
+                />
+              }
+              label="Pantsed?"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isAwayGame}
+                  onChange={(e) => setIsAwayGame(e.target.checked)}
+                />
+              }
+              label="Away Game?"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isLostByFoul}
+                  onChange={(e) => setIsLostByFoul(e.target.checked)}
+                />
+              }
+              label="Lost by Foul?"
+            />
+          </Box>
         </Box>
       </DialogContent>
       <DialogActions>

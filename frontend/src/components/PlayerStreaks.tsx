@@ -1,12 +1,12 @@
 import React from 'react';
-import { Box, Typography, Paper } from '@mui/material';
+import { Box, Typography, Paper, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 
 interface PlayerStreak {
   player_id: number;
   player_name: string;
   current_streak: number;
-  elo: number;
   elo_change: number;
 }
 

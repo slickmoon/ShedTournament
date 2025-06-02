@@ -18,6 +18,7 @@ import { randomTexts, wednesdayTexts } from './data/shed-quotes.ts';
 import { checkSpecialMatchResult } from './utils/matchChecks.ts';
 import SpecialMatchGraphic from './components/SpecialMatchGraphic.tsx';
 import MatchConfetti from './components/MatchConfetti.tsx';
+import { Player } from './types/Player.ts';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -31,26 +32,13 @@ const getAuthHeaders = () => {
   };
 };
 
-interface Player {
-  id: number;
-  player_name: string;
-  elo: number;
-  total_matches: number;
-}
-
-interface AuditLogEntry {
-  id: number;
-  log: string;
-  timestamp: string;
-}
-
 interface PlayerStreak {
   player_id: number;
   player_name: string;
   current_streak: number;
-  elo: number;
   elo_change: number;
 }
+
 interface PlayerStreakLongest {
   player_id: number;
   player_name: string;
@@ -74,6 +62,12 @@ interface MostMatchesInDay {
   matches_played: number;
 }
 
+interface AuditLogEntry {
+  id: number;
+  log: string;
+  timestamp: string;
+}
+
 function App() {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -91,6 +85,8 @@ function App() {
   const [loser2, setLoser2] = useState<string>('');
   const [isRecordingMatch, setIsRecordingMatch] = useState(false);
   const [isPantsed, setIsPantsed] = useState(false);
+  const [isAwayGame, setIsAwayGame] = useState(false);
+  const [isLostByFoul, setIsLostByFoul] = useState(false);
   const [playerStreaks, setPlayerStreaks] = useState<PlayerStreak[]>([]);
   const [playerStreakLongest, setPlayerStreakLongest] = useState<PlayerStreakLongest[]>([]);
   const [playerKd, setPlayerKD] = useState<PlayerKD[]>([]);
@@ -329,7 +325,9 @@ function App() {
             winner2_id: winner2Player.id,
             loser1_id: loser1Player.id,
             loser2_id: loser2Player.id,
-            is_pantsed: isPantsed
+            is_pantsed: isPantsed,
+            is_away_game: isAwayGame,
+            is_lost_by_foul: isLostByFoul
           })
         });
 
@@ -368,7 +366,9 @@ function App() {
             is_doubles: false,
             winner1_id: winner1Player.id,
             loser1_id: loser1Player.id,
-            is_pantsed: isPantsed
+            is_pantsed: isPantsed,
+            is_away_game: isAwayGame,
+            is_lost_by_foul: isLostByFoul
           })
         });
 
@@ -401,6 +401,8 @@ function App() {
       setLoser2('');
       setIsDoubles(false);
       setIsPantsed(false);
+      setIsAwayGame(false);
+      setIsLostByFoul(false);
       setMatchError('');
     } catch (error) {
       setStatusMessage(`Error recording match: ${error}`);
@@ -516,6 +518,8 @@ function App() {
                     setLoser2('');
                     setIsDoubles(false);
                     setIsPantsed(false);
+                    setIsAwayGame(false);
+                    setIsLostByFoul(false);
                     setMatchError('');
                   }}
                   onRecordMatch={recordMatch}
@@ -534,6 +538,10 @@ function App() {
                   isLoading={isRecordingMatch}
                   isPantsed={isPantsed}
                   setIsPantsed={setIsPantsed}
+                  isAwayGame={isAwayGame}
+                  setIsAwayGame={setIsAwayGame}
+                  isLostByFoul={isLostByFoul}
+                  setIsLostByFoul={setIsLostByFoul}
                 />
                 
           </div>
