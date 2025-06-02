@@ -621,7 +621,6 @@ function App() {
             onComplete={handleSpecialMatchComplete}
           />
         )}
-        <InstallPrompt />
       </ThemeProvider>
     </QueryClientProvider>
   );

@@ -14,6 +14,11 @@ const InstallPrompt: React.FC = () => {
   const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
+    // Debug: Log initial state
+    console.log('InstallPrompt mounted');
+    console.log('Display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
+    console.log('User agent:', navigator.userAgent);
+
     // Check if the app is already installed
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
     if (isInstalled) {
@@ -24,6 +29,7 @@ const InstallPrompt: React.FC = () => {
     // Check if it's iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(isIOSDevice);
+    console.log('Is iOS device:', isIOSDevice);
 
     // Handle the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -40,6 +46,8 @@ const InstallPrompt: React.FC = () => {
         console.log('Found existing deferred prompt');
         setDeferredPrompt(promptEvent);
         setIsVisible(true);
+      } else {
+        console.log('No existing deferred prompt found');
       }
     };
 
@@ -48,7 +56,7 @@ const InstallPrompt: React.FC = () => {
 
     // Show iOS prompt if it's an iOS device
     if (isIOSDevice) {
-      console.log('iOS device detected');
+      console.log('iOS device detected, showing custom prompt');
       setIsVisible(true);
     }
 
@@ -82,13 +90,17 @@ const InstallPrompt: React.FC = () => {
   };
 
   const handleDismiss = () => {
+    console.log('User dismissed the install prompt');
     setIsVisible(false);
     // Store in localStorage to not show again
     localStorage.setItem('installPromptDismissed', 'true');
   };
 
   // Don't show if user has dismissed before
-  if (!isVisible || localStorage.getItem('installPromptDismissed') === 'true') return null;
+  if (!isVisible || localStorage.getItem('installPromptDismissed') === 'true') {
+    console.log('Install prompt not visible:', { isVisible, dismissed: localStorage.getItem('installPromptDismissed') === 'true' });
+    return null;
+  }
 
   return (
     <Paper
@@ -122,7 +134,10 @@ const InstallPrompt: React.FC = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => setIsVisible(false)}
+          onClick={() => {
+            console.log('User clicked How to Install on iOS');
+            setIsVisible(false);
+          }}
         >
           How to Install
         </Button>
