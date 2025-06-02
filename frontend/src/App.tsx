@@ -90,6 +90,7 @@ function App() {
   const [winner2, setWinner2] = useState<string>('');
   const [loser2, setLoser2] = useState<string>('');
   const [isRecordingMatch, setIsRecordingMatch] = useState(false);
+  const [isPantsed, setIsPantsed] = useState(false);
   const [playerStreaks, setPlayerStreaks] = useState<PlayerStreak[]>([]);
   const [playerStreakLongest, setPlayerStreakLongest] = useState<PlayerStreakLongest[]>([]);
   const [playerKd, setPlayerKD] = useState<PlayerKD[]>([]);
@@ -162,22 +163,10 @@ function App() {
     }
   };
 
-  const listPlayerStreaks = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/players/streaks`, {
-        headers: getAuthHeaders()
-      });
-      const data = await response.json();
-      setPlayerStreaks(data);
-    } catch (error) {
-      setStatusMessage(`Error fetching player streaks: ${error}`);
-    }
-  };
-
   const getPlayerStats = async () => {
     // Player Streaks
     try {
-      const response = await fetch(`${API_BASE_URL}/players/streaks`, {
+      const response = await fetch(`${API_BASE_URL}/stats/streaks`, {
         headers: getAuthHeaders()
       });
       const data = await response.json();
@@ -188,7 +177,7 @@ function App() {
     
     // Longest player streaks
     try {
-      const response = await fetch(`${API_BASE_URL}/players/streaks/longest`, {
+      const response = await fetch(`${API_BASE_URL}/stats/streaks/longest`, {
         headers: getAuthHeaders()
       });
       const data = await response.json();
@@ -199,7 +188,7 @@ function App() {
 
     // Player KD Ratios
     try {
-      const response = await fetch(`${API_BASE_URL}/players/kds`, {
+      const response = await fetch(`${API_BASE_URL}/stats/player-kds`, {
         headers: getAuthHeaders()
       });
       const data = await response.json();
@@ -210,7 +199,7 @@ function App() {
 
     // Most matches in a day
     try {
-      const response = await fetch(`${API_BASE_URL}/matches/most`, {
+      const response = await fetch(`${API_BASE_URL}/stats/most-matches`, {
         headers: getAuthHeaders()
       });
       const data = await response.json();
@@ -224,7 +213,6 @@ function App() {
   const updatePageData = () => { 
     listPlayers();
     listAuditLog();
-    listPlayerStreaks();
     getPlayerStats();
   };
 
@@ -340,7 +328,8 @@ function App() {
             winner1_id: winner1Player.id,
             winner2_id: winner2Player.id,
             loser1_id: loser1Player.id,
-            loser2_id: loser2Player.id
+            loser2_id: loser2Player.id,
+            is_pantsed: isPantsed
           })
         });
 
@@ -378,7 +367,8 @@ function App() {
           body: JSON.stringify({
             is_doubles: false,
             winner1_id: winner1Player.id,
-            loser1_id: loser1Player.id
+            loser1_id: loser1Player.id,
+            is_pantsed: isPantsed
           })
         });
 
@@ -410,6 +400,7 @@ function App() {
       setWinner2('');
       setLoser2('');
       setIsDoubles(false);
+      setIsPantsed(false);
       setMatchError('');
     } catch (error) {
       setStatusMessage(`Error recording match: ${error}`);
@@ -524,6 +515,7 @@ function App() {
                     setWinner2('');
                     setLoser2('');
                     setIsDoubles(false);
+                    setIsPantsed(false);
                     setMatchError('');
                   }}
                   onRecordMatch={recordMatch}
@@ -540,6 +532,8 @@ function App() {
                   setLoser2={setLoser2}
                   matchError={matchError}
                   isLoading={isRecordingMatch}
+                  isPantsed={isPantsed}
+                  setIsPantsed={setIsPantsed}
                 />
                 
           </div>

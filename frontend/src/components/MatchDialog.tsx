@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, Select, MenuItem } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, Select, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
 
 interface Player {
   id: number;
@@ -24,6 +24,8 @@ interface MatchDialogProps {
   setLoser2: (loser2: string) => void;
   matchError: string;
   isLoading?: boolean;
+  isPantsed: boolean;
+  setIsPantsed: (isPantsed: boolean) => void;
 }
 
 const MatchDialog: React.FC<MatchDialogProps> = ({
@@ -42,7 +44,9 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
   loser2,
   setLoser2,
   matchError,
-  isLoading = false
+  isLoading = false,
+  isPantsed,
+  setIsPantsed
 }) => {
   return (
     <Dialog open={open} onClose={onClose}>
@@ -126,6 +130,16 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
               </Select>
             )}
           </Box>
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isPantsed}
+                onChange={(e) => setIsPantsed(e.target.checked)}
+              />
+            }
+            label="Pantsed?"
+          />
         </Box>
       </DialogContent>
       <DialogActions>

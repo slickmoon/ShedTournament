@@ -37,7 +37,27 @@ class MatchService:
         if match.is_doubles and len(set(players.keys())) != 4:
             return None, "Duplicate players not allowed in doubles match"
         
-        # Calculate ELO changes
+        # Handle pantsed event
+        if match.is_pantsed:
+            # Get ID for pantsed event type
+            pantsed_event = db.query(base.EventType).filter(base.EventType.name == "pantsed").first()
+            if not pantsed_event:
+                return None, "DB Error: Pantsed event type not found in EventType table"
+
+            # Create player events for losers
+            loser1_event = base.PlayerEvent(
+                player_id=match.loser1_id,
+                event_id=pantsed_event.id
+            )
+            db.add(loser1_event)
+
+            if match.is_doubles:
+                loser2_event = base.PlayerEvent(
+                    player_id=match.loser2_id,
+                    event_id=pantsed_event.id
+                )
+                db.add(loser2_event)
+
         if match.is_doubles:
             team1_elo = (players[match.winner1_id].elo + players[match.winner2_id].elo) / 2
             team2_elo = (players[match.loser1_id].elo + players[match.loser2_id].elo) / 2

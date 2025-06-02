@@ -1,6 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy import select
+from typing import List
+import logging
 
 from . import database
 from .auth import (
@@ -90,21 +93,21 @@ async def get_players(
         for player, total_matches in players
     ]
 
-@api.get("/players/streaks", response_model=list[dict])
+@api.get("/stats/streaks", response_model=list[dict])
 async def get_player_streaks(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
     return StatsService.get_player_streaks(db)
 
-@api.get("/players/streaks/longest", response_model=list[dict])
+@api.get("/stats/streaks/longest", response_model=list[dict])
 async def get_best_streak(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
     return StatsService.get_longest_streaks(db)
 
-@api.get("/players/kds", response_model=list[dict])
+@api.get("/stats/player-kds", response_model=list[dict])
 async def get_player_kds(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
@@ -244,7 +247,7 @@ async def record_match(
         })
     return response
 
-@api.get("/matches/most", response_model=dict)
+@api.get("/stats/most-matches", response_model=dict)
 async def get_most_matches_in_day(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
