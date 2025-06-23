@@ -21,6 +21,7 @@ interface TotalMatchStats {
   total_matches: number;
   money_saved: number;
   time_wasted: number;
+  per_person_time_wasted: number;
 }
 
 interface PlayerStatsProps {
@@ -216,7 +217,11 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
                     Time wasted in the shed
                   </Typography>
                   <Typography component="span" sx={{ color: 'success.main' }}>
-                    {totalMatchStats.time_wasted / 60} hours
+                    {totalMatchStats.time_wasted / 60} 
+                  </Typography>
+                  <Typography component="span"> hours game time wasting </Typography>
+                  <Typography component="span" sx={{ color: 'success.main' }}>
+                    {totalMatchStats.per_person_time_wasted / 60 } total hours
                   </Typography>
                 </Typography>
               </Box>

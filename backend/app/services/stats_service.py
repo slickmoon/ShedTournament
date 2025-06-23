@@ -197,8 +197,22 @@ class StatsService:
             func.count(base.Match.id).label('match_count')
         ).first()
 
+        w1_matches = db.query(
+            func.count(base.Match.winner1_id).label('match_count')
+        ).filter((base.Match.winner1_id != None )).first()
+        w2_matches = db.query(
+            func.count(base.Match.winner2_id).label('match_count')
+        ).filter((base.Match.winner2_id != None )).first()
+        l1_matches = db.query(
+            func.count(base.Match.loser1_id).label('match_count')
+        ).filter((base.Match.loser1_id != None )).first()
+        l2_matches = db.query(
+            func.count(base.Match.loser2_id).label('match_count')
+        ).filter((base.Match.loser2_id != None )).first()
+
         return {
             "total_matches": total_matches.match_count,
             "money_saved": (total_matches.match_count * price_per_match),
-            "time_wasted": (total_matches.match_count * time_per_game)
+            "time_wasted": (total_matches.match_count * time_per_game),
+            "per_person_time_wasted": ((w1_matches.match_count + w2_matches.match_count + l1_matches.match_count + l2_matches.match_count) * time_per_game)
         }

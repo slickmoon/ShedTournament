@@ -77,6 +77,7 @@ interface TotalMatchStats {
   total_matches: number;
   money_saved: number;
   time_wasted: number;
+  per_person_time_wasted: number;
 }
 
 interface AuditLogEntry {
@@ -139,7 +140,8 @@ function App() {
   const [totalMatchStats, setTotalMatchStats] = useState<TotalMatchStats>({
     total_matches: 0,
     money_saved: 0,
-    time_wasted: 0
+    time_wasted: 0,
+    per_person_time_wasted: 0
   });
   const [showConfetti, setShowConfetti] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
