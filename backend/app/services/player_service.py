@@ -159,7 +159,6 @@ class PlayerService:
 
     @staticmethod
     def get_seasons(db: Session):
-        from datetime import datetime
         now = datetime.now()
         # Current season
         current_season = db.query(base.GameSeason).filter(
