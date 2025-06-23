@@ -6,6 +6,8 @@ from datetime import datetime
 
 Base = declarative_base()
 
+DEFAULT_ELO = 1000  # Default ELO rating for new players
+
 class BaseModel(Base):
     __abstract__ = True
     
@@ -18,7 +20,7 @@ class Player(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     player_name = Column(String)
-    elo = Column(Integer, default=1000)  # Default ELO rating
+    elo = Column(Integer, default=DEFAULT_ELO)  # Default ELO rating
     deleted = Column(Boolean, default=False)  # Soft delete flag
     deleted_at = Column(DateTime(timezone=True), nullable=True)  # When the player was deleted
 
