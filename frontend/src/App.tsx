@@ -295,8 +295,8 @@ function App() {
         return;
       }
 
-      if (!playerName || !newElo) {
-        setPlayerAdminMessage('Please fill in both name and ELO fields');
+      if (!playerName) {
+        setPlayerAdminMessage('Please fill in the name field');
         return;
       }
       const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
@@ -306,8 +306,7 @@ function App() {
           'X-Admin-Password': access_password
         },
         body: JSON.stringify({
-          player_name: playerName,
-          player_elo: newElo
+          player_name: playerName
         })
       });
       if (response.ok) {

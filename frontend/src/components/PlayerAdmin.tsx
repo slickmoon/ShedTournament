@@ -5,14 +5,13 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 interface Player {
   id: number;
   player_name: string;
-  elo: number;
 }
 
 interface PlayerAdminProps {
   players: Player[];
   onAddPlayer: (playerName: string) => void;
   onDeletePlayer: (playerId: number, access_password: string) => void;
-  onUpdatePlayer: (playerId: number, playerName: string, newElo: number, access_password: string) => void;
+  onUpdatePlayer: (playerId: number, playerName: string, access_password: string) => void;
   playerAdminMessage: string | React.ReactNode;
 }
 
@@ -26,7 +25,6 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
   const [selectedUpdatePlayer, setSelectedUpdatePlayer] = useState<string>('');
   const [selectedPlayerUpdateName, setSelectedPlayerUpdateName] = useState<string>('');
-  const [selectedPlayerUpdateElo, setSelectedPlayerUpdateElo] = useState<number>(1000);
   const [accessPassword, setAccessPassword] = useState<string>('');
 
   return (
@@ -128,11 +126,8 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
                 {players.map((player) => (
                   <MenuItem key={player.id} value={player.id} onClick={() => {
                     const playerNameInput = document.getElementById('player-name-update-input') as HTMLInputElement;
-                    const playerEloInput = document.getElementById('player-elo-input') as HTMLInputElement;
-                    playerEloInput.value = player.elo.toString();
                     playerNameInput.value = player.player_name;
                     setSelectedPlayerUpdateName(player.player_name);
-                    setSelectedPlayerUpdateElo(player.elo);
                   }}>
                     {player.player_name}
                   </MenuItem>
@@ -144,14 +139,6 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
                 variant="outlined" 
                 value={selectedUpdatePlayer} 
                 disabled 
-                fullWidth
-                sx={{ mt: 2 }}
-              />
-              <TextField 
-                id="player-elo-input" 
-                label="New ELO" 
-                variant="outlined" 
-                InputLabelProps={{ shrink: true }} 
                 fullWidth
                 sx={{ mt: 2 }}
               />
@@ -178,13 +165,11 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
                   variant="contained"
                   onClick={() => {
                     const playerNameInput = document.getElementById('player-name-update-input') as HTMLInputElement;
-                    const playerEloInput = document.getElementById('player-elo-input') as HTMLInputElement;
                     const player = players.find(p => p.id == parseInt(selectedUpdatePlayer));
                     if (player) {
-                      onUpdatePlayer(player.id, playerNameInput.value, parseInt(playerEloInput.value), accessPassword);
+                      onUpdatePlayer(player.id, playerNameInput.value, accessPassword);
                       setSelectedUpdatePlayer('');
                       playerNameInput.value = '';
-                      playerEloInput.value = '1000';
                       setAccessPassword('');
                     }
                   }}
