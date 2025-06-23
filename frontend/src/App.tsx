@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, CssBaseline, Button, Typography, Box, CircularProgress, Container, TextField, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Checkbox, Snackbar, Alert, Divider, Paper, useMediaQuery, useTheme } from '@mui/material';
+import { ThemeProvider, CssBaseline, Button, Typography, Box, CircularProgress, Container, TextField, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Checkbox, Snackbar, Alert, Divider, Paper, useMediaQuery, useTheme, Select, MenuItem } from '@mui/material';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
@@ -113,6 +113,8 @@ function App() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
+  const [seasons, setSeasons] = useState<{id: number, season_name: string}[]>([]);
+  const [selectedSeasonId, setSelectedSeasonId] = useState<number>(-1);
 
   // Add online/offline status listener
   useEffect(() => {
@@ -152,6 +154,20 @@ function App() {
       updatePageData();
     }
   }, [token]);
+  
+  // Load this data only once
+  useEffect(() => {
+    const fetchSeasons = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/seasons`, { headers: getAuthHeaders() });
+        const data = await response.json();
+        setSeasons(data);
+      } catch (error) {
+        setStatusMessage(`Error fetching seasons: ${error}`);
+      }
+    };
+    fetchSeasons();
+  }, []);
 
   const handleLogin = (newToken: string) => {
     setToken(newToken);
@@ -163,9 +179,10 @@ function App() {
   };
 
   {/* Data view functions */}
+  const season_id = -1;
   const listPlayers = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/players`, {
+      const response = await fetch(`${API_BASE_URL}/players?season_id=${selectedSeasonId}`, {
         headers: getAuthHeaders()
       });
       const data = await response.json();
@@ -520,6 +537,21 @@ function App() {
                   >
                     {randomText}
                   </Typography>
+
+                  <Box sx={{ mb: 2, textAlign: 'center' }}>
+                    <Select
+                      value={selectedSeasonId}
+                      onChange={(e) => setSelectedSeasonId(Number(e.target.value))}
+                      displayEmpty
+                      sx={{ minWidth: 200 }}
+                    >
+                      <MenuItem value={-1}>Current Season</MenuItem>
+                      <MenuItem value={-2}>All Time</MenuItem>
+                      {seasons.map(season => (
+                        <MenuItem key={season.id} value={season.id}>{season.season_name}</MenuItem>
+                      ))}
+                    </Select>
+                  </Box>
 
                   <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
                     <Button 
