@@ -252,7 +252,7 @@ async def get_most_matches_in_day(
 ):
     return StatsService.get_most_matches_in_day(db)
 
-@api.get("stats/total-matches", response_model=dict)
+@api.get("/stats/total-matches", response_model=dict)
 async def get_total_matches(
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
