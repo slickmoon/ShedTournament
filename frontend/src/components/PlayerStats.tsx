@@ -162,7 +162,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
                     Total Matches Played
                   </Typography>
                   <Typography component="span" sx={{ color: 'info.main' }}>
-                    {totalMatchStats.total_matches}
+                    #{totalMatchStats.total_matches}
                   </Typography>
                 </Typography>
               </Box>
