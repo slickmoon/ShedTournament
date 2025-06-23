@@ -15,14 +15,43 @@ class PlayerService:
         return db_player
 
     @staticmethod
-    def get_player(db: Session, player_id: int) -> Optional[base.Player]:
-        return db.query(base.Player).filter(
+    def get_player(db: Session, player_id: int) -> Optional[dict]:
+        new_elo_calc = True
+        player = db.query(base.Player).filter(
             base.Player.id == player_id,
             base.Player.deleted == False
         ).first()
+        if not player:
+            return None
+        if (new_elo_calc):
+            # Calculate ELO from matches
+            elo = base.DEFAULT_ELO
+            # Get all matches where the player was a winner or loser
+            matches = db.query(base.Match).filter(
+                (base.Match.winner1_id == player_id) |
+                (base.Match.winner2_id == player_id) |
+                (base.Match.loser1_id == player_id) |
+                (base.Match.loser2_id == player_id)
+            ).all()
+            for match in matches:
+                if match.winner1_id == player_id:
+                    elo += match.winner1_elo_change
+                if match.winner2_id == player_id and match.winner2_elo_change is not None:
+                    elo += match.winner2_elo_change
+                if match.loser1_id == player_id:
+                    elo += match.loser1_elo_change
+                if match.loser2_id == player_id and match.loser2_elo_change is not None:
+                    elo += match.loser2_elo_change
+
+            # Build composite result without the elo field from the player model
+            player_dict = {c.name: getattr(player, c.name) for c in player.__table__.columns if c.name != 'elo'} # Build a new dict of the player object without the elo field
+            player_dict['elo'] = elo # append the elo field
+            return player_dict
+        else:
+            return player
 
     @staticmethod
-    def get_players(db: Session) -> List[Tuple[base.Player, int, bool]]:
+    def get_players(db: Session) -> list[dict]:
         # Get match counts
         match_counts = db.query(
             base.Player.id,
@@ -41,13 +70,14 @@ class PlayerService:
         pantsed_event = db.query(base.EventType).filter(base.EventType.name == "pantsed").first()
         
         # Get recent pantsing events (last 90 days)
-        ninety_days_ago = datetime.now() - timedelta(days=90)
+        pantsed_validity_start_date = datetime.now() - timedelta(days=90)
         recent_pantsed_players = db.query(base.PlayerEvent.player_id).filter(
             base.PlayerEvent.event_id == pantsed_event.id,
-            base.PlayerEvent.timestamp >= ninety_days_ago
+            base.PlayerEvent.timestamp >= pantsed_validity_start_date
         ).subquery()
 
-        return db.query(
+        # Query all players with match counts and pantsed status
+        player_rows = db.query(
             base.Player,
             match_counts.c.total_matches,
             base.Player.id.in_(recent_pantsed_players).label('recently_pantsed')
@@ -59,6 +89,34 @@ class PlayerService:
         ).order_by(
             base.Player.player_name.asc()
         ).all()
+
+        # For each player, calculate ELO from matches
+        result = []
+        for player, total_matches, recently_pantsed in player_rows:
+            elo = base.DEFAULT_ELO
+            matches = db.query(base.Match).filter(
+                (base.Match.winner1_id == player.id) |
+                (base.Match.winner2_id == player.id) |
+                (base.Match.loser1_id == player.id) |
+                (base.Match.loser2_id == player.id)
+            ).all()
+            for match in matches:
+                if match.winner1_id == player.id:
+                    elo += match.winner1_elo_change
+                if match.winner2_id == player.id and match.winner2_elo_change is not None:
+                    elo += match.winner2_elo_change
+                if match.loser1_id == player.id:
+                    elo += match.loser1_elo_change
+                if match.loser2_id == player.id and match.loser2_elo_change is not None:
+                    elo += match.loser2_elo_change
+            result.append({
+                "id": player.id,
+                "player_name": player.player_name,
+                "elo": elo,
+                "total_matches": total_matches or 0,
+                "recently_pantsed": recently_pantsed
+            })
+        return result
 
     @staticmethod
     def update_player(db: Session, player_id: int, player: PlayerUpdate) -> Optional[base.Player]:
