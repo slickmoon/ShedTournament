@@ -169,6 +169,13 @@ function App() {
     fetchSeasons();
   }, []);
 
+  // Reload data when selectedSeasonId changes
+  useEffect(() => {
+    if (token) {
+      updatePageData();
+    }
+  }, [selectedSeasonId]);
+
   const handleLogin = (newToken: string) => {
     setToken(newToken);
   };
