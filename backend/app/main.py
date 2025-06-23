@@ -79,10 +79,11 @@ async def addplayer(
 
 @api.get("/players", response_model=list[dict])
 async def get_players(
+    season_id: int = -1,
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    players = PlayerService.get_players(db)
+    players = PlayerService.get_players(db,season_id)
     return players
 
 @api.get("/stats/streaks", response_model=list[dict])
@@ -109,10 +110,11 @@ async def get_player_kds(
 @api.get("/players/{player_id}", response_model=PlayerResponse)
 async def get_player(
     player_id: int,
+    season_id: int = -1,
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    player = PlayerService.get_player(db, player_id)
+    player = PlayerService.get_player(db, player_id, season_id)
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
     return player
