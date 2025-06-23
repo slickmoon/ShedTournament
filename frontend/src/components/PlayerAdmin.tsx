@@ -12,15 +12,13 @@ interface PlayerAdminProps {
   onAddPlayer: (playerName: string) => void;
   onDeletePlayer: (playerId: number, access_password: string) => void;
   onUpdatePlayer: (playerId: number, playerName: string, access_password: string) => void;
-  playerAdminMessage: string | React.ReactNode;
 }
 
 const PlayerAdmin: React.FC<PlayerAdminProps> = ({
   players,
   onAddPlayer,
   onDeletePlayer,
-  onUpdatePlayer,
-  playerAdminMessage
+  onUpdatePlayer
 }) => {
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
   const [selectedUpdatePlayer, setSelectedUpdatePlayer] = useState<string>('');
@@ -35,11 +33,6 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
           <Typography>Add/Delete Players</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          {playerAdminMessage && (
-            <Typography variant="h6" sx={{ mt: 2 }}>
-              {playerAdminMessage}
-            </Typography>
-          )}
           <Box sx={{ 
             display: 'flex', 
             flexDirection: { xs: 'column', md: 'row' },

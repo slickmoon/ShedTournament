@@ -111,7 +111,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [players, setPlayers] = useState<Player[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | React.ReactNode>('');
-  const [updatePlayerMessage, setPlayerAdminMessage] = useState<string | React.ReactNode>('');
   const [auditlog, setAuditLog] = useState<AuditLogEntry[]>([]);
   const [openMatchDialog, setOpenMatchDialog] = useState(false);
   const [matchError, setMatchError] = useState<string>('');
@@ -329,16 +328,13 @@ function App() {
       });
       const data = await response.json();
       if (response.ok) {
-        setPlayerAdminMessage(`Added ${playerName} successfully`);
         updatePageData();
         setSnackbar({open: true, message: `Added ${playerName} successfully`, severity: 'success'});
       } else {
         const errorData = await response.json();
-        setPlayerAdminMessage(`Error adding player ${playerName}: ${errorData.detail}`);
         setSnackbar({open: true, message: `Error adding player ${playerName}: ${errorData.detail}`, severity: 'error'});
       }
     } catch (error) {
-      setPlayerAdminMessage(`Error adding player ${playerName}: ${error}`);
       setSnackbar({open: true, message: `Error adding player ${playerName}: ${error}`, severity: 'error'});
     }
   };
@@ -346,12 +342,11 @@ function App() {
   const updatePlayer = async (player_id: number, playerName: string, access_password: string) => {
     try {
       if (!player_id) {
-        setPlayerAdminMessage('No player selected');
+        setSnackbar({open: true, message: 'No player selected', severity: 'error'});
         return;
       }
-
       if (!playerName) {
-        setPlayerAdminMessage('Please fill in the name field');
+        setSnackbar({open: true, message: 'Please fill in the name field', severity: 'error'});
         return;
       }
       const response = await fetch(`${API_BASE_URL}/players/${player_id}`, {
@@ -365,16 +360,13 @@ function App() {
         })
       });
       if (response.ok) {
-        setPlayerAdminMessage(`Successfully updated player ${playerName} (#${player_id})`);
         updatePageData();
         setSnackbar({open: true, message: `Successfully updated player ${playerName} (#${player_id})`, severity: 'success'});
       } else {
         const errorData = await response.json();
-        setPlayerAdminMessage(`Error updating player ${playerName} (#${player_id}): ${errorData.detail}`);
         setSnackbar({open: true, message: `Error updating player ${playerName} (#${player_id}): ${errorData.detail}`, severity: 'error'});
       }
     } catch (error) {
-      setPlayerAdminMessage(`Error updating player ${playerName} (#${player_id}): ${error}`);
       setSnackbar({open: true, message: `Error updating player ${playerName} (#${player_id}): ${error}`, severity: 'error'});
     }
   };
@@ -389,16 +381,13 @@ function App() {
         }
       });
       if (response.ok) {
-        setPlayerAdminMessage(`Successfully deleted player (ID: ${playerId})`);
         updatePageData();
         setSnackbar({open: true, message: `Successfully deleted player (ID: ${playerId})`, severity: 'success'});
       } else {
         const errorData = await response.json();
-        setPlayerAdminMessage(`Error deleting player (ID: ${playerId}): ${errorData.detail}`);
         setSnackbar({open: true, message: `Error deleting player (ID: ${playerId}): ${errorData.detail}`, severity: 'error'});
       }
     } catch (error) {
-      setPlayerAdminMessage(`Error deleting player: ${error}`);
       setSnackbar({open: true, message: `Error deleting player: ${error}`, severity: 'error'});
     }
   };
@@ -720,7 +709,6 @@ function App() {
                       onAddPlayer={addplayer}
                       onDeletePlayer={deletePlayer}
                       onUpdatePlayer={updatePlayer}
-                      playerAdminMessage={updatePlayerMessage}
                     />
 
                     <AuditLog auditLog={auditlog} />
