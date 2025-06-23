@@ -79,6 +79,26 @@ interface AuditLogEntry {
   timestamp: string;
 }
 
+// Helper for localStorage match IDs
+const MATCH_IDS_KEY = 'recent-match-ids';
+
+function getRecentMatchIds() {
+  const raw = localStorage.getItem(MATCH_IDS_KEY);
+  if (!raw) return [];
+  try {
+    const arr = JSON.parse(raw);
+    const now = Date.now();
+    // Only keep matches from last 12 hours
+    return arr.filter((item: {id: number, ts: number}) => now - item.ts < 12 * 60 * 60 * 1000);
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentMatchIds(ids: {id: number, ts: number}[]) {
+  localStorage.setItem(MATCH_IDS_KEY, JSON.stringify(ids));
+}
+
 function App() {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -115,6 +135,10 @@ function App() {
   const mainContentRef = useRef<HTMLDivElement>(null);
   const [seasons, setSeasons] = useState<{id: number, season_name: string}[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<number>(-1);
+  const [recentMatchIds, setRecentMatchIds] = useState<{id: number, ts: number}[]>(getRecentMatchIds());
+  const [undoDialogOpen, setUndoDialogOpen] = useState(false);
+  const [undoLoading, setUndoLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState<{open: boolean, message: string, severity: 'success' | 'error'}>({open: false, message: '', severity: 'success'});
 
   // Add online/offline status listener
   useEffect(() => {
@@ -177,6 +201,11 @@ function App() {
       updatePageData();
     }
   }, [selectedSeasonId]);
+
+  // Keep localStorage in sync
+  useEffect(() => {
+    saveRecentMatchIds(recentMatchIds);
+  }, [recentMatchIds]);
 
   const handleLogin = (newToken: string) => {
     setToken(newToken);
@@ -288,7 +317,7 @@ function App() {
     }
   };
 
-  const updatePlayer = async (player_id: number, playerName: string, newElo: number, access_password: string) => {
+  const updatePlayer = async (player_id: number, playerName: string, access_password: string) => {
     try {
       if (!player_id) {
         setPlayerAdminMessage('No player selected');
@@ -386,6 +415,8 @@ function App() {
 
         if (response.ok) {
           const data = await response.json();
+          // Store match id
+          if (data.id) setRecentMatchIds(ids => [{id: data.id, ts: Date.now()}, ...ids].slice(0, 10));
           setStatusMessage(
             <Box>
               <Typography>Doubles match recorded successfully</Typography>
@@ -427,6 +458,8 @@ function App() {
 
         if (response.ok) {
           const data = await response.json();
+          // Store match id
+          if (data.id) setRecentMatchIds(ids => [{id: data.id, ts: Date.now()}, ...ids].slice(0, 10));
           setStatusMessage(
             <Box>
               <Typography>Match recorded successfully</Typography>
@@ -484,6 +517,46 @@ function App() {
       return;
     }
     setOpenMatchDialog(true);
+  };
+
+  // Undo logic
+  const handleUndoMatch = () => {
+    if (recentMatchIds.length === 0) {
+      setSnackbar({open: true, message: 'No recent matches to undo.', severity: 'error'});
+      return;
+    }
+    setUndoDialogOpen(true);
+  };
+
+  const confirmUndoMatch = async () => {
+    if (recentMatchIds.length === 0) {
+      setUndoDialogOpen(false);
+      setSnackbar({open: true, message: 'No recent matches to undo.', severity: 'error'});
+      return;
+    }
+    const {id} = recentMatchIds[0];
+    setUndoLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/matches/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+      if (response.ok) {
+        setRecentMatchIds(ids => ids.slice(1));
+        setSnackbar({open: true, message: 'Last match undone successfully.', severity: 'success'});
+        updatePageData();
+      } else {
+        const errorData = await response.json();
+        setSnackbar({open: true, message: `Error undoing match: ${errorData.detail}`, severity: 'error'});
+      }
+    } catch (error) {
+      setSnackbar({open: true, message: `Error undoing match: ${error}`, severity: 'error'});
+    } finally {
+      setUndoLoading(false);
+      setUndoDialogOpen(false);
+    }
   };
 
   if (loading) {
@@ -570,6 +643,16 @@ function App() {
                     >
                       Record Match Result
                     </Button>
+                    <Button
+                      variant="outlined"
+                      color="warning"
+                      size="large"
+                      onClick={handleUndoMatch}
+                      disabled={recentMatchIds.length === 0 || undoLoading}
+                      startIcon={undoLoading ? <CircularProgress size={20} /> : null}
+                    >
+                      Undo Last Match
+                    </Button>
                   </Box>
                   {!isOnline && (
                     <Typography 
@@ -655,6 +738,38 @@ function App() {
                     isLostByFoul={isLostByFoul}
                     setIsLostByFoul={setIsLostByFoul}
                   />
+                  <Dialog open={undoDialogOpen} onClose={() => setUndoDialogOpen(false)}>
+                    <DialogTitle>Undo Last Match?</DialogTitle>
+                    <DialogContent>
+                      {recentMatchIds.length > 0 ? (
+                        <>
+                          <Typography>Are you sure you want to undo the most recent match?</Typography>
+                          <Typography variant="body2" sx={{ mt: 1 }}>
+                            <b>Match ID:</b> {recentMatchIds[0].id}<br/>
+                            <b>Time:</b> {new Date(recentMatchIds[0].ts).toLocaleString()}
+                          </Typography>
+                        </>
+                      ) : (
+                        <Typography>No recent match to undo.</Typography>
+                      )}
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setUndoDialogOpen(false)} disabled={undoLoading}>Cancel</Button>
+                      <Button onClick={confirmUndoMatch} color="warning" variant="contained" disabled={undoLoading} startIcon={undoLoading ? <CircularProgress size={20} /> : null}>
+                        Undo
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                  <Snackbar
+                    open={snackbar.open}
+                    autoHideDuration={4000}
+                    onClose={() => setSnackbar(s => ({...s, open: false}))}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                  >
+                    <Alert onClose={() => setSnackbar(s => ({...s, open: false}))} severity={snackbar.severity} sx={{ width: '100%' }}>
+                      {snackbar.message}
+                    </Alert>
+                  </Snackbar>
                 </div>
               </div>
             } />

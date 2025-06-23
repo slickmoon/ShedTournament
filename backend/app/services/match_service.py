@@ -121,3 +121,31 @@ class MatchService:
         db.refresh(match_record)
         
         return match_record, None 
+
+    @staticmethod
+    def delete_match(db: Session, match_id: int):
+        # Only delete if this is the latest match
+        match = db.query(base.Match).order_by(base.Match.timestamp.desc()).first()
+        if not match or match.id != match_id:
+            return None, "Cannot undo if other matches have taken place following it"
+        # Retrieve player names using relationships
+        match_info = {
+            'id': match.id,
+            'timestamp': match.timestamp,
+            'is_doubles': match.is_doubles,
+            'winner1_id': match.winner1_id,
+            'winner1_name': match.winner1.player_name if match.winner1 else None,
+            'winner2_id': match.winner2_id,
+            'winner2_name': match.winner2.player_name if match.winner2 else None,
+            'loser1_id': match.loser1_id,
+            'loser1_name': match.loser1.player_name if match.loser1 else None,
+            'loser2_id': match.loser2_id,
+            'loser2_name': match.loser2.player_name if match.loser2 else None,
+            'winner1_elo_change': match.winner1_elo_change,
+            'winner2_elo_change': match.winner2_elo_change,
+            'loser1_elo_change': match.loser1_elo_change,
+            'loser2_elo_change': match.loser2_elo_change,
+        }
+        db.delete(match)
+        db.commit()
+        return match_info, None

@@ -215,6 +215,7 @@ async def record_match(
     # Prepare response
     response = {
         "message": "Match recorded successfully",
+        "id": match_record.id,
         "is_doubles": match.is_doubles,
         "winners": [{
             "id": winner1.id,
@@ -257,4 +258,24 @@ async def get_seasons(
     token: dict = Depends(verify_token)
 ):
     return PlayerService.get_seasons(db)
+
+@api.delete("/matches/{match_id}")
+async def delete_match(
+    match_id: int,
+    request: Request,
+    db: Session = Depends(database.get_db),
+    token: dict = Depends(verify_token)
+):
+    match_info, error = MatchService.delete_match(db, match_id)
+    if error:
+        raise HTTPException(status_code=500, detail=error)
+    AuditLogService.create_log(
+        db,
+        f"Match #{match_id} between "
+        f"{match_info.get('winner1_name', '')}"
+        f"{(' & ' + match_info['winner2_name']) if match_info.get('is_doubles') and match_info.get('winner2_name') else ''} "
+        f"and {match_info.get('loser1_name', '')}"
+        f"{(' & ' + match_info['loser2_name']) if match_info.get('is_doubles') and match_info.get('loser2_name') else ''} undone"
+    )
+    return {"message": f"Match #{match_id} deleted successfully", "match": match_info}
 
