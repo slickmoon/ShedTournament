@@ -155,4 +155,30 @@ class PlayerService:
         player.deleted = True
         player.deleted_at = datetime.now()
         db.commit()
-        return True 
+        return True
+
+    @staticmethod
+    def get_seasons(db: Session):
+        from datetime import datetime
+        now = datetime.now()
+        # Current season
+        current_season = db.query(base.GameSeason).filter(
+            base.GameSeason.start_date <= now,
+            base.GameSeason.end_date >= now
+        ).first()
+        # Next season
+        next_season = db.query(base.GameSeason).filter(
+            base.GameSeason.start_date > now
+        ).order_by(base.GameSeason.start_date.asc()).first()
+        # Previous seasons
+        previous_seasons = db.query(base.GameSeason).filter(
+            base.GameSeason.end_date < now
+        ).order_by(base.GameSeason.start_date.desc()).all()
+        seasons = []
+        if current_season:
+            seasons.append({"id": current_season.id, "season_name": current_season.season_name})
+        if next_season:
+            seasons.append({"id": next_season.id, "season_name": next_season.season_name})
+        for s in previous_seasons:
+            seasons.append({"id": s.id, "season_name": s.season_name})
+        return seasons 

@@ -251,3 +251,7 @@ async def get_most_matches_in_day(
 ):
     return StatsService.get_most_matches_in_day(db)
 
+@app.get("/seasons")
+async def get_seasons(db: Session = Depends(database.get_db)):
+    return PlayerService.get_seasons(db)
+
