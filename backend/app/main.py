@@ -166,11 +166,11 @@ async def delete_player(
     if not player:
         raise HTTPException(status_code=404, detail=f"Player #{player_id} not found")
     if not PlayerService.delete_player(db, player_id):
-        raise HTTPException(status_code=500, detail=f"Failed to delete #{player_id} {player["player_name"]}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete #{player_id} {player['player_name']}")
         
     
-    AuditLogService.create_log(db, f"Player #{player_id} {player["player_name"]} deleted")
-    return {"message": f"Player #{player_id} {player["player_name"]} deleted successfully"}
+    AuditLogService.create_log(db, f"Player #{player_id} {player['player_name']} deleted")
+    return {"message": f"Player #{player_id} {player['player_name']} deleted successfully"}
 
 @api.get("/auditlog", response_model=list[AuditLogResponse])
 async def get_audit_log(
