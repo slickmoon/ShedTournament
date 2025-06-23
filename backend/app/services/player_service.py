@@ -15,39 +15,25 @@ class PlayerService:
         return db_player
 
     @staticmethod
-    def get_player(db: Session, player_id: int) -> Optional[dict]:
+    def get_player(db: Session, player_id: int, season_id: int) -> Optional[dict]:
         player = db.query(base.Player).filter(
             base.Player.id == player_id,
             base.Player.deleted == False
         ).first()
         if not player:
             return None
-        # Calculate ELO from matches
-        elo = base.DEFAULT_ELO
-        # Get all matches where the player was a winner or loser
-        matches = db.query(base.Match).filter(
-            (base.Match.winner1_id == player_id) |
-            (base.Match.winner2_id == player_id) |
-            (base.Match.loser1_id == player_id) |
-            (base.Match.loser2_id == player_id)
-        ).all()
-        for match in matches:
-            if match.winner1_id == player_id:
-                elo += match.winner1_elo_change
-            if match.winner2_id == player_id and match.winner2_elo_change is not None:
-                elo += match.winner2_elo_change
-            if match.loser1_id == player_id:
-                elo += match.loser1_elo_change
-            if match.loser2_id == player_id and match.loser2_elo_change is not None:
-                elo += match.loser2_elo_change
+        
+        current_season = PlayerService.get_current_season(season_id,db)
 
-        # Build composite result without the elo field from the player model
-        player_dict = {c.name: getattr(player, c.name) for c in player.__table__.columns if c.name != 'elo'} # Build a new dict of the player object without the elo field
-        player_dict['elo'] = elo # append the elo field
+        elo = PlayerService.calculate_player_elo(player, current_season, db)
+        # Build a new dict of the player object without the elo field
+        player_dict = {c.name: getattr(player, c.name) for c in player.__table__.columns if c.name != 'elo'}
+         # append the elo field
+        player_dict['elo'] = elo
         return player_dict
 
     @staticmethod
-    def get_players(db: Session) -> list[dict]:
+    def get_players(db: Session,season_id) -> list[dict]:
         # Get match counts
         match_counts = db.query(
             base.Player.id,
@@ -86,25 +72,12 @@ class PlayerService:
             base.Player.player_name.asc()
         ).all()
 
-        # For each player, calculate ELO from matches
+        current_season = PlayerService.get_current_season(season_id, db)
+
+        # For each player, calculate ELO from matches in the current season
         result = []
         for player, total_matches, recently_pantsed in player_rows:
-            elo = base.DEFAULT_ELO
-            matches = db.query(base.Match).filter(
-                (base.Match.winner1_id == player.id) |
-                (base.Match.winner2_id == player.id) |
-                (base.Match.loser1_id == player.id) |
-                (base.Match.loser2_id == player.id)
-            ).all()
-            for match in matches:
-                if match.winner1_id == player.id:
-                    elo += match.winner1_elo_change
-                if match.winner2_id == player.id and match.winner2_elo_change is not None:
-                    elo += match.winner2_elo_change
-                if match.loser1_id == player.id:
-                    elo += match.loser1_elo_change
-                if match.loser2_id == player.id and match.loser2_elo_change is not None:
-                    elo += match.loser2_elo_change
+            elo = PlayerService.calculate_player_elo(player, current_season, db)
             result.append({
                 "id": player.id,
                 "player_name": player.player_name,
@@ -113,6 +86,54 @@ class PlayerService:
                 "recently_pantsed": recently_pantsed
             })
         return result
+    
+    @staticmethod
+    def get_current_season(season_id, db: Session):
+        # Return Current season
+        if season_id == -1: 
+            now = datetime.now()
+            return db.query(base.GameSeason).filter(
+                base.GameSeason.start_date <= now,
+                base.GameSeason.end_date >= now
+            ).first()
+        # Return lifetime data for all seasons
+        elif season_id == -2:
+            return None
+        # Return specified season
+        else:
+            return db.query(base.GameSeason).filter(
+                base.GameSeason.id == season_id
+            ).first()
+    
+    @staticmethod
+    def calculate_player_elo(player, current_season, db: Session):
+        elo = base.DEFAULT_ELO
+        if current_season:
+            matches = db.query(base.Match).filter(
+                ((base.Match.winner1_id == player.id) |
+                    (base.Match.winner2_id == player.id) |
+                    (base.Match.loser1_id == player.id) |
+                    (base.Match.loser2_id == player.id)) &
+                (base.Match.timestamp >= current_season.start_date) &
+                (base.Match.timestamp <= current_season.end_date)
+            ).all()
+        else:
+            matches = db.query(base.Match).filter(
+                (base.Match.winner1_id == player.id) |
+                (base.Match.winner2_id == player.id) |
+                (base.Match.loser1_id == player.id) |
+                (base.Match.loser2_id == player.id)
+            ).all()
+        for match in matches:
+            if match.winner1_id == player.id:
+                elo += match.winner1_elo_change
+            if match.winner2_id == player.id and match.winner2_elo_change is not None:
+                elo += match.winner2_elo_change
+            if match.loser1_id == player.id:
+                elo += match.loser1_elo_change
+            if match.loser2_id == player.id and match.loser2_elo_change is not None:
+                elo += match.loser2_elo_change
+        return elo
 
     @staticmethod
     def update_player(db: Session, player_id: int, player: PlayerUpdate) -> Optional[base.Player]:
