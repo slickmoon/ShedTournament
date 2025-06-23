@@ -15,7 +15,7 @@ class PlayerService:
         return db_player
 
     @staticmethod
-    def get_player(db: Session, player_id: int, season_id: int) -> Optional[dict]:
+    def get_player(db: Session, player_id: int, season_id: int = -1) -> Optional[dict]:
         player = db.query(base.Player).filter(
             base.Player.id == player_id,
             base.Player.deleted == False
