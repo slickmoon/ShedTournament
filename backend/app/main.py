@@ -252,6 +252,13 @@ async def get_most_matches_in_day(
 ):
     return StatsService.get_most_matches_in_day(db)
 
+@api.get("stats/total-matches", response_model=dict)
+async def get_total_matches(
+    db: Session = Depends(database.get_db),
+    token: dict = Depends(verify_token)
+):
+    return StatsService.get_total_matches(db)
+
 @api.get("/seasons", response_model=list[dict])
 async def get_seasons(
     db: Session = Depends(database.get_db),

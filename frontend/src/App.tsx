@@ -73,6 +73,12 @@ interface MostMatchesInDay {
   matches_played: number;
 }
 
+interface TotalMatchStats {
+  total_matches: number;
+  money_saved: number;
+  time_wasted: number;
+}
+
 interface AuditLogEntry {
   id: number;
   log: string;
@@ -130,6 +136,7 @@ function App() {
     date: '',
     matches_played: 0
   });
+  const [totalMatchStats, setTotalMatchStats] = useState<TotalMatchStats[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
@@ -285,6 +292,16 @@ function App() {
       setMostMatchesInDay(data);
     } catch (error) {
       setStatusMessage(`Error fetching most matches in day: ${error}`);
+    }
+    // total matches
+    try {
+      const response = await fetch(`${API_BASE_URL}/stats/total-matches`, {
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      setTotalMatchStats(data);
+    } catch (error) {
+      setStatusMessage(`Error fetching total matches stats: ${error}`);
     }
   };
   

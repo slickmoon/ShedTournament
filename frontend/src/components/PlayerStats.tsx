@@ -17,14 +17,22 @@ interface MostMatchesInDay {
   matches_played: number;
 }
 
+interface TotalMatchStats {
+  total_matches: number;
+  money_saved: number;
+  time_wasted: number;
+}
+
 interface PlayerStatsProps {
   playerStreakLongest: PlayerStreakLongest[];
   mostMatchesInDay: MostMatchesInDay;
+  totalMatchStats: TotalMatchStats;
 }
 
 const PlayerStats: React.FC<PlayerStatsProps> = ({
   playerStreakLongest,
-  mostMatchesInDay
+  mostMatchesInDay,
+  totalMatchStats
 }) => {
   return (
     <>
@@ -129,6 +137,87 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
                     {mostMatchesInDay.matches_played} matches
                   </Typography>
                   <Typography component="span"> on {new Date(mostMatchesInDay.date).toLocaleDateString()}</Typography>
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
+          {/* Total Matches box */}
+          <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                p: 1,
+                mb: 1,
+                borderRadius: 1,
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    Total Matches Played
+                  </Typography>
+                  <Typography component="span" sx={{ color: 'info.main' }}>
+                    {totalMatchStats.total_matches}
+                  </Typography>
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
+          {/* Money Saved box */}
+          <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                p: 1,
+                mb: 1,
+                borderRadius: 1,
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    Money Saved from the pub
+                  </Typography>
+                  <Typography component="span" sx={{ color: 'success.main' }}>
+                    ${totalMatchStats.money_saved}
+                  </Typography>
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
+          {/* Time wasted box */}
+          <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                p: 1,
+                mb: 1,
+                borderRadius: 1,
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    Time wasted in the shed
+                  </Typography>
+                  <Typography component="span" sx={{ color: 'success.main' }}>
+                    {totalMatchStats.time_wasted / 60} hours
+                  </Typography>
                 </Typography>
               </Box>
             </Box>

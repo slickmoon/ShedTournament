@@ -187,3 +187,18 @@ class StatsService:
             "date": max_matches.match_date.isoformat(),
             "matches_played": max_matches.matches_played
         }
+    
+    @staticmethod
+    def get_total_matches(db: Session) -> Dict[str, Any]:
+        price_per_match = 3
+        time_per_game = 15
+
+        total_matches = db.query(
+            func.count(base.Match.id).label('match_count')
+        ).first()
+
+        return {
+            "total_matches": total_matches.match_count,
+            "money_saved": (total_matches.match_count * price_per_match),
+            "time_wasted": (total_matches.match_count * time_per_game)
+        }
