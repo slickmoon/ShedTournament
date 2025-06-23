@@ -16,39 +16,35 @@ class PlayerService:
 
     @staticmethod
     def get_player(db: Session, player_id: int) -> Optional[dict]:
-        new_elo_calc = True
         player = db.query(base.Player).filter(
             base.Player.id == player_id,
             base.Player.deleted == False
         ).first()
         if not player:
             return None
-        if (new_elo_calc):
-            # Calculate ELO from matches
-            elo = base.DEFAULT_ELO
-            # Get all matches where the player was a winner or loser
-            matches = db.query(base.Match).filter(
-                (base.Match.winner1_id == player_id) |
-                (base.Match.winner2_id == player_id) |
-                (base.Match.loser1_id == player_id) |
-                (base.Match.loser2_id == player_id)
-            ).all()
-            for match in matches:
-                if match.winner1_id == player_id:
-                    elo += match.winner1_elo_change
-                if match.winner2_id == player_id and match.winner2_elo_change is not None:
-                    elo += match.winner2_elo_change
-                if match.loser1_id == player_id:
-                    elo += match.loser1_elo_change
-                if match.loser2_id == player_id and match.loser2_elo_change is not None:
-                    elo += match.loser2_elo_change
+        # Calculate ELO from matches
+        elo = base.DEFAULT_ELO
+        # Get all matches where the player was a winner or loser
+        matches = db.query(base.Match).filter(
+            (base.Match.winner1_id == player_id) |
+            (base.Match.winner2_id == player_id) |
+            (base.Match.loser1_id == player_id) |
+            (base.Match.loser2_id == player_id)
+        ).all()
+        for match in matches:
+            if match.winner1_id == player_id:
+                elo += match.winner1_elo_change
+            if match.winner2_id == player_id and match.winner2_elo_change is not None:
+                elo += match.winner2_elo_change
+            if match.loser1_id == player_id:
+                elo += match.loser1_elo_change
+            if match.loser2_id == player_id and match.loser2_elo_change is not None:
+                elo += match.loser2_elo_change
 
-            # Build composite result without the elo field from the player model
-            player_dict = {c.name: getattr(player, c.name) for c in player.__table__.columns if c.name != 'elo'} # Build a new dict of the player object without the elo field
-            player_dict['elo'] = elo # append the elo field
-            return player_dict
-        else:
-            return player
+        # Build composite result without the elo field from the player model
+        player_dict = {c.name: getattr(player, c.name) for c in player.__table__.columns if c.name != 'elo'} # Build a new dict of the player object without the elo field
+        player_dict['elo'] = elo # append the elo field
+        return player_dict
 
     @staticmethod
     def get_players(db: Session) -> list[dict]:
