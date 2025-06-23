@@ -697,6 +697,7 @@ function App() {
                     <PlayerStats 
                       playerStreakLongest={playerStreakLongest}
                       mostMatchesInDay={mostMatchesInDay}
+                      totalMatchStats={totalMatchStats[0] || { total_matches: 0, money_saved: 0, time_wasted: 0 }}
                     />
 
                     <PlayerAdmin
