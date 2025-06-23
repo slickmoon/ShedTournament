@@ -552,7 +552,6 @@ function App() {
                       displayEmpty
                       sx={{ minWidth: 200 }}
                     >
-                      <MenuItem value={-1}>Current Season</MenuItem>
                       <MenuItem value={-2}>All Time</MenuItem>
                       {seasons.map(season => (
                         <MenuItem key={season.id} value={season.id}>{season.season_name}</MenuItem>
