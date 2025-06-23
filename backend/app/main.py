@@ -83,16 +83,7 @@ async def get_players(
     token: dict = Depends(verify_token)
 ):
     players = PlayerService.get_players(db)
-    return [
-        {
-            "id": player.id,
-            "player_name": player.player_name,
-            "elo": player.elo,
-            "total_matches": total_matches or 0,
-            "recently_pantsed": recently_pantsed
-        }
-        for player, total_matches, recently_pantsed in players
-    ]
+    return players
 
 @api.get("/stats/streaks", response_model=list[dict])
 async def get_player_streaks(
