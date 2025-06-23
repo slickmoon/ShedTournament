@@ -138,7 +138,7 @@ async def update_player(
         raise HTTPException(status_code=404, detail=f"Player #{player_id} not found")
     
     # Capture original values before update
-    original_name = original_player.player_name
+    original_name = original_player["player_name"]
     
     if not PlayerService.update_player(db, player_id, player):
         raise HTTPException(status_code=500, detail=f"Failed to update player #{player_id} {original_name}")
@@ -166,11 +166,11 @@ async def delete_player(
     if not player:
         raise HTTPException(status_code=404, detail=f"Player #{player_id} not found")
     if not PlayerService.delete_player(db, player_id):
-        raise HTTPException(status_code=500, detail=f"Failed to delete #{player_id} {player.player_name}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete #{player_id} {player["player_name"]}")
         
     
-    AuditLogService.create_log(db, f"Player #{player_id} {player.player_name} deleted")
-    return {"message": f"Player #{player_id} {player.player_name} deleted successfully"}
+    AuditLogService.create_log(db, f"Player #{player_id} {player["player_name"]} deleted")
+    return {"message": f"Player #{player_id} {player["player_name"]} deleted successfully"}
 
 @api.get("/auditlog", response_model=list[AuditLogResponse])
 async def get_audit_log(
@@ -204,12 +204,12 @@ async def record_match(
         
         AuditLogService.create_log(
             db,
-            f"Doubles match recorded: Players {winner1.player_name} ({winner1.elo}) & {winner2.player_name} ({winner2.elo}) {lossMessage} {loser1.player_name} ({loser1.elo}) & {loser2.player_name} ({loser2.elo})"
+            f"Doubles match recorded: Players {winner1['player_name']} ({winner1['elo']}) & {winner2['player_name']} ({winner2['elo']}) {lossMessage} {loser1['player_name']} ({loser1['elo']}) & {loser2['player_name']} ({loser2['elo']})"
         )
     else:
         AuditLogService.create_log(
             db,
-            f"Match recorded: {winner1.player_name} ({winner1.elo}) {lossMessage} {loser1.player_name} ({loser1.elo})"
+            f"Match recorded: {winner1['player_name']} ({winner1['elo']}) {lossMessage} {loser1['player_name']} ({loser1['elo']})"
         )
 
     # Prepare response
@@ -218,29 +218,29 @@ async def record_match(
         "id": match_record.id,
         "is_doubles": match.is_doubles,
         "winners": [{
-            "id": winner1.id,
-            "name": winner1.player_name,
-            "new_elo": winner1.elo,
+            "id": winner1["id"],
+            "name": winner1["player_name"],
+            "new_elo": winner1["elo"],
             "elo_change": match_record.winner1_elo_change
         }],
         "losers": [{
-            "id": loser1.id,
-            "name": loser1.player_name,
-            "new_elo": loser1.elo,
+            "id": loser1["id"],
+            "name": loser1["player_name"],
+            "new_elo": loser1["elo"],
             "elo_change": match_record.loser1_elo_change
         }]
     }
     if match.is_doubles:
         response["winners"].append({
-            "id": winner2.id,
-            "name": winner2.player_name,
-            "new_elo": winner2.elo,
+            "id": winner2["id"],
+            "name": winner2["player_name"],
+            "new_elo": winner2["elo"],
             "elo_change": match_record.winner2_elo_change
         })
         response["losers"].append({
-            "id": loser2.id,
-            "name": loser2.player_name,
-            "new_elo": loser2.elo,
+            "id": loser2["id"],
+            "name": loser2["player_name"],
+            "new_elo": loser2["elo"],
             "elo_change": match_record.loser2_elo_change
         })
     return response
