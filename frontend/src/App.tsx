@@ -136,7 +136,11 @@ function App() {
     date: '',
     matches_played: 0
   });
-  const [totalMatchStats, setTotalMatchStats] = useState<TotalMatchStats[]>([]);
+  const [totalMatchStats, setTotalMatchStats] = useState<TotalMatchStats>({
+    total_matches: 0,
+    money_saved: 0,
+    time_wasted: 0
+  });
   const [showConfetti, setShowConfetti] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
@@ -697,7 +701,6 @@ function App() {
                     <PlayerStats 
                       playerStreakLongest={playerStreakLongest}
                       mostMatchesInDay={mostMatchesInDay}
-                      totalMatchStats={totalMatchStats[0] || { total_matches: 0, money_saved: 0, time_wasted: 0 }}
                     />
 
                     <PlayerAdmin

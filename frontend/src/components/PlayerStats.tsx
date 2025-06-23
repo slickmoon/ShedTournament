@@ -186,7 +186,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
               <Box sx={{ flex: 1 }}>
                 <Typography variant="body1">
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                    Money Saved from the pub
+                    Money Saved at the pub
                   </Typography>
                   <Typography component="span" sx={{ color: 'success.main' }}>
                     ${totalMatchStats.money_saved}
