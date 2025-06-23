@@ -175,7 +175,7 @@ class PlayerService:
         ).order_by(base.GameSeason.start_date.desc()).all()
         seasons = []
         if current_season:
-            seasons.append({"id": current_season.id, "season_name": f"Current Season - {current_season.season_name}"})
+            seasons.append({"id": -1, "season_name": f"Current Season - {current_season.season_name}"})
         if next_season:
             seasons.append({"id": next_season.id, "season_name": next_season.season_name})
         for s in previous_seasons:
