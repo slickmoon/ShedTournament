@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, CssBaseline, Button, Typography, Box, CircularProgress, Container, TextField, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Checkbox, Snackbar, Alert, Divider, Paper, useMediaQuery, useTheme, Select, MenuItem } from '@mui/material';
+import { ThemeProvider, CssBaseline, Button, Typography, Box, CircularProgress, Container, TextField, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Checkbox, Snackbar, Alert, Divider, Paper, useMediaQuery, useTheme, Select, MenuItem, Menu } from '@mui/material';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
@@ -554,10 +554,10 @@ function App() {
                       displayEmpty
                       sx={{ minWidth: 200 }}
                     >
-                      <MenuItem value={-2}>All Time</MenuItem>
                       {seasons.map(season => (
                         <MenuItem key={season.id} value={season.id}>{season.season_name}</MenuItem>
                       ))}
+                      <MenuItem value={-2}>All Time</MenuItem>
                     </Select>
                   </Box>
 
