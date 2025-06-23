@@ -142,7 +142,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
             </Box>
           </Paper>
           {/* Total Matches box */}
-          {/*<Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
+          <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
             <Box
               sx={{
                 display: 'flex',
@@ -168,7 +168,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
               </Box>
             </Box>
           </Paper>
-          {/* Money Saved box }
+          {/* Money Saved box */}
           <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
             <Box
               sx={{
@@ -195,7 +195,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
               </Box>
             </Box>
           </Paper>
-          {/* Time wasted box }
+          {/* Time wasted box */}
           <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
             <Box
               sx={{
@@ -221,7 +221,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
                 </Typography>
               </Box>
             </Box>
-          </Paper>*/}
+          </Paper>
         </AccordionDetails>
       </Accordion>
     </>
