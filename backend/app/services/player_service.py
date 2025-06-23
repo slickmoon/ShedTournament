@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, or_, and_
+from sqlalchemy import func, or_, and_, select
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple
 from .. import base
@@ -80,7 +80,7 @@ class PlayerService:
         player_rows = db.query(
             base.Player,
             match_counts.c.total_matches,
-            base.Player.id.in_(recent_pantsed_players).label('recently_pantsed')
+            base.Player.id.in_(select(recent_pantsed_players)).label('recently_pantsed')
         ).outerjoin(
             match_counts,
             base.Player.id == match_counts.c.id
@@ -125,7 +125,6 @@ class PlayerService:
             return None
         
         db_player.player_name = player.player_name
-        db_player.elo = player.player_elo
         db.commit()
         db.refresh(db_player)
         return db_player
