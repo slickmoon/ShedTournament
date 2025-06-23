@@ -162,7 +162,8 @@ function App() {
         const response = await fetch(`${API_BASE_URL}/seasons`, { headers: getAuthHeaders() });
         const data = await response.json();
         setSeasons(data);
-        setSelectedSeasonId(-1)
+        // Set default to -1 if not already set
+        setSelectedSeasonId(prev => (prev === undefined || prev === null ? -1 : prev));
       } catch (error) {
         setStatusMessage(`Error fetching seasons: ${error}`);
       }
