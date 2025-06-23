@@ -100,7 +100,7 @@ const InstallPrompt: React.FC = () => {
 
   // Don't show if user has dismissed before
   if (!isVisible || localStorage.getItem('installPromptDismissed') === 'true') {
-    console.log('Install prompt not visible:', { isVisible, dismissed: localStorage.getItem('installPromptDismissed') === 'true' });
+    //console.log('Install prompt not visible:', { isVisible, dismissed: localStorage.getItem('installPromptDismissed') === 'true' });
     return null;
   }
 
