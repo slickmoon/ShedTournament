@@ -202,7 +202,7 @@ function App() {
         // Set default to -1 if not already set
         setSelectedSeasonId(prev => (prev === undefined || prev === null ? -1 : prev));
       } catch (error) {
-        setStatusMessage(`Error fetching seasons: ${error}`);
+        setSnackbar({open: true, message: `Error fetching seasons: ${error}`, severity: 'error'});
       }
     };
     fetchSeasons();
@@ -239,7 +239,7 @@ function App() {
       const data = await response.json();
       setPlayers(data);
     } catch (error) {
-      setStatusMessage(`Error fetching players: ${error}`);
+      setSnackbar({open: true, message: `Error fetching players: ${error}`, severity: 'error'});
     }
   };
 
@@ -251,7 +251,7 @@ function App() {
       const data = await response.json();
       setAuditLog(data);
     } catch (error) {
-      setStatusMessage(`Error fetching audit log: ${error}`);
+      setSnackbar({open: true, message: `Error fetching audit log: ${error}`, severity: 'error'});
     }
   };
 
@@ -264,7 +264,7 @@ function App() {
       const data = await response.json();
       setPlayerStreaks(data);
     } catch (error) {
-      setStatusMessage(`Error fetching player streaks: ${error}`);
+      setSnackbar({open: true, message: `Error fetching player streaks: ${error}`, severity: 'error'});
     }
     
     // Longest player streaks
@@ -275,7 +275,7 @@ function App() {
       const data = await response.json();
       setPlayerStreakLongest(data);
     } catch (error) {
-      setStatusMessage(`Error fetching longest player streak: ${error}`);
+      setSnackbar({open: true, message: `Error fetching longest player streak: ${error}`, severity: 'error'});
     }
 
     // Player KD Ratios
@@ -286,7 +286,7 @@ function App() {
       const data = await response.json();
       setPlayerKD(data);
     } catch (error) {
-      setStatusMessage(`Error fetching player KD: ${error}`);
+      setSnackbar({open: true, message: `Error fetching player KD: ${error}`, severity: 'error'});
     }
 
     // Most matches in a day
@@ -297,7 +297,7 @@ function App() {
       const data = await response.json();
       setMostMatchesInDay(data);
     } catch (error) {
-      setStatusMessage(`Error fetching most matches in day: ${error}`);
+      setSnackbar({open: true, message: `Error fetching most matches in day: ${error}`, severity: 'error'});
     }
     // total matches
     try {
@@ -307,7 +307,7 @@ function App() {
       const data = await response.json();
       setTotalMatchStats(data);
     } catch (error) {
-      setStatusMessage(`Error fetching total matches stats: ${error}`);
+      setSnackbar({open: true, message: `Error fetching total matches stats: ${error}`, severity: 'error'});
     }
   };
   
@@ -331,12 +331,15 @@ function App() {
       if (response.ok) {
         setPlayerAdminMessage(`Added ${playerName} successfully`);
         updatePageData();
+        setSnackbar({open: true, message: `Added ${playerName} successfully`, severity: 'success'});
       } else {
         const errorData = await response.json();
         setPlayerAdminMessage(`Error adding player ${playerName}: ${errorData.detail}`);
+        setSnackbar({open: true, message: `Error adding player ${playerName}: ${errorData.detail}`, severity: 'error'});
       }
     } catch (error) {
       setPlayerAdminMessage(`Error adding player ${playerName}: ${error}`);
+      setSnackbar({open: true, message: `Error adding player ${playerName}: ${error}`, severity: 'error'});
     }
   };
 
@@ -364,12 +367,15 @@ function App() {
       if (response.ok) {
         setPlayerAdminMessage(`Successfully updated player ${playerName} (#${player_id})`);
         updatePageData();
+        setSnackbar({open: true, message: `Successfully updated player ${playerName} (#${player_id})`, severity: 'success'});
       } else {
         const errorData = await response.json();
         setPlayerAdminMessage(`Error updating player ${playerName} (#${player_id}): ${errorData.detail}`);
+        setSnackbar({open: true, message: `Error updating player ${playerName} (#${player_id}): ${errorData.detail}`, severity: 'error'});
       }
     } catch (error) {
       setPlayerAdminMessage(`Error updating player ${playerName} (#${player_id}): ${error}`);
+      setSnackbar({open: true, message: `Error updating player ${playerName} (#${player_id}): ${error}`, severity: 'error'});
     }
   };
   
@@ -385,12 +391,15 @@ function App() {
       if (response.ok) {
         setPlayerAdminMessage(`Successfully deleted player (ID: ${playerId})`);
         updatePageData();
+        setSnackbar({open: true, message: `Successfully deleted player (ID: ${playerId})`, severity: 'success'});
       } else {
         const errorData = await response.json();
         setPlayerAdminMessage(`Error deleting player (ID: ${playerId}): ${errorData.detail}`);
+        setSnackbar({open: true, message: `Error deleting player (ID: ${playerId}): ${errorData.detail}`, severity: 'error'});
       }
     } catch (error) {
       setPlayerAdminMessage(`Error deleting player: ${error}`);
+      setSnackbar({open: true, message: `Error deleting player: ${error}`, severity: 'error'});
     }
   };
 
@@ -458,7 +467,7 @@ function App() {
           setShowConfetti(true);
         } else {
           const errorData = await response.json();
-          setStatusMessage(`Error recording match: ${errorData.detail}`);
+          setSnackbar({open: true, message: `Error recording match: ${errorData.detail}`, severity: 'error'});
         }
       } else {
         if (winner1Player.id === loser1Player.id) {
@@ -497,7 +506,7 @@ function App() {
           setShowConfetti(true);
         } else {
           const errorData = await response.json();
-          setStatusMessage(`Error recording match: ${errorData.detail}`);
+          setSnackbar({open: true, message: `Error recording match: ${errorData.detail}`, severity: 'error'});
         }
       }
 
@@ -514,7 +523,7 @@ function App() {
       setIsLostByFoul(false);
       setMatchError('');
     } catch (error) {
-      setStatusMessage(`Error recording match: ${error}`);
+      setSnackbar({open: true, message: `Error recording match: ${error}`, severity: 'error'});
     } finally {
       setIsRecordingMatch(false);
     }
@@ -536,7 +545,7 @@ function App() {
 
   const handleOpenMatchDialog = () => {
     if (!isOnline) {
-      setStatusMessage('Cannot record matches while offline. Please check your internet connection.');
+      setSnackbar({open: true, message: 'Cannot record matches while offline. Please check your internet connection.', severity: 'error'});
       return;
     }
     setOpenMatchDialog(true);
