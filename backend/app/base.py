@@ -12,8 +12,8 @@ class BaseModel(Base):
     __abstract__ = True
     
     id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow) 
+    created_at = Column(DateTime, default=lambda: datetime.now(datetime.UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(datetime.UTC), onupdate=lambda: datetime.now(datetime.UTC)) 
 
 class Player(Base):
     __tablename__ = "players"
@@ -68,4 +68,11 @@ class PlayerEvent(Base):
     player_id = Column(Integer, ForeignKey("players.id"), nullable=False)
     event_id = Column(Integer, ForeignKey("event_type.id"), nullable=False)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
-    event_type = relationship("EventType", back_populates="events") 
+    event_type = relationship("EventType", back_populates="events")
+
+class GameSeason(Base):
+    __tablename__ = "game_seasons"
+    id = Column(Integer, primary_key=True, index=True)
+    start_date = Column(DateTime(timezone=True), unique=True, nullable=False)
+    end_date = Column(DateTime(timezone=True), nullable=False)
+    season_name = Column(String)

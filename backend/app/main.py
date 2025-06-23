@@ -137,14 +137,13 @@ async def update_player(
     
     # Capture original values before update
     original_name = original_player.player_name
-    original_elo = original_player.elo
     
     if not PlayerService.update_player(db, player_id, player):
         raise HTTPException(status_code=500, detail=f"Failed to update player #{player_id} {original_name}")
     
     AuditLogService.create_log(
         db,
-        f"Player #{player_id} updated: Name changed from {original_name} to {player.player_name}. ELO Changed from {original_elo} to {player.player_elo}"
+        f"Player #{player_id} updated: Name changed from {original_name} to {player.player_name}."
     )
     return {"message": f"Player {player_id} updated successfully"}
 
