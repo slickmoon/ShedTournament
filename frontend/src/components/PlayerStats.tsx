@@ -163,7 +163,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
                     Total Matches Played
                   </Typography>
                   <Typography component="span" sx={{ color: 'info.main' }}>
-                    #{totalMatchStats.total_matches}
+                    {totalMatchStats.total_matches}
                   </Typography>
                 </Typography>
               </Box>
@@ -216,13 +216,10 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     Time wasted in the shed
                   </Typography>
-                  <Typography component="span" sx={{ color: 'success.main' }}>
-                    {totalMatchStats.time_wasted / 60} 
-                  </Typography>
+                  <Typography component="span" sx={{ color: 'success.main' }}>{totalMatchStats.time_wasted / 60}</Typography>
                   <Typography component="span"> hours game time wasting </Typography>
-                  <Typography component="span" sx={{ color: 'success.main' }}>
-                    {totalMatchStats.per_person_time_wasted / 60 } total hours
-                  </Typography>
+                  <Typography component="span" sx={{ color: 'success.main' }}>{totalMatchStats.per_person_time_wasted / 60}</Typography>
+                  <Typography component="span"> total hours</Typography>
                 </Typography>
               </Box>
             </Box>
