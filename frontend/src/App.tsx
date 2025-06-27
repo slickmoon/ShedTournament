@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, CssBaseline, Button, Typography, Box, CircularProgress, Container, TextField, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Checkbox, Snackbar, Alert, Divider, Paper, useMediaQuery, useTheme, Select, MenuItem, Menu } from '@mui/material';
+import { ThemeProvider, CssBaseline, Button, Typography, Box, CircularProgress, Container, TextField, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Checkbox, Snackbar, Alert, Divider, Paper, useMediaQuery, useTheme, Select, MenuItem, Menu, Switch } from '@mui/material';
 import theme from './theme.ts';
 import { API_BASE_URL } from './config.ts';
 import { Login } from './components/Login.tsx';
@@ -654,19 +654,6 @@ function App() {
                       <MenuItem value={-2}>All Time</MenuItem>
                     </Select>
                   </Box>
-                  <Box sx={{ mb: 2, textAlign: 'center' }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={showPlayerNumbers}
-                          onChange={e => setShowPlayerNumbers(e.target.checked)}
-                          color="primary"
-                        />
-                      }
-                      label="Show player numbers"
-                    />
-                  </Box>
-
                   <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
                     <Button 
                       variant="contained" 
@@ -737,7 +724,18 @@ function App() {
                       Logout
                     </Button>
                   </Box>
-
+                  <Box sx={{ mb: 2, textAlign: 'center' }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={showPlayerNumbers}
+                          onChange={e => setShowPlayerNumbers(e.target.checked)}
+                          color="primary"
+                        />
+                      }
+                      label="Show player numbers"
+                    />
+                  </Box>
                   <MatchDialog
                     open={openMatchDialog}
                     onClose={() => {
@@ -772,7 +770,6 @@ function App() {
                     setIsAwayGame={setIsAwayGame}
                     isLostByFoul={isLostByFoul}
                     setIsLostByFoul={setIsLostByFoul}
-                    showPlayerNumbers={showPlayerNumbers}
                   />
                   <Dialog open={undoDialogOpen} onClose={() => setUndoDialogOpen(false)}>
                     <DialogTitle>Undo Last Match?</DialogTitle>
