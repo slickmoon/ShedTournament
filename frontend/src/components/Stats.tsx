@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Paper, TextField, Select, MenuItem, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Box, Button, Paper, TextField, Select, MenuItem, Typography, Accordion, AccordionSummary, AccordionDetails, SelectChangeEvent } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -30,11 +30,18 @@ interface MatchesPerDay {
   count: number;
 }
 
+interface Player {
+  id: number;
+  player_name: string;
+}
+
 interface StatsProps {
   playerStreakLongest: PlayerStreakLongest[];
   mostMatchesInDay: MostMatchesInDay;
   totalMatchStats: TotalMatchStats;
   matchesPerDay: MatchesPerDay[];
+  players: Player[];
+  onPlayerSelect: (playerId: number | null) => void;
 }
 
 // Helper to calculate linear regression points for trendline
@@ -55,11 +62,20 @@ const Stats: React.FC<StatsProps> = ({
   playerStreakLongest,
   mostMatchesInDay,
   totalMatchStats,
-  matchesPerDay
+  matchesPerDay,
+  players,
+  onPlayerSelect
 }) => {
+  const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
   const trendlineData = getTrendline(matchesPerDay);
   const yMin = Math.min(...matchesPerDay.map(d => d.count), 0);
   const yMax = Math.max(...matchesPerDay.map(d => d.count), 5);
+
+  const handlePlayerChange = (event: SelectChangeEvent<number>) => {
+    const value = Number(event.target.value);
+    setSelectedPlayerId(value === -1 ? null : value);
+    onPlayerSelect(value === -1 ? null : value);
+  };
 
   return (
     <>
@@ -255,6 +271,18 @@ const Stats: React.FC<StatsProps> = ({
             <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
               Matches Played Per Day
             </Typography>
+            <Box sx={{ mb: 2, maxWidth: 300 }}>
+              <Select
+                value={selectedPlayerId === null ? -1 : selectedPlayerId}
+                onChange={handlePlayerChange}
+                fullWidth
+              >
+                <MenuItem value={-1}>All Time</MenuItem>
+                {players.map((player) => (
+                  <MenuItem key={player.id} value={player.id}>{player.player_name}</MenuItem>
+                ))}
+              </Select>
+            </Box>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={matchesPerDay} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" />

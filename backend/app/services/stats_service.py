@@ -218,12 +218,26 @@ class StatsService:
         }
     
     @staticmethod
-    def get_matches_per_day(db: Session) -> list[dict]:
-        results = db.query(
-            cast(base.Match.timestamp, Date).label('date'),
-            func.count(base.Match.id).label('count')
-        ).group_by(cast(base.Match.timestamp, Date))\
-         .order_by(cast(base.Match.timestamp, Date).asc())
+    def get_matches_per_day(db: Session, player_id = None) -> list[dict]:
+        if player_id:
+            # get match results for this player only
+            results = db.query(
+                cast(base.Match.timestamp, Date).label('date'),
+                func.count(base.Match.id).label('count')
+            ).filter(
+                (base.Match.winner1_id == player_id) |
+                (base.Match.winner2_id == player_id) |
+                (base.Match.loser1_id == player_id) |
+                (base.Match.loser2_id == player_id)
+            ).group_by(cast(base.Match.timestamp, Date))\
+            .order_by(cast(base.Match.timestamp, Date).asc())
+        else:
+            results = db.query(
+                cast(base.Match.timestamp, Date).label('date'),
+                func.count(base.Match.id).label('count')
+            ).group_by(cast(base.Match.timestamp, Date))\
+            .order_by(cast(base.Match.timestamp, Date).asc())
+        
         # Format results as list of dicts with date as dd/mm/yy
         matches_per_day = []
         for row in results:

@@ -597,6 +597,19 @@ function App() {
     }
   };
 
+  const handleStatGraphPlayer = async (playerId) => {
+    try {
+      const url = playerId === null 
+        ? `${API_BASE_URL}/stats/matches-per-day`
+        : `${API_BASE_URL}/stats/matches-per-day?player_id=${playerId}`;
+      const response = await fetch(url, { headers: getAuthHeaders() });
+      const data = await response.json();
+      setMatchesPerDay(data);
+    } catch (error) {
+      setSnackbar({open: true, message: `Error fetching matches per day: ${error}`, severity: 'error'});
+    }
+  }
+
   if (loading) {
     return null;
   }
@@ -720,6 +733,10 @@ function App() {
                       mostMatchesInDay={mostMatchesInDay}
                       totalMatchStats={totalMatchStats}
                       matchesPerDay={matchesPerDay}
+                      players={players}
+                      onPlayerSelect={async (playerId) => {
+                        handleStatGraphPlayer(playerId)
+                      }}
                     />
 
                     <PlayerAdmin

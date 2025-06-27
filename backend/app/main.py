@@ -288,8 +288,9 @@ async def delete_match(
 
 @api.get("/stats/matches-per-day", response_model=list[MatchesPerDay])
 async def get_matches_per_day(
+    player_id: int = None,
     db: Session = Depends(database.get_db),
     token: dict = Depends(verify_token)
 ):
-    return StatsService.get_matches_per_day(db)
+    return StatsService.get_matches_per_day(db, player_id)
 
