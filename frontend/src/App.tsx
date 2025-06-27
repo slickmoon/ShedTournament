@@ -86,6 +86,11 @@ interface AuditLogEntry {
   timestamp: string;
 }
 
+interface MatchesPerDay {
+  date: string;
+  count: number;
+}
+
 // Helper for localStorage match IDs
 const MATCH_IDS_KEY = 'recent-match-ids';
 
@@ -152,6 +157,7 @@ function App() {
   const [undoLoading, setUndoLoading] = useState(false);
   const [snackbar, setSnackbar] = useState<{open: boolean, message: string, severity: 'success' | 'error'}>({open: false, message: '', severity: 'success'});
   const [showPlayerNumbers, setShowPlayerNumbers] = useState(false);
+  const [matchesPerDay, setMatchesPerDay] = useState<MatchesPerDay[]>([]);
 
   // Add online/offline status listener
   useEffect(() => {
@@ -308,6 +314,16 @@ function App() {
       setTotalMatchStats(data);
     } catch (error) {
       setSnackbar({open: true, message: `Error fetching total matches stats: ${error}`, severity: 'error'});
+    }
+    // matches per day
+    try {
+      const response = await fetch(`${API_BASE_URL}/stats/matches-per-day`, {
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      setMatchesPerDay(data);
+    } catch (error) {
+      setSnackbar({open: true, message: `Error fetching matches per day: ${error}`, severity: 'error'});
     }
   };
   
@@ -703,6 +719,7 @@ function App() {
                       playerStreakLongest={playerStreakLongest}
                       mostMatchesInDay={mostMatchesInDay}
                       totalMatchStats={totalMatchStats}
+                      matchesPerDay={matchesPerDay}
                     />
 
                     <PlayerAdmin

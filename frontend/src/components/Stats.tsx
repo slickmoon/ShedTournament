@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Paper, TextField, Select, MenuItem, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface PlayerStreakLongest {
   player_id: number;
@@ -24,16 +25,23 @@ interface TotalMatchStats {
   per_person_time_wasted: number;
 }
 
+interface MatchesPerDay {
+  date: string;
+  count: number;
+}
+
 interface StatsProps {
   playerStreakLongest: PlayerStreakLongest[];
   mostMatchesInDay: MostMatchesInDay;
   totalMatchStats: TotalMatchStats;
+  matchesPerDay: MatchesPerDay[];
 }
 
 const Stats: React.FC<StatsProps> = ({
   playerStreakLongest,
   mostMatchesInDay,
-  totalMatchStats
+  totalMatchStats,
+  matchesPerDay
 }) => {
   return (
     <>
@@ -223,6 +231,21 @@ const Stats: React.FC<StatsProps> = ({
                 </Typography>
               </Box>
             </Box>
+          </Paper>
+          {/* Matches Played Per Day box */}
+          <Paper elevation={3} sx={{ p: 2, maxWidth: 600, mx: 'auto', width: '100%' }}>
+            <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+              Matches Played Per Day
+            </Typography>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={matchesPerDay} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" tick={{ fontSize: 12 }} angle={-45} textAnchor="end" height={60} />
+                <YAxis allowDecimals={false} label={{ value: 'Matches', angle: -90, position: 'insideLeft', fontSize: 12 }} />
+                <Tooltip />
+                <Line type="monotone" dataKey="count" stroke="#1976d2" strokeWidth={2} dot={{ r: 2 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </Paper>
         </AccordionDetails>
       </Accordion>

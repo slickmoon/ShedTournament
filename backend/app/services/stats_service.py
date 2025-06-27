@@ -217,3 +217,20 @@ class StatsService:
             "per_person_time_wasted": ((w1_matches.match_count + w2_matches.match_count + l1_matches.match_count + l2_matches.match_count) * time_per_game)
         }
     
+    @staticmethod
+    def get_matches_per_day(db: Session) -> list[dict]:
+        results = db.query(
+            cast(base.Match.timestamp, Date).label('date'),
+            func.count(base.Match.id).label('count')
+        ).group_by(cast(base.Match.timestamp, Date))\
+         .order_by(cast(base.Match.timestamp, Date).asc())
+        # Format results as list of dicts with date as dd/mm/yy
+        matches_per_day = []
+        for row in results:
+            date_str = row.date.strftime('%d/%m/%y')
+            matches_per_day.append({
+                'date': date_str,
+                'count': row.count
+            })
+        return matches_per_day
+    

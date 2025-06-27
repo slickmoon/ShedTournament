@@ -97,4 +97,11 @@ class PlayerEvent(PlayerEventBase):
     timestamp: datetime
 
     class Config:
+        from_attributes = True
+
+class MatchesPerDay(BaseModel):
+    date: str
+    count: int
+
+    class Config:
         from_attributes = True 

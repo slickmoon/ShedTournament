@@ -13,7 +13,7 @@ from .auth import (
 from .schemas import (
     PlayerCreate, PlayerUpdate, PlayerResponse,
     MatchCreate, MatchResponse,
-    AuditLogResponse
+    AuditLogResponse, MatchesPerDay
 )
 from .services import PlayerService, MatchService, AuditLogService, StatsService
 from .config import get_settings
@@ -285,4 +285,11 @@ async def delete_match(
         f"{(' & ' + match_info['loser2_name']) if match_info.get('is_doubles') and match_info.get('loser2_name') else ''} undone"
     )
     return {"message": f"Match #{match_id} deleted successfully", "match": match_info}
+
+@api.get("/stats/matches-per-day", response_model=list[MatchesPerDay])
+async def get_matches_per_day(
+    db: Session = Depends(database.get_db),
+    token: dict = Depends(verify_token)
+):
+    return StatsService.get_matches_per_day(db)
 
