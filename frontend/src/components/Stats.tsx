@@ -271,7 +271,7 @@ const Stats: React.FC<StatsProps> = ({
             <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
               Matches Played Per Day
             </Typography>
-            <Box sx={{ mb: 2, maxWidth: 300 }}>
+            <Box sx={{ mb: 2, maxWidth: 300, mx: 'auto', display: 'flex', justifyContent: 'center' }}>
               <Select
                 value={selectedPlayerId === null ? -1 : selectedPlayerId}
                 onChange={handlePlayerChange}
