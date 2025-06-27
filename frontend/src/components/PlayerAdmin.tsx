@@ -62,9 +62,9 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
                     setAddPlayerLoading(true);
                     try {
                       await onAddPlayer(playerNameInputValue);
-                      setPlayerNameInputValue('');
                     } finally {
                       setAddPlayerLoading(false);
+                      setPlayerNameInputValue('');
                     }
                   }}
                 >
