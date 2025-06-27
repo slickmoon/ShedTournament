@@ -58,6 +58,8 @@ const Stats: React.FC<StatsProps> = ({
   matchesPerDay
 }) => {
   const trendlineData = getTrendline(matchesPerDay);
+  const yMin = Math.min(...matchesPerDay.map(d => d.count), 0);
+  const yMax = Math.max(...matchesPerDay.map(d => d.count), 5);
 
   return (
     <>
@@ -257,7 +259,7 @@ const Stats: React.FC<StatsProps> = ({
               <LineChart data={matchesPerDay} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" tick={{ fontSize: 12 }} angle={-45} textAnchor="end" height={60} />
-                <YAxis allowDecimals={false} label={{ value: 'Matches', angle: -90, position: 'insideLeft', fontSize: 12 }} />
+                <YAxis allowDecimals={false} label={{ value: 'Matches', angle: -90, position: 'insideLeft', fontSize: 12 }} domain={[yMin, yMax]} />
                 <Tooltip />
                 <Line type="monotone" dataKey="count" stroke="#1976d2" strokeWidth={2} dot={{ r: 2 }} />
                 {/* Trendline */}
