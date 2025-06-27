@@ -37,18 +37,48 @@ interface StatsProps {
   matchesPerDay: MatchesPerDay[];
 }
 
-// Helper to calculate linear regression points for trendline
-function getTrendline(data: MatchesPerDay[]) {
-  if (data.length < 2) return [];
+// Helper to calculate 2nd-degree polynomial regression points for trendline
+function getPolynomialTrendline(data: MatchesPerDay[]) {
+  if (data.length < 3) return [];
   // x: index, y: count
   const n = data.length;
-  const sumX = data.reduce((acc, _, i) => acc + i, 0);
-  const sumY = data.reduce((acc, d) => acc + d.count, 0);
-  const sumXY = data.reduce((acc, d, i) => acc + i * d.count, 0);
-  const sumXX = data.reduce((acc, _, i) => acc + i * i, 0);
-  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-  const intercept = (sumY - slope * sumX) / n;
-  return data.map((d, i) => ({ date: d.date, trend: slope * i + intercept }));
+  let sumX = 0, sumX2 = 0, sumX3 = 0, sumX4 = 0;
+  let sumY = 0, sumXY = 0, sumX2Y = 0;
+  for (let i = 0; i < n; i++) {
+    const x = i;
+    const y = data[i].count;
+    sumX += x;
+    sumX2 += x * x;
+    sumX3 += x * x * x;
+    sumX4 += x * x * x * x;
+    sumY += y;
+    sumXY += x * y;
+    sumX2Y += x * x * y;
+  }
+  // Solve the normal equations for a, b, c in y = a*x^2 + b*x + c
+  // Using Cramer's rule for 3x3 system
+  const S = [
+    [n, sumX, sumX2],
+    [sumX, sumX2, sumX3],
+    [sumX2, sumX3, sumX4]
+  ];
+  const Y = [sumY, sumXY, sumX2Y];
+  function det3(m) {
+    return m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1])
+         - m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0])
+         + m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]);
+  }
+  function replaceCol(m, col, v) {
+    return m.map((row, i) => row.map((val, j) => (j === col ? v[i] : val)));
+  }
+  const D = det3(S);
+  const Da = det3(replaceCol(S, 0, Y));
+  const Db = det3(replaceCol(S, 1, Y));
+  const Dc = det3(replaceCol(S, 2, Y));
+  const a = Da / D;
+  const b = Db / D;
+  const c = Dc / D;
+  return data.map((d, i) => ({ date: d.date, trend: a * i * i + b * i + c }));
 }
 
 const Stats: React.FC<StatsProps> = ({
@@ -57,7 +87,7 @@ const Stats: React.FC<StatsProps> = ({
   totalMatchStats,
   matchesPerDay
 }) => {
-  const trendlineData = getTrendline(matchesPerDay);
+  const trendlineData = getPolynomialTrendline(matchesPerDay);
   const yMin = Math.min(...matchesPerDay.map(d => d.count), 0);
   const yMax = Math.max(...matchesPerDay.map(d => d.count), 5);
 
