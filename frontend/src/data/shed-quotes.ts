@@ -38,7 +38,8 @@ export const randomTexts = [
     "'Ooooh, arrrrghhh, fuck ooooooff, get out of town!' - Sounds from The Shed",
     "She can't keep getting away with it!",
     "'Once you pop you can’t stop!' - Blake while observing Loz Beeby’s pringles underwear",
-    "Enhanced league when???"
+    "Enhanced league when???",
+    "They've got magnets in the balls!"
 ];
 
 export const wednesdayTexts = [ 
@@ -53,5 +54,8 @@ export const wednesdayTexts = [
     "Trivia, I hardly knew 'er",
     "The shed feels Holmes alone without you",
     "You know what Wednesday rhymes with? Drugs!",
-    "Kick-ons to the shed!"
+    "Kick-ons to the shed!",
+    "I'm a beau-liber!",
+    "Converting our parasocial relationships one week at a time",
+    "Next Feature: Battleshipples Shed Edition"
 ];
