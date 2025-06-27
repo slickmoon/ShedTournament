@@ -26,6 +26,8 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
   const [selectedUpdatePlayer, setSelectedUpdatePlayer] = useState<string>('');
   const [selectedPlayerUpdateName, setSelectedPlayerUpdateName] = useState<string>('');
   const [accessPassword, setAccessPassword] = useState<string>('');
+  const [addPlayerLoading, setAddPlayerLoading] = useState(false);
+  const [playerNameInputValue, setPlayerNameInputValue] = useState('');
 
   return (
     <>
@@ -47,18 +49,26 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
           }}>
             <Box sx={{ textAlign: 'center', width: { xs: '100%', md: 'auto' } }}>
               <h2>Add Player</h2>
-              <TextField id="player-name-input" label="Player Name" variant="outlined" InputLabelProps={{ shrink: true }} fullWidth />
+              <TextField id="player-name-input" label="Player Name" variant="outlined" InputLabelProps={{ shrink: true }} fullWidth 
+                value={playerNameInputValue}
+                onChange={e => setPlayerNameInputValue(e.target.value)}
+                disabled={addPlayerLoading}
+              />
               <Box sx={{ mt: 2 }}>
                 <Button 
                   variant="contained"
-                  onClick={() => {
-                    const playerNameInput = document.getElementById('player-name-input') as HTMLInputElement;
-                    if (playerNameInput.value) {
-                      onAddPlayer(playerNameInput.value);
+                  disabled={addPlayerLoading || !playerNameInputValue}
+                  onClick={async () => {
+                    setAddPlayerLoading(true);
+                    try {
+                      await onAddPlayer(playerNameInputValue);
+                      setPlayerNameInputValue('');
+                    } finally {
+                      setAddPlayerLoading(false);
                     }
                   }}
                 >
-                  Add player
+                  {addPlayerLoading ? 'Adding...' : 'Add player'}
                 </Button>
               </Box>
             </Box>
