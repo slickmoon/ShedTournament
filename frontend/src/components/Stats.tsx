@@ -67,7 +67,6 @@ const Stats: React.FC<StatsProps> = ({
           <Typography>View Player Stats</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-          <div>
           {/* Winning Streak Record box */}
           <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
             {[...playerStreakLongest]
@@ -249,7 +248,6 @@ const Stats: React.FC<StatsProps> = ({
               </Box>
             </Box>
           </Paper>
-          </div>
           {/* Matches Played Per Day box */}
           <Paper elevation={3} sx={{ p: 2, maxWidth: 600, mx: 'auto', width: '100%' }}>
             <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
