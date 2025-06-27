@@ -16,6 +16,9 @@ const STATIC_ASSETS = [
   '/icons/icon-384x384.png'
 ];
 
+// Set your API base URL here. This can be replaced at build time.
+const API_BASE_URL = self.API_BASE_URL;
+
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -51,7 +54,7 @@ self.addEventListener('activate', (event) => {
 // Fetch event - serve from cache or network
 self.addEventListener('fetch', (event) => {
   // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) {
+  if (!event.request.url.startsWith(self.location.origin) && !event.request.url.startsWith(API_BASE_URL)) {
     return;
   }
 
@@ -60,33 +63,51 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Network-first for API requests
+  if (event.request.url.startsWith(API_BASE_URL)) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request).then((response) => {
+            if (response) {
+              return response;
+            }
+            return new Response('Offline', {
+              status: 503,
+              statusText: 'Service Unavailable',
+              headers: new Headers({
+                'Content-Type': 'text/plain'
+              })
+            });
+          });
+        })
+    );
+    return;
+  }
+
+  // Cache-first for static assets
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
         if (response) {
           return response;
         }
-
         return fetch(event.request)
           .then((response) => {
-            // Don't cache if not a valid response
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
-
-            // Clone the response
             const responseToCache = response.clone();
-
-            // Cache the response
             caches.open(CACHE_NAME)
               .then((cache) => {
                 cache.put(event.request, responseToCache);
               });
-
             return response;
           })
           .catch(() => {
-            // Return offline page for navigation requests
             if (event.request.mode === 'navigate') {
               return caches.match(OFFLINE_URL);
             }
