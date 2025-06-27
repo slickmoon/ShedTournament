@@ -75,7 +75,7 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
                 fullWidth
               >
                 {players.map((player) => (
-                  <MenuItem key={player.id} value={player.player_name}>
+                  <MenuItem key={player.id} value={player.id}>
                     {showPlayerNumbers ? `#${player.id} - ` : ''}{player.player_name}
                   </MenuItem>
                 ))}
@@ -95,7 +95,7 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
                   variant="contained"
                   color="error" 
                   onClick={() => {
-                    const player = players.find(p => p.player_name.toLowerCase() === selectedPlayer.toLowerCase());
+                    const player = players.find(p => p.id == parseInt(selectedPlayer));
                     if (player) {
                       onDeletePlayer(player.id, accessPassword);
                       setAccessPassword('');
