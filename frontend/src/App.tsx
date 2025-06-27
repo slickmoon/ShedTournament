@@ -642,6 +642,7 @@ function App() {
                   </Typography>
 
                   <Box sx={{ mb: 2, textAlign: 'center' }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>Select Game Season</Typography>
                     <Select
                       value={selectedSeasonId}
                       onChange={(e) => setSelectedSeasonId(Number(e.target.value))}
