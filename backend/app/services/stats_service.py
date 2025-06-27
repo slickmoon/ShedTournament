@@ -216,3 +216,4 @@ class StatsService:
             "time_wasted": (total_matches.match_count * time_per_game),
             "per_person_time_wasted": ((w1_matches.match_count + w2_matches.match_count + l1_matches.match_count + l2_matches.match_count) * time_per_game)
         }
+    

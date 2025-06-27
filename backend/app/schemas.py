@@ -62,7 +62,7 @@ class AuditLogResponse(BaseModel):
         from_attributes = True
 
 # Stats schemas
-class PlayerStats(BaseModel):
+class Stats(BaseModel):
     player_id: int
     player_name: str
     total_matches: int

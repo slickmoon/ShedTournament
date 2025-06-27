@@ -24,13 +24,13 @@ interface TotalMatchStats {
   per_person_time_wasted: number;
 }
 
-interface PlayerStatsProps {
+interface StatsProps {
   playerStreakLongest: PlayerStreakLongest[];
   mostMatchesInDay: MostMatchesInDay;
   totalMatchStats: TotalMatchStats;
 }
 
-const PlayerStats: React.FC<PlayerStatsProps> = ({
+const Stats: React.FC<StatsProps> = ({
   playerStreakLongest,
   mostMatchesInDay,
   totalMatchStats
@@ -230,4 +230,4 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
   );
 };
 
-export default PlayerStats; 
+export default Stats; 

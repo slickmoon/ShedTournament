@@ -8,7 +8,7 @@ import { Login } from './components/Login.tsx';
 import BouncingWednesday from './components/BouncingWednesday.tsx';
 import PlayerPodium from './components/PlayerPodium.tsx';
 import PlayerStreaks from './components/PlayerStreaks.tsx';
-import PlayerStats from './components/PlayerStats.tsx';
+import Stats from './components/Stats.tsx';
 import PlayerKD from './components/PlayerKD.tsx';
 import PlayerAdmin from './components/PlayerAdmin.tsx';
 import AuditLog from './components/AuditLog.tsx';
@@ -254,7 +254,7 @@ function App() {
     }
   };
 
-  const getPlayerStats = async () => {
+  const getStats = async () => {
     // Player Streaks
     try {
       const response = await fetch(`${API_BASE_URL}/stats/streaks`, {
@@ -314,7 +314,7 @@ function App() {
   const updatePageData = () => { 
     listPlayers();
     listAuditLog();
-    getPlayerStats();
+    getStats();
   };
 
 
@@ -698,7 +698,7 @@ function App() {
 
                     {isWednesday && <ScrabbleGame />}
                     
-                    <PlayerStats 
+                    <Stats 
                       playerStreakLongest={playerStreakLongest}
                       mostMatchesInDay={mostMatchesInDay}
                       totalMatchStats={totalMatchStats}
