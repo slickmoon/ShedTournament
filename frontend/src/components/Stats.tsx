@@ -37,12 +37,28 @@ interface StatsProps {
   matchesPerDay: MatchesPerDay[];
 }
 
+// Helper to calculate linear regression points for trendline
+function getTrendline(data: MatchesPerDay[]) {
+  if (data.length < 2) return [];
+  // x: index, y: count
+  const n = data.length;
+  const sumX = data.reduce((acc, _, i) => acc + i, 0);
+  const sumY = data.reduce((acc, d) => acc + d.count, 0);
+  const sumXY = data.reduce((acc, d, i) => acc + i * d.count, 0);
+  const sumXX = data.reduce((acc, _, i) => acc + i * i, 0);
+  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+  return data.map((d, i) => ({ date: d.date, trend: slope * i + intercept }));
+}
+
 const Stats: React.FC<StatsProps> = ({
   playerStreakLongest,
   mostMatchesInDay,
   totalMatchStats,
   matchesPerDay
 }) => {
+  const trendlineData = getTrendline(matchesPerDay);
+
   return (
     <>
       <h2>Player Statistics</h2>
@@ -51,6 +67,7 @@ const Stats: React.FC<StatsProps> = ({
           <Typography>View Player Stats</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          <div>
           {/* Winning Streak Record box */}
           <Paper elevation={3} sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
             {[...playerStreakLongest]
@@ -232,6 +249,7 @@ const Stats: React.FC<StatsProps> = ({
               </Box>
             </Box>
           </Paper>
+          </div>
           {/* Matches Played Per Day box */}
           <Paper elevation={3} sx={{ p: 2, maxWidth: 600, mx: 'auto', width: '100%' }}>
             <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
@@ -244,6 +262,8 @@ const Stats: React.FC<StatsProps> = ({
                 <YAxis allowDecimals={false} label={{ value: 'Matches', angle: -90, position: 'insideLeft', fontSize: 12 }} />
                 <Tooltip />
                 <Line type="monotone" dataKey="count" stroke="#1976d2" strokeWidth={2} dot={{ r: 2 }} />
+                {/* Trendline */}
+                <Line type="monotone" dataKey="trend" data={trendlineData} stroke="#888" strokeDasharray="5 5" dot={false} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </Paper>
