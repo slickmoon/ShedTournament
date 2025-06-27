@@ -151,6 +151,7 @@ function App() {
   const [undoDialogOpen, setUndoDialogOpen] = useState(false);
   const [undoLoading, setUndoLoading] = useState(false);
   const [snackbar, setSnackbar] = useState<{open: boolean, message: string, severity: 'success' | 'error'}>({open: false, message: '', severity: 'success'});
+  const [showPlayerNumbers, setShowPlayerNumbers] = useState(false);
 
   // Add online/offline status listener
   useEffect(() => {
@@ -653,6 +654,18 @@ function App() {
                       <MenuItem value={-2}>All Time</MenuItem>
                     </Select>
                   </Box>
+                  <Box sx={{ mb: 2, textAlign: 'center' }}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={showPlayerNumbers}
+                          onChange={e => setShowPlayerNumbers(e.target.checked)}
+                          color="primary"
+                        />
+                      }
+                      label="Show player numbers"
+                    />
+                  </Box>
 
                   <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
                     <Button 
@@ -691,7 +704,7 @@ function App() {
                       </Typography>
                     )}
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
-                      <PlayerPodium players={players} />
+                      <PlayerPodium players={players} showPlayerNumbers={showPlayerNumbers} />
                       <PlayerStreaks playerStreaks={playerStreaks} />
                       <PlayerKD playerKd={playerKd} />
                     </Box>
@@ -709,6 +722,7 @@ function App() {
                       onAddPlayer={addplayer}
                       onDeletePlayer={deletePlayer}
                       onUpdatePlayer={updatePlayer}
+                      showPlayerNumbers={showPlayerNumbers}
                     />
 
                     <AuditLog auditLog={auditlog} />
@@ -758,6 +772,7 @@ function App() {
                     setIsAwayGame={setIsAwayGame}
                     isLostByFoul={isLostByFoul}
                     setIsLostByFoul={setIsLostByFoul}
+                    showPlayerNumbers={showPlayerNumbers}
                   />
                   <Dialog open={undoDialogOpen} onClose={() => setUndoDialogOpen(false)}>
                     <DialogTitle>Undo Last Match?</DialogTitle>

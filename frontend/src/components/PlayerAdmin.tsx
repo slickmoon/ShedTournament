@@ -12,13 +12,15 @@ interface PlayerAdminProps {
   onAddPlayer: (playerName: string) => void;
   onDeletePlayer: (playerId: number, access_password: string) => void;
   onUpdatePlayer: (playerId: number, playerName: string, access_password: string) => void;
+  showPlayerNumbers?: boolean;
 }
 
 const PlayerAdmin: React.FC<PlayerAdminProps> = ({
   players,
   onAddPlayer,
   onDeletePlayer,
-  onUpdatePlayer
+  onUpdatePlayer,
+  showPlayerNumbers
 }) => {
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
   const [selectedUpdatePlayer, setSelectedUpdatePlayer] = useState<string>('');
@@ -74,7 +76,7 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
               >
                 {players.map((player) => (
                   <MenuItem key={player.id} value={player.player_name}>
-                    {player.player_name}
+                    {showPlayerNumbers ? `#${player.id} - ` : ''}{player.player_name}
                   </MenuItem>
                 ))}
               </Select>
@@ -122,7 +124,7 @@ const PlayerAdmin: React.FC<PlayerAdminProps> = ({
                     playerNameInput.value = player.player_name;
                     setSelectedPlayerUpdateName(player.player_name);
                   }}>
-                    {player.player_name}
+                    {showPlayerNumbers ? `#${player.id} - ` : ''}{player.player_name}
                   </MenuItem>
                 ))}
               </Select>
