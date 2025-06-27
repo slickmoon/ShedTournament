@@ -65,7 +65,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                 color: 'text.primary'
               }}
             >
-              {showPlayerNumbers ? `#${player.id} - ` : ''}{player.player_name}{player.recently_pantsed ? ' ��' : ''}
+              {showPlayerNumbers ? `#${player.id} - ` : ''}{player.player_name}{player.recently_pantsed ? ' 👖' : ''}
             </Typography>
             <Typography
               variant="subtitle1"
