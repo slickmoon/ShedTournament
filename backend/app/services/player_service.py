@@ -137,20 +137,26 @@ class PlayerService:
 
     @staticmethod
     def update_player(db: Session, player_id: int, player: PlayerUpdate) -> Optional[base.Player]:
-        db_player = PlayerService.get_player(db, player_id)
-        if not db_player:
+        player = db.query(base.Player).filter(
+            base.Player.id == player_id,
+            base.Player.deleted == False
+        ).first()
+        if not player:
             return None
         
-        db_player.player_name = player.player_name
+        player.player_name = player.player_name
         db.commit()
-        db.refresh(db_player)
-        return db_player
+        db.refresh(player)
+        return player
 
     @staticmethod
     def delete_player(db: Session, player_id: int) -> bool:
-        player = PlayerService.get_player(db, player_id)
+        player = db.query(base.Player).filter(
+            base.Player.id == player_id,
+            base.Player.deleted == False
+        ).first()
         if not player:
-            return False
+            return None
         
         player.deleted = True
         player.deleted_at = datetime.now()
