@@ -39,7 +39,8 @@ export const randomTexts = [
     "She can't keep getting away with it!",
     "'Once you pop you can’t stop!' - Blake while observing Loz Beeby’s pringles underwear",
     "Enhanced league when???",
-    "They've got magnets in the balls!"
+    "They've got magnets in the balls!",
+    "Let's get absolutely pixelated tonight"
 ];
 
 export const wednesdayTexts = [ 
