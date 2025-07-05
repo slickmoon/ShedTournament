@@ -151,7 +151,7 @@ function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
   const [seasons, setSeasons] = useState<{id: number, season_name: string, sort_order: number}[]>([]);
-  const [selectedSeasonId, setSelectedSeasonId] = useState<number>(-1);
+  const [selectedSeasonId, setSelectedSeasonId] = useState<number>();
   const [recentMatchIds, setRecentMatchIds] = useState<{id: number, ts: number}[]>(getRecentMatchIds());
   const [undoDialogOpen, setUndoDialogOpen] = useState(false);
   const [undoLoading, setUndoLoading] = useState(false);
