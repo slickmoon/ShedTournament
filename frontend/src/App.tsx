@@ -191,14 +191,7 @@ function App() {
     }
   }, []);
 
-  // Load players and audit log when token is available
-  useEffect(() => {
-    if (token) {
-      updatePageData();
-    }
-  }, [token]);
-  
-  // Load this data only once
+  // Load data when token is available
   useEffect(() => {
     const fetchSeasons = async () => {
       try {
@@ -214,8 +207,11 @@ function App() {
         setSnackbar({open: true, message: `Error fetching seasons: ${error}`, severity: 'error'});
       }
     };
-    fetchSeasons();
-  }, []);
+    if (token) {
+      fetchSeasons();
+      updatePageData();
+    }
+  }, [token]);
 
   // Reload data when selectedSeasonId changes
   useEffect(() => {
@@ -239,7 +235,6 @@ function App() {
   };
 
   {/* Data view functions */}
-  const season_id = -1;
   const listPlayers = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/players?season_id=${selectedSeasonId}`, {
