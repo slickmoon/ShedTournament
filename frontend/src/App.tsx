@@ -151,7 +151,7 @@ function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
   const [seasons, setSeasons] = useState<{id: number, season_name: string, sort_order: number}[]>([]);
-  const [selectedSeasonId, setSelectedSeasonId] = useState<number>();
+  const [selectedSeasonId, setSelectedSeasonId] = useState<number>(-999);
   const [recentMatchIds, setRecentMatchIds] = useState<{id: number, ts: number}[]>(getRecentMatchIds());
   const [undoDialogOpen, setUndoDialogOpen] = useState(false);
   const [undoLoading, setUndoLoading] = useState(false);
@@ -191,7 +191,14 @@ function App() {
     }
   }, []);
 
-  // Load data when token is available
+  // Load players and audit log when token is available
+  useEffect(() => {
+    if (token) {
+      updatePageData();
+    }
+  }, [token]);
+  
+  // Load this data only once
   useEffect(() => {
     const fetchSeasons = async () => {
       try {
@@ -201,17 +208,17 @@ function App() {
         // Set default to season with sort_order = 0 if not already set
         if (selectedSeasonId === undefined || selectedSeasonId === null) {
           const defaultSeason = data.find((season: any) => season.sort_order === 0);
+          console.log('defaultSeason', defaultSeason.id);
           setSelectedSeasonId(defaultSeason ? defaultSeason.id : 0);
+        } else {
+          console.log('selectedSeasonId', selectedSeasonId);
         }
       } catch (error) {
         setSnackbar({open: true, message: `Error fetching seasons: ${error}`, severity: 'error'});
       }
     };
-    if (token) {
-      fetchSeasons();
-      updatePageData();
-    }
-  }, [token]);
+    fetchSeasons();
+  }, []);
 
   // Reload data when selectedSeasonId changes
   useEffect(() => {
