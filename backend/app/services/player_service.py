@@ -92,6 +92,16 @@ class PlayerService:
         # Return lifetime data for all seasons
         if season_id == -999:
             return None
+        # Initial load return current season
+        if season_id == -998:
+            now = datetime.now()
+            return db.query(base.GameSeason).filter(
+                base.GameSeason.start_date <= now,
+                base.GameSeason.end_date >= now
+            ).order_by(
+                (base.GameSeason.end_date - base.GameSeason.start_date).asc()
+            ).first()
+
         # Return specified season
         else:
             return db.query(base.GameSeason).filter(

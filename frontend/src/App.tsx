@@ -151,7 +151,7 @@ function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
   const [seasons, setSeasons] = useState<{id: number, season_name: string, sort_order: number}[]>([]);
-  const [selectedSeasonId, setSelectedSeasonId] = useState<number>(-999);
+  const [selectedSeasonId, setSelectedSeasonId] = useState<number>(-998);
   const [recentMatchIds, setRecentMatchIds] = useState<{id: number, ts: number}[]>(getRecentMatchIds());
   const [undoDialogOpen, setUndoDialogOpen] = useState(false);
   const [undoLoading, setUndoLoading] = useState(false);
@@ -206,12 +206,9 @@ function App() {
         const data = await response.json();
         setSeasons(data);
         // Set default to season with sort_order = 0 if not already set
-        if (selectedSeasonId === undefined || selectedSeasonId === null) {
+        if (selectedSeasonId === undefined || selectedSeasonId === null || selectedSeasonId === -998) {
           const defaultSeason = data.find((season: any) => season.sort_order === 0);
-          console.log('defaultSeason', defaultSeason.id);
           setSelectedSeasonId(defaultSeason ? defaultSeason.id : 0);
-        } else {
-          console.log('selectedSeasonId', selectedSeasonId);
         }
       } catch (error) {
         setSnackbar({open: true, message: `Error fetching seasons: ${error}`, severity: 'error'});
