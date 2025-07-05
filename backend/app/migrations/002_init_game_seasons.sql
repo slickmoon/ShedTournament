@@ -2,6 +2,7 @@
 INSERT INTO game_seasons (start_date, end_date, season_name) VALUES
     -- Special first season
     ('2025-01-01T00:00:00+00:00', '2025-11-30T23:59:59+00:00', 'Special 2025 Season'),
+    ('2025-07-12T07:00:00+00:00', '2025-07-15T23:59:59+00:00', 'Winter Retreat Regional Championship'),
     ('2025-12-01T00:00:00+00:00', '2026-05-31T23:59:59+00:00', '2026 Summer'),
     ('2026-06-01T00:00:00+00:00', '2026-11-30T23:59:59+00:00', '2026 Winter'),
     ('2026-12-01T00:00:00+00:00', '2027-05-31T23:59:59+00:00', '2027 Summer'),

@@ -150,7 +150,7 @@ function App() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
-  const [seasons, setSeasons] = useState<{id: number, season_name: string}[]>([]);
+  const [seasons, setSeasons] = useState<{id: number, season_name: string, sort_order: number}[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<number>(-1);
   const [recentMatchIds, setRecentMatchIds] = useState<{id: number, ts: number}[]>(getRecentMatchIds());
   const [undoDialogOpen, setUndoDialogOpen] = useState(false);
@@ -205,8 +205,11 @@ function App() {
         const response = await fetch(`${API_BASE_URL}/seasons`, { headers: getAuthHeaders() });
         const data = await response.json();
         setSeasons(data);
-        // Set default to -1 if not already set
-        setSelectedSeasonId(prev => (prev === undefined || prev === null ? -1 : prev));
+        // Set default to season with sort_order = 0 if not already set
+        if (selectedSeasonId === undefined || selectedSeasonId === null) {
+          const defaultSeason = data.find((season: any) => season.sort_order === 0);
+          setSelectedSeasonId(defaultSeason ? defaultSeason.id : 0);
+        }
       } catch (error) {
         setSnackbar({open: true, message: `Error fetching seasons: ${error}`, severity: 'error'});
       }
@@ -679,9 +682,9 @@ function App() {
                       sx={{ minWidth: 200 }}
                     >
                       {seasons.map(season => (
-                        <MenuItem key={season.id} value={season.id}>{season.season_name}</MenuItem>
+                        <MenuItem key={season.sort_order} value={season.id}>{season.season_name}</MenuItem>
                       ))}
-                      <MenuItem value={-2}>All Time</MenuItem>
+                      <MenuItem value={-999}>All Time</MenuItem>
                     </Select>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>

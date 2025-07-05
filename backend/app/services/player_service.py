@@ -15,7 +15,7 @@ class PlayerService:
         return db_player
 
     @staticmethod
-    def get_player(db: Session, player_id: int, season_id: int = -1) -> Optional[dict]:
+    def get_player(db: Session, player_id: int, season_id: int = 0) -> Optional[dict]:
         player = db.query(base.Player).filter(
             base.Player.id == player_id,
             base.Player.deleted == False
@@ -89,15 +89,8 @@ class PlayerService:
     
     @staticmethod
     def get_current_season(season_id, db: Session):
-        # Return Current season
-        if season_id == -1: 
-            now = datetime.now()
-            return db.query(base.GameSeason).filter(
-                base.GameSeason.start_date <= now,
-                base.GameSeason.end_date >= now
-            ).first()
         # Return lifetime data for all seasons
-        elif season_id == -2:
+        if season_id == -999:
             return None
         # Return specified season
         else:
@@ -167,10 +160,12 @@ class PlayerService:
     def get_seasons(db: Session):
         now = datetime.now()
         # Current season
-        current_season = db.query(base.GameSeason).filter(
+        current_seasons = db.query(base.GameSeason).filter(
             base.GameSeason.start_date <= now,
             base.GameSeason.end_date >= now
-        ).first()
+        ).order_by(
+            (base.GameSeason.end_date - base.GameSeason.start_date).asc()
+        ).all()
         # Next season
         next_season = db.query(base.GameSeason).filter(
             base.GameSeason.start_date > now
@@ -178,12 +173,31 @@ class PlayerService:
         # Previous seasons
         previous_seasons = db.query(base.GameSeason).filter(
             base.GameSeason.end_date < now
-        ).order_by(base.GameSeason.start_date.desc()).all()
+        ).order_by(base.GameSeason.end_date.desc()).all()
         seasons = []
-        if current_season:
-            seasons.append({"id": -1, "season_name": f"*{current_season.season_name}*"})
+        # Current seasons (sort_order: 0, 1, 2, ...)
+        for i, s in enumerate(current_seasons):
+            seasons.append({
+                "id": s.id, 
+                "season_name": f"*{s.season_name}*",
+                "sort_order": i
+            })
+        # Next season (sort_order: current_seasons count)
         if next_season:
-            seasons.append({"id": next_season.id, "season_name": next_season.season_name})
-        for s in previous_seasons:
-            seasons.append({"id": s.id, "season_name": s.season_name})
+            seasons.append({
+                "id": next_season.id, 
+                "season_name": next_season.season_name,
+                "sort_order": len(current_seasons)
+            })
+        # Previous seasons (sort_order: -1, -2, -3, ...)
+        for i, s in enumerate(previous_seasons):
+            seasons.append({
+                "id": s.id, 
+                "season_name": s.season_name,
+                "sort_order": -(i + 1)
+            })
+        
+        # Sort the final list by sort_order
+        seasons.sort(key=lambda x: x['sort_order'])
+            
         return seasons 
