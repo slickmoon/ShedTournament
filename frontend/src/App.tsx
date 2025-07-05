@@ -208,10 +208,7 @@ function App() {
         // Set default to season with sort_order = 0 if not already set
         if (selectedSeasonId === undefined || selectedSeasonId === null) {
           const defaultSeason = data.find((season: any) => season.sort_order === 0);
-          console.log('defaultSeason', defaultSeason.id);
           setSelectedSeasonId(defaultSeason ? defaultSeason.id : 0);
-        } else {
-          console.log('selectedSeasonId', selectedSeasonId);
         }
       } catch (error) {
         setSnackbar({open: true, message: `Error fetching seasons: ${error}`, severity: 'error'});
