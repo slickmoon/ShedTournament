@@ -35,7 +35,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                 <Typography variant="h5" sx={{ mb: 2, color: 'text.secondary' }}>
                   No ranked players yet, play some games to get on the podium!
                 </Typography>
-                <Typography variant="h6" sx={{ mb: 2 }}>Qualifying</Typography>
+                <Typography variant="h6" sx={{ mb: 2 }}>Qualifying Players</Typography>
                 {[...players]
                   .filter(player => player.matches_in_season < 3)
                   .sort((a, b) => b.elo - a.elo)
