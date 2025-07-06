@@ -392,7 +392,7 @@ const Stats: React.FC<StatsProps> = ({
                 displayEmpty
                 sx={{ minWidth: 180 }}
               >
-                <MenuItem value={-1}>Select Player 1</MenuItem>
+                <MenuItem value={-1}></MenuItem>
                 {players.map((player) => (
                   <MenuItem key={player.id} value={player.id}>{player.player_name}</MenuItem>
                 ))}
@@ -403,7 +403,7 @@ const Stats: React.FC<StatsProps> = ({
                 displayEmpty
                 sx={{ minWidth: 180 }}
               >
-                <MenuItem value={-1}>Select Player 2</MenuItem>
+                <MenuItem value={-1}></MenuItem>
                 {players.map((player) => (
                   <MenuItem key={player.id} value={player.id}>{player.player_name}</MenuItem>
                 ))}
@@ -464,7 +464,7 @@ const Stats: React.FC<StatsProps> = ({
                   </Typography>
                   {stats.most_frequent_day && (
                     <Typography variant="body1">
-                      Most Frequent Play Day: {stats.most_frequent_day} ({stats.most_frequent_day_count} matches)
+                      Most Frequent Match Day: {stats.most_frequent_day} ({stats.most_frequent_day_count} matches)
                     </Typography>
                   )}
                 </Paper>
