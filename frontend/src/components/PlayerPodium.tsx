@@ -115,18 +115,6 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                     <br />
                     Games: {player.matches_in_season}
                   </Typography>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      position: 'relative',
-                      zIndex: 1,
-                      color: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
-                      fontWeight: 'bold',
-                      mt: { xs: 0.5, md: 1 },
-                    }}
-                  >
-                    #{index + 1}
-                  </Typography>
                 </Box>
               ))}
             </Box>
