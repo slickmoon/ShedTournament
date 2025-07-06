@@ -53,12 +53,12 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
           <div>
             <Box sx={{ 
               display: 'flex', 
-              flexDirection: { xs: 'column', md: 'row' },
+              flexDirection: { xs: 'row', md: 'row' },
               justifyContent: 'center',
               alignItems: 'flex-end',
-              gap: 2,
-              mb: 4,
-              minHeight: '200px'
+              gap: { xs: 1, md: 2 },
+              mb: { xs: 2, md: 4 },
+              minHeight: { xs: '100px', md: '200px' }
             }}>
               {rankedPlayers
                 .sort((a, b) => b.elo - a.elo)
@@ -70,9 +70,9 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    order: { xs: 0, md: index === 1 ? 0 : index === 0 ? 1 : 2 },
+                    order: { xs: index, md: index === 1 ? 0 : index === 0 ? 1 : 2 },
                     flex: { xs: 1, md: 'none' },
-                    width: { xs: '100%', md: '200px' },
+                    width: { xs: '90px', md: '200px' },
                     position: 'relative',
                     '&::after': {
                       content: '""',
@@ -80,11 +80,12 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       bottom: 0,
                       left: 0,
                       right: 0,
-                      height: index === 0 ? '120px' : index === 1 ? '80px' : '40px',
+                      height: index === 0 ? { xs: '60px', md: '120px' } : index === 1 ? { xs: '40px', md: '80px' } : { xs: '25px', md: '40px' },
                       backgroundColor: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
                       borderRadius: '8px 8px 0 0',
                       zIndex: 0
-                    }
+                    },
+                    mx: { xs: 0.5, md: 0 }
                   }}
                 >
                   <Typography
@@ -92,9 +93,11 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                     sx={{
                       position: 'relative',
                       zIndex: 1,
-                      mb: 1,
+                      mb: { xs: 0.5, md: 1 },
                       fontWeight: 'bold',
-                      color: 'text.primary'
+                      color: 'text.primary',
+                      fontSize: { xs: '1rem', md: '1.25rem' },
+                      textAlign: 'center'
                     }}
                   >
                     {showPlayerNumbers ? `#${player.id} - ` : ''}{player.player_name}{player.recently_pantsed ? ' 👖' : ''}
@@ -105,7 +108,9 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       position: 'relative',
                       zIndex: 1,
                       color: 'text.secondary',
-                      fontWeight: 'bold'
+                      fontWeight: 'bold',
+                      fontSize: { xs: '0.85rem', md: '1rem' },
+                      textAlign: 'center'
                     }}
                   >
                     ELO: {player.elo} 
@@ -119,7 +124,8 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       zIndex: 1,
                       color: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
                       fontWeight: 'bold',
-                      mt: 1
+                      mt: { xs: 0.5, md: 1 },
+                      fontSize: { xs: '1.5rem', md: '2rem' }
                     }}
                   >
                     #{index + 1}
