@@ -160,27 +160,22 @@ function App() {
   const [showPlayerNumbers, setShowPlayerNumbers] = useState(false);
   const [matchesPerDay, setMatchesPerDay] = useState<MatchesPerDay[]>([]);
 
-  // Add online/offline status listener
+  // Initialize app on mount
   useEffect(() => {
+    // Add online/offline status listener
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
-  // Load initial data and check token
-  useEffect(() => {
+    // Load initial data and check token
     const storedToken = localStorage.getItem('shed-tournament-token');
     if (storedToken) {
       setToken(storedToken);
     }
     setLoading(false);
+    
     // Set random text on initial load
     const today = new Date();
     const isWednesdayToday = today.getDay() === 3;
@@ -190,17 +185,8 @@ function App() {
     } else {
       setRandomText(randomTexts[Math.floor(Math.random() * randomTexts.length)]);
     }
-  }, []);
 
-  // Load players and audit log when token is available
-  useEffect(() => {
-    if (token) {
-      updatePageData();
-    }
-  }, [token]);
-  
-  // Load this data only once
-  useEffect(() => {
+    // Fetch seasons data
     const fetchSeasons = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/seasons`, { headers: getAuthHeaders() });
@@ -216,7 +202,20 @@ function App() {
       }
     };
     fetchSeasons();
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
+
+  // Load players and audit log when token is available
+  useEffect(() => {
+    if (token) {
+      updatePageData();
+    }
+  }, [token]);
 
   // Reload data when selectedSeasonId changes
   useEffect(() => {
@@ -331,10 +330,10 @@ function App() {
   };
   
   {/* Called to refresh the page data after data modifications occur */}
-  const updatePageData = () => { 
-    listPlayers();
-    listAuditLog();
-    getStats();
+  const updatePageData = async () => { 
+    await listPlayers();
+    await listAuditLog();
+    await getStats();
   };
 
 
