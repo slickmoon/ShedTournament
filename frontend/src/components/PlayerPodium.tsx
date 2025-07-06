@@ -109,7 +109,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       color: 'text.secondary',
                       fontWeight: 'bold',
                       textAlign: 'center',
-                      marginBottom: index === 0 ? { xs: '1.5em', md: '3em' } : index === 1 ? { xs: '0.5em', md: '1em' } : { xs: '0', md: '0.25em' },
+                      marginBottom: index === 0 ? { xs: '1.5em', md: '3.2em' } : index === 1 ? { xs: '0.5em', md: '1em' } : { xs: '0', md: '0.25em' },
                     }}
                   >
                     ELO: {player.elo} 
