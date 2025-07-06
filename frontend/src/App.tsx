@@ -30,6 +30,7 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import InstallPrompt from './components/InstallPrompt.tsx';
+// @ts-ignore
 import krackemSponsored from './assets/krackemsponsored.png';
 import './App.css';
 
