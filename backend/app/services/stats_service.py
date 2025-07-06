@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, or_, cast, Date
+from sqlalchemy import func, or_, and_, cast, Date
 from typing import List, Dict, Any
 from .. import base
 
@@ -247,4 +247,98 @@ class StatsService:
                 'count': row.count
             })
         return matches_per_day
+
+    @staticmethod
+    def get_head_to_head_stats(db: Session, player1_id: int, player2_id: int) -> dict:
+        """Get head-to-head statistics between two players"""
+        
+        # Get all matches where both players participated
+        matches = db.query(base.Match).filter(
+            or_(
+                # Player 1 and Player 2 on opposite teams
+                and_(
+                    or_(base.Match.winner1_id == player1_id, base.Match.winner2_id == player1_id),
+                    or_(base.Match.loser1_id == player2_id, base.Match.loser2_id == player2_id)
+                ),
+                and_(
+                    or_(base.Match.winner1_id == player2_id, base.Match.winner2_id == player2_id),
+                    or_(base.Match.loser1_id == player1_id, base.Match.loser2_id == player1_id)
+                )
+            )
+        ).order_by(base.Match.timestamp.asc()).all()
+        
+        # Get player names
+        player1 = db.query(base.Player).filter(base.Player.id == player1_id).first()
+        player2 = db.query(base.Player).filter(base.Player.id == player2_id).first()
+        
+        if not player1 or not player2:
+            return {
+                "error": "One or both players not found"
+            }
+        
+        # Calculate statistics
+        player1_wins = 0
+        player2_wins = 0
+        player1_elo_gained = 0
+        player2_elo_gained = 0
+        total_matches = len(matches)
+        
+        # Track days of the week for most frequent play day
+        day_counts = {}
+        
+        for match in matches:
+            # Determine who won
+            player1_was_winner = (match.winner1_id == player1_id or match.winner2_id == player1_id)
+            player2_was_winner = (match.winner1_id == player2_id or match.winner2_id == player2_id)
+            
+            if player1_was_winner:
+                player1_wins += 1
+                # Calculate ELO gained by player1
+                if match.winner1_id == player1_id:
+                    player1_elo_gained += match.winner1_elo_change
+                else:
+                    player1_elo_gained += match.winner2_elo_change
+            elif player2_was_winner:
+                player2_wins += 1
+                # Calculate ELO gained by player2
+                if match.winner1_id == player2_id:
+                    player2_elo_gained += match.winner1_elo_change
+                else:
+                    player2_elo_gained += match.winner2_elo_change
+            
+            # Track day of week
+            day_of_week = match.timestamp.strftime('%A')
+            day_counts[day_of_week] = day_counts.get(day_of_week, 0) + 1
+        
+        # Find most frequent play day
+        most_frequent_day = max(day_counts.items(), key=lambda x: x[1]) if day_counts else None
+        
+        # Calculate win percentages
+        player1_win_percentage = round((player1_wins / total_matches) * 100, 1) if total_matches > 0 else 0
+        player2_win_percentage = round((player2_wins / total_matches) * 100, 1) if total_matches > 0 else 0
+        
+        return {
+            "player1": {
+                "id": player1_id,
+                "name": player1.player_name,
+                "wins": player1_wins,
+                "losses": player2_wins,
+                "win_percentage": player1_win_percentage,
+                "elo_gained": player1_elo_gained,
+                "current_elo": player1.elo
+            },
+            "player2": {
+                "id": player2_id,
+                "name": player2.player_name,
+                "wins": player2_wins,
+                "losses": player1_wins,
+                "win_percentage": player2_win_percentage,
+                "elo_gained": player2_elo_gained,
+                "current_elo": player2.elo
+            },
+            "total_matches": total_matches,
+            "most_frequent_day": most_frequent_day[0] if most_frequent_day else None,
+            "most_frequent_day_count": most_frequent_day[1] if most_frequent_day else 0,
+            "day_breakdown": day_counts
+        }
     

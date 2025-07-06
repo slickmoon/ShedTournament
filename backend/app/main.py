@@ -294,3 +294,12 @@ async def get_matches_per_day(
 ):
     return StatsService.get_matches_per_day(db, player_id)
 
+@api.get("/stats/head-to-head")
+async def get_head_to_head_stats(
+    player1_id: int,
+    player2_id: int,
+    db: Session = Depends(database.get_db),
+    token: dict = Depends(verify_token)
+):
+    return StatsService.get_head_to_head_stats(db, player1_id, player2_id)
+
