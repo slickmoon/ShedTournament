@@ -85,8 +85,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       borderRadius: '8px 8px 0 0',
                       zIndex: 0
                     },
-                    mx: { xs: 0.5, md: 0 },
-                    mb: { xs: 0.5, md: 1}
+                    mx: { xs: 0.5, md: 0 }
                   }}
                 >
                   <Typography
@@ -109,7 +108,8 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       zIndex: 1,
                       color: 'text.secondary',
                       fontWeight: 'bold',
-                      textAlign: 'center'
+                      textAlign: 'center',
+                      marginBottom: index === 0 ? { xs: '1em', md: '2em' } : index === 1 ? { xs: '0.5em', md: '1em' } : { xs: '0.25em', md: '0.5em' },
                     }}
                   >
                     ELO: {player.elo} 
