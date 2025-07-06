@@ -96,7 +96,6 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       mb: { xs: 0.5, md: 1 },
                       fontWeight: 'bold',
                       color: 'text.primary',
-                      fontSize: { xs: '1rem', md: '1.25rem' },
                       textAlign: 'center'
                     }}
                   >
@@ -109,7 +108,6 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       zIndex: 1,
                       color: 'text.secondary',
                       fontWeight: 'bold',
-                      fontSize: { xs: '0.85rem', md: '1rem' },
                       textAlign: 'center'
                     }}
                   >
@@ -125,7 +123,6 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       color: index === 0 ? 'gold' : index === 1 ? 'silver' : '#cd7f32',
                       fontWeight: 'bold',
                       mt: { xs: 0.5, md: 1 },
-                      fontSize: { xs: '1.5rem', md: '2rem' }
                     }}
                   >
                     #{index + 1}
