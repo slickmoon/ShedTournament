@@ -85,7 +85,8 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       borderRadius: '8px 8px 0 0',
                       zIndex: 0
                     },
-                    mx: { xs: 0.5, md: 0 }
+                    mx: { xs: 0.5, md: 0 },
+                    mb: { xs: 0.5, md: 1}
                   }}
                 >
                   <Typography
