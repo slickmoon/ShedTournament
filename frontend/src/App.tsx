@@ -686,7 +686,7 @@ function App() {
                       <MenuItem value={-999}>All Time</MenuItem>
                     </Select>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 , marginLeft: "0.5em", marginRight: "0.5em"}}>
                     <Button 
                       variant="contained" 
                       color="primary"
