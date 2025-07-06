@@ -25,12 +25,12 @@ class PlayerService:
         
         current_season = PlayerService.get_current_season(season_id,db)
 
-        elo, games_in_season = PlayerService.calculate_player_season_data(player, current_season, db)
+        elo, matches_in_season = PlayerService.calculate_player_season_data(player, current_season, db)
         # Build a new dict of the player object without the elo field
         player_dict = {c.name: getattr(player, c.name) for c in player.__table__.columns if c.name != 'elo'}
          # append the elo field
         player_dict['elo'] = elo
-        player_dict['games_in_season'] = games_in_season
+        player_dict['matches_in_season'] = matches_in_season
         return player_dict
 
     @staticmethod
@@ -78,14 +78,14 @@ class PlayerService:
         # For each player, calculate ELO from matches in the current season
         result = []
         for player, total_matches, recently_pantsed in player_rows:
-            elo, games_in_season = PlayerService.calculate_player_season_data(player, current_season, db)
+            elo, matches_in_season = PlayerService.calculate_player_season_data(player, current_season, db)
             result.append({
                 "id": player.id,
                 "player_name": player.player_name,
                 "elo": elo,
                 "total_matches": total_matches or 0,
                 "recently_pantsed": recently_pantsed,
-                "games_in_season": games_in_season
+                "matches_in_season": matches_in_season
             })
         return result
     

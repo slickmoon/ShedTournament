@@ -4,4 +4,5 @@ export interface Player {
   elo: number;
   total_matches: number;
   recently_pantsed: boolean;
+  matches_in_season: number;
 } 
