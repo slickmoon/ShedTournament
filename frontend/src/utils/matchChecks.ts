@@ -29,6 +29,34 @@ export const checkPerfectWin = (data: MatchData): SpecialMatchResult | null => {
   return null;
 };
 
+export const checkQualifyingToRankingPromotion = (data: MatchData, players: Player[]): SpecialMatchResult | null => {
+  // Get all players involved in this match
+  const matchPlayerIds = [...data.winners, ...data.losers].map(player => player.id);
+  
+  // Find players who had exactly 2 matches before this match (meaning they're now at 3)
+  const promotedPlayers = players
+    .filter(player => matchPlayerIds.includes(player.id) && player.matches_in_season === 2)
+    .map(player => player.player_name);
+  
+  if (promotedPlayers.length === 0) {
+    return null;
+  }
+  
+  let message: string;
+  if (promotedPlayers.length === 1) {
+    message = `🎉 ${promotedPlayers[0]} are now ranked! 🎉`;
+  } else if (promotedPlayers.length === 2) {
+    message = `🎉 ${promotedPlayers.join(' and ')} are now ranked! 🎉`;
+  } else {
+    message = `🎉 ${promotedPlayers.join(', ')} are now ranked! 🎉`
+  }
+  
+  return {
+    message,
+    color: "#ff9800" // orange color for promotion
+  };
+}
+
 export const checkAssassination = (data: MatchData, players: Player[]): SpecialMatchResult | null => {
   // Sort players by ELO in descending order
   const sortedPlayers = [...players].sort((a, b) => b.elo - a.elo);
@@ -77,6 +105,7 @@ export const checkLowestLostAgain = (data: MatchData, players: Player[]): Specia
 
 export const checkSpecialMatchResult = (data: MatchData, players: Player[]): SpecialMatchResult[] => {
   const checks = [
+    checkQualifyingToRankingPromotion(data,players),
     checkAssassination(data,players),
     checkMassiveGain(data),
     checkLowestLostAgain(data,players)
