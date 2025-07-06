@@ -35,6 +35,31 @@ interface Player {
   player_name: string;
 }
 
+interface HeadToHeadStats {
+  player1: {
+    id: number;
+    name: string;
+    wins: number;
+    losses: number;
+    win_percentage: number;
+    elo_gained: number;
+    current_elo: number;
+  };
+  player2: {
+    id: number;
+    name: string;
+    wins: number;
+    losses: number;
+    win_percentage: number;
+    elo_gained: number;
+    current_elo: number;
+  };
+  total_matches: number;
+  most_frequent_day: string | null;
+  most_frequent_day_count: number;
+  day_breakdown: Record<string, number>;
+}
+
 interface StatsProps {
   playerStreakLongest: PlayerStreakLongest[];
   mostMatchesInDay: MostMatchesInDay;
@@ -43,6 +68,7 @@ interface StatsProps {
   players: Player[];
   onPlayerSelect: (playerId: number | null) => void;
 }
+
 
 // Helper to calculate linear regression points for trendline
 function getTrendline(data: MatchesPerDay[]) {
@@ -76,6 +102,65 @@ const Stats: React.FC<StatsProps> = ({
     setSelectedPlayerId(value === -1 ? null : value);
     onPlayerSelect(value === -1 ? null : value);
   };
+
+  // Head-to-head state and logic
+  const [player1Id, setPlayer1Id] = useState<number>(-1);
+  const [player2Id, setPlayer2Id] = useState<number>(-1);
+  const [stats, setStats] = useState<HeadToHeadStats | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('shed-tournament-token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  };
+
+  const fetchHeadToHeadStats = async () => {
+    if (player1Id === -1 || player2Id === -1 || player1Id === player2Id) {
+      setError('Please select two different players');
+      setStats(null);
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch(
+        `/shedapi/stats/head-to-head?player1_id=${player1Id}&player2_id=${player2Id}`,
+        { headers: getAuthHeaders() }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data.error) {
+          setError(data.error);
+          setStats(null);
+        } else {
+          setStats(data);
+        }
+      } else {
+        setError('Failed to fetch head-to-head statistics');
+        setStats(null);
+      }
+    } catch (error) {
+      setError(`Error: ${error}`);
+      setStats(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch stats when both players are selected
+  React.useEffect(() => {
+    if (player1Id !== -1 && player2Id !== -1 && player1Id !== player2Id) {
+      fetchHeadToHeadStats();
+    } else {
+      setStats(null);
+      setError('');
+    }
+    // eslint-disable-next-line
+  }, [player1Id, player2Id]);
 
   return (
     <>
@@ -295,6 +380,123 @@ const Stats: React.FC<StatsProps> = ({
               </LineChart>
             </ResponsiveContainer>
           </Paper>
+        </AccordionDetails>
+      </Accordion>
+      {/* Head-to-Head Section */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography>Head-to-Head Player Stats</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Box sx={{ mb: 3 }}>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2 }}>
+              <Select
+                value={player1Id}
+                onChange={e => setPlayer1Id(Number(e.target.value))}
+                displayEmpty
+                sx={{ minWidth: 180 }}
+              >
+                <MenuItem value={-1}>Select Player 1</MenuItem>
+                {players.map((player) => (
+                  <MenuItem key={player.id} value={player.id}>{player.player_name}</MenuItem>
+                ))}
+              </Select>
+              <Select
+                value={player2Id}
+                onChange={e => setPlayer2Id(Number(e.target.value))}
+                displayEmpty
+                sx={{ minWidth: 180 }}
+              >
+                <MenuItem value={-1}>Select Player 2</MenuItem>
+                {players.map((player) => (
+                  <MenuItem key={player.id} value={player.id}>{player.player_name}</MenuItem>
+                ))}
+              </Select>
+            </Box>
+            {loading && <Typography>Loading...</Typography>}
+            {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
+            {stats && (
+              <Box>
+                <Typography variant="h6" sx={{ mb: 2, textAlign: 'center' }}>
+                  {stats.player1.name} vs {stats.player2.name}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3, justifyContent: 'center' }}>
+                  {/* Player 1 Stats */}
+                  <Paper elevation={2} sx={{ p: 2, textAlign: 'center', minWidth: 220 }}>
+                    <Typography variant="h6" color="primary" sx={{ mb: 1 }}>
+                      {stats.player1.name}
+                    </Typography>
+                    <Typography variant="h4" color="success.main" sx={{ mb: 1 }}>
+                      {stats.player1.wins} - {stats.player1.losses}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      Win Rate: {stats.player1.win_percentage}%
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      ELO Gained: {stats.player1.elo_gained > 0 ? '+' : ''}{stats.player1.elo_gained}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Current ELO: {stats.player1.current_elo}
+                    </Typography>
+                  </Paper>
+                  {/* Player 2 Stats */}
+                  <Paper elevation={2} sx={{ p: 2, textAlign: 'center', minWidth: 220 }}>
+                    <Typography variant="h6" color="primary" sx={{ mb: 1 }}>
+                      {stats.player2.name}
+                    </Typography>
+                    <Typography variant="h4" color="success.main" sx={{ mb: 1 }}>
+                      {stats.player2.wins} - {stats.player2.losses}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      Win Rate: {stats.player2.win_percentage}%
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      ELO Gained: {stats.player2.elo_gained > 0 ? '+' : ''}{stats.player2.elo_gained}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Current ELO: {stats.player2.current_elo}
+                    </Typography>
+                  </Paper>
+                </Box>
+                {/* Match Summary */}
+                <Paper elevation={2} sx={{ p: 2, mb: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Match Summary
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
+                    Total Matches: {stats.total_matches}
+                  </Typography>
+                  {stats.most_frequent_day && (
+                    <Typography variant="body1">
+                      Most Frequent Play Day: {stats.most_frequent_day} ({stats.most_frequent_day_count} matches)
+                    </Typography>
+                  )}
+                </Paper>
+                {/* Day Breakdown */}
+                {stats.day_breakdown && Object.keys(stats.day_breakdown).length > 0 && (
+                  <Paper elevation={2} sx={{ p: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                      Matches by Day of Week
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                      {Object.entries(stats.day_breakdown)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([day, count]) => (
+                          <Box key={day} sx={{ textAlign: 'center', p: 1, minWidth: 80 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              {day}
+                            </Typography>
+                            <Typography variant="h6" color="primary">
+                              {count}
+                            </Typography>
+                          </Box>
+                        ))}
+                    </Box>
+                  </Paper>
+                )}
+              </Box>
+            )}
+          </Box>
         </AccordionDetails>
       </Accordion>
     </>
