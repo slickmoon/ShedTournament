@@ -44,7 +44,7 @@ export const checkQualifyingToRankingPromotion = (data: MatchData, players: Play
   
   let message: string;
   if (promotedPlayers.length === 1) {
-    message = `🎉 ${promotedPlayers[0]} are now ranked! 🎉`;
+    message = `🎉 ${promotedPlayers[0]} is now ranked! 🎉`;
   } else if (promotedPlayers.length === 2) {
     message = `🎉 ${promotedPlayers.join(' and ')} are now ranked! 🎉`;
   } else {
