@@ -70,7 +70,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    order: { xs: index, md: index === 1 ? 0 : index === 0 ? 1 : 2 },
+                    order: index === 1 ? 0 : index === 0 ? 1 : 2,
                     flex: { xs: 1, md: 'none' },
                     width: { xs: '90px', md: '200px' },
                     position: 'relative',
