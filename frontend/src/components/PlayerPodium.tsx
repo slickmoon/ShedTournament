@@ -7,6 +7,7 @@ interface Player {
   elo: number;
   total_matches: number;
   recently_pantsed: boolean;
+  matches_in_season: number;
 }
 
 interface PlayerPodiumProps {
@@ -28,7 +29,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
         minHeight: '200px'
       }}>
         {[...players]
-          .filter(player => player.total_matches >= 3)
+          .filter(player => player.matches_in_season >= 3)
           .sort((a, b) => b.elo - a.elo)
           .slice(0, 3)
           .map((player, index) => (
@@ -78,7 +79,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
             >
               ELO: {player.elo} 
               <br />
-              Games: {player.total_matches}
+              Games: {player.matches_in_season}
             </Typography>
             <Typography
               variant="h4"
@@ -105,23 +106,23 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
         <Box>
           <Typography variant="h6" sx={{ mb: 2 }}>Ranked Players</Typography>
           {[...players]
-            .filter(player => player.total_matches >= 3)
+            .filter(player => player.matches_in_season >= 3)
             .sort((a, b) => b.elo - a.elo)
             .slice(3)
             .map((player, index) => (
             <Typography key={player.id} sx={{ mb: 1 }}>
-              #{index + 4}. {showPlayerNumbers ? `#${player.id} - ` : ''}{player.player_name}{player.recently_pantsed ? ' 👖' : ''} (ELO: {player.elo}) (Games: {player.total_matches})
+              #{index + 4}. {showPlayerNumbers ? `#${player.id} - ` : ''}{player.player_name}{player.recently_pantsed ? ' 👖' : ''} (ELO: {player.elo}) (Games: {player.matches_in_season})
             </Typography>
           ))}
         </Box>
         <Box>
           <Typography variant="h6" sx={{ mb: 2 }}>Qualifying</Typography>
           {[...players]
-            .filter(player => player.total_matches < 3)
+            .filter(player => player.matches_in_season < 3)
             .sort((a, b) => b.elo - a.elo)
             .map((player) => (
             <Typography key={player.id} sx={{ mb: 1 }}>
-              {showPlayerNumbers ? `#${player.id} - ` : ''}{player.player_name}{player.recently_pantsed ? ' 👖' : ''} (ELO: {player.elo}) (Games: {player.total_matches})
+              {showPlayerNumbers ? `#${player.id} - ` : ''}{player.player_name}{player.recently_pantsed ? ' 👖' : ''} (ELO: {player.elo}) (Games: {player.matches_in_season})
             </Typography>
           ))}
         </Box>
