@@ -69,7 +69,7 @@ const SpecialMatchGraphic: React.FC<SpecialMatchGraphicProps> = ({ message, colo
           fontWeight: 'bold',
           textShadow: '0 0 10px rgba(0,0,0,0.5)',
           fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' },
-          whiteSpace: 'nowrap'
+          whiteSpace: 'normal'
         }}
       >
         {message}
