@@ -380,16 +380,12 @@ const Stats: React.FC<StatsProps> = ({
               </LineChart>
             </ResponsiveContainer>
           </Paper>
-        </AccordionDetails>
-      </Accordion>
-      {/* Head-to-Head Section */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Head-to-Head Player Stats</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Box sx={{ mb: 3 }}>
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2 }}>
+          {/* Head-to-Head Section as a Paper */}
+          <Paper elevation={3} sx={{ p: 2, maxWidth: 900, mx: 'auto', width: '100%', mt: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, textAlign: 'center' }}>
+              Head-to-Head Player Stats
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2, justifyContent: 'center' }}>
               <Select
                 value={player1Id}
                 onChange={e => setPlayer1Id(Number(e.target.value))}
@@ -496,7 +492,7 @@ const Stats: React.FC<StatsProps> = ({
                 )}
               </Box>
             )}
-          </Box>
+          </Paper>
         </AccordionDetails>
       </Accordion>
     </>
