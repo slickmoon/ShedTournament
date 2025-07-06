@@ -93,7 +93,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                     sx={{
                       position: 'relative',
                       zIndex: 1,
-                      mb: { xs: 0.5, md: 1 },
+                      mb: { xs: 0.25, md: 0.5 },
                       fontWeight: 'bold',
                       color: 'text.primary',
                       textAlign: 'center'
@@ -109,7 +109,7 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
                       color: 'text.secondary',
                       fontWeight: 'bold',
                       textAlign: 'center',
-                      marginBottom: index === 0 ? { xs: '1em', md: '2em' } : index === 1 ? { xs: '0.5em', md: '1em' } : { xs: '0.25em', md: '0.5em' },
+                      marginBottom: index === 0 ? { xs: '1.5em', md: '3em' } : index === 1 ? { xs: '0.5em', md: '1em' } : { xs: '0', md: '0.25em' },
                     }}
                   >
                     ELO: {player.elo} 
