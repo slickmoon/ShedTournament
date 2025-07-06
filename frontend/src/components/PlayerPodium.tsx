@@ -31,10 +31,10 @@ const PlayerPodium: React.FC<PlayerPodiumProps> = ({ players, showPlayerNumbers 
               minHeight: '200px',
               mb: 4
             }}>
-              <Typography variant="h5" sx={{ color: 'text.secondary' }}>
-                No ranked players yet, play some games to get on the podium!
-              </Typography>
               <Box>
+                <Typography variant="h5" sx={{ color: 'text.secondary' }}>
+                  No ranked players yet, play some games to get on the podium!
+                </Typography>
                 <Typography variant="h6" sx={{ mb: 2 }}>Qualifying</Typography>
                 {[...players]
                   .filter(player => player.matches_in_season < 3)
