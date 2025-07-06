@@ -30,6 +30,7 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import InstallPrompt from './components/InstallPrompt.tsx';
+import krackemSponsored from './assets/krackemsponsored.png';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -722,6 +723,8 @@ function App() {
                         {statusMessage}
                       </Typography>
                     )}
+                    <h2>Shed Podium</h2>
+                    <img src={krackemSponsored} alt="Krackem Sponsored" style={{ maxWidth: 220, margin: '0 auto 1em', display: 'block' }} />
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
                       <PlayerPodium players={players} showPlayerNumbers={showPlayerNumbers} />
                       <PlayerStreaks playerStreaks={playerStreaks} />
