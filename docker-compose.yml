@@ -1,5 +1,5 @@
 services:
-  shed-tournament-api:
+  shed-api:
     build: 
       context: ./backend
       dockerfile: Dockerfile
@@ -10,15 +10,15 @@ services:
     ports:
       - "4322:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@shed-tournament-db:5432/competition_app
+      - DATABASE_URL=postgresql://postgres:postgres@shed-db:5432/competition_app
     env_file:
       - .env
     depends_on:
-      - shed-tournament-db
+      - shed-db
     volumes:
       - ./backend:/app
 
-  shed-tournament-app:
+  shed-app:
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -32,7 +32,7 @@ services:
     ports:
       - "4321:80"
     depends_on:
-      - shed-tournament-api
+      - shed-api
     environment:
       - BACKEND_API_URL=http://localhost:4322/shedapi
       - PUBLIC_URL=/shed
@@ -43,7 +43,7 @@ services:
       retries: 3
 
 
-  shed-tournament-db:
+  shed-db:
     image: postgres:15
     restart: unless-stopped
     networks:
