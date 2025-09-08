@@ -1,5 +1,6 @@
 services:
   shed-api:
+    
     build: 
       context: ./backend
       dockerfile: Dockerfile
@@ -19,6 +20,7 @@ services:
       - ./backend:/app
 
   shed-app:
+    container_name: shed-app
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -44,6 +46,7 @@ services:
 
 
   shed-db:
+    container_name: shed-db
     image: postgres:15
     restart: unless-stopped
     networks:
