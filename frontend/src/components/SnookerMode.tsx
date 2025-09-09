@@ -117,6 +117,10 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
     sendAction({ type: 'foul_colour', slot: selectedScoreSlot, value });
   }
 
+  function handleReset() {
+    sendAction({ type: 'reset' });
+  }
+
   if (!open) return null;
 
   return (
@@ -225,6 +229,17 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
                 </Button>
               ))}
             </Box>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>Reset</Typography>
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={handleReset}
+            >
+              Reset Scores
+            </Button>
           </Box>
           
         </Box>
