@@ -12,6 +12,7 @@ _state = {
         'pink': False,
         'black': False
     },
+    'red_enabled' True,
     'red_count': 15,
 }
 # Map colour names to their snooker point values
@@ -95,7 +96,7 @@ class SnookerService:
                 if _state['red_enabled']:
                     _state['colours_enabled'] = {k: False for k in _state['colours_enabled']}
                 else: #no reds, only allow unsunk balls
-                    _state['colours_enabled'][colour]
+                    _state['colours_enabled'][colour] = False
             return dict(_state)
 
         return dict(_state)

@@ -78,6 +78,7 @@ class SnookerState(BaseModel):
     top: int
     bottom: int
     colours_enabled: dict[str, bool]
+    red_enabled: bool
     red_count: int
 
 class SnookerAction(BaseModel):

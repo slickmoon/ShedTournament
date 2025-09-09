@@ -55,6 +55,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
     pink: false,
     black: false
   });
+  const [redEnabled, setRedEnabled] = useState<boolean>(true);
   const [redCount, setRedCount] = useState<number>(15);
 
   async function fetchState() {
@@ -68,7 +69,8 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
       const data = await res.json();
       setScores({ top: data.top, bottom: data.bottom });
       setColoursEnabled(data.colours_enabled);
-      setRedCount(data.red_count)
+      setRedEnabled(data.red_enabled);
+      setRedCount(data.red_count);
     } catch {}
   }
 
@@ -86,6 +88,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
       const data = await res.json();
       setScores({ top: data.top, bottom: data.bottom });
       setColoursEnabled(data.colours_enabled);
+      setRedEnabled(data.red_enabled);
       setRedCount(data.red_count);
     } catch {}
   }
@@ -106,6 +109,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
   }
 
   function handleRed() {
+    if(!redEnabled) return;
     sendAction({ type: 'red', slot: selectedScoreSlot });
   }
 
@@ -125,6 +129,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
   }
 
   function handleFoulRed() {
+    if(!redEnabled) return;
     sendAction({ type: 'foul_red', slot: selectedScoreSlot})
   }
 
