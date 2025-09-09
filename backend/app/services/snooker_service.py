@@ -89,7 +89,7 @@ class SnookerService:
             return dict(_state)
 
         if action_type == 'foul_colour':
-           value = colour_values.get(colour)
+            value = colour_values.get(colour)
             if slot in ('top', 'bottom') and isinstance(value, int):
                 _state[slot] -= value
                 if _state['red_enabled']:
