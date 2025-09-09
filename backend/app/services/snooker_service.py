@@ -12,7 +12,7 @@ _state = {
         'pink': False,
         'black': False
     },
-    'red_enabled' True,
+    'red_enabled': True,
     'red_count': 15,
 }
 # Map colour names to their snooker point values
