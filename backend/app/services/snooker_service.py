@@ -52,12 +52,13 @@ class SnookerService:
             return dict(_state)
 
         if action_type == 'red':
+            if _state['red_count'] <= 0:
+                _state['red_enabled'] = False
+                return dict(_state)
             if slot in ('top', 'bottom') and _state['red_count'] > 0:
                 _state[slot] += 1
                 _state['colours_enabled'] = {k: True for k in _state['colours_enabled']}
                 _state['red_count'] -= 1
-            if _state['red_count'] <= 0:
-                _state['red_enabled'] = False
             return dict(_state)
 
         if action_type == 'colour':
@@ -66,6 +67,8 @@ class SnookerService:
                 _state[slot] += value
                 if _state['red_enabled']:
                     _state['colours_enabled'] = {k: False for k in _state['colours_enabled']}
+                    if _state['red_count'] <= 0:
+                        _state['red_enabled'] = False
                 else: #no reds, only allow unsunk balls
                     _state['colours_enabled'][colour] = False
             return dict(_state)
