@@ -78,6 +78,11 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
     setColoursEnabled(false);
   }
 
+  function handleMissColour() {
+    if (!coloursEnabled) return;
+    setColoursEnabled(false);
+  }
+
   function handleFoul() {
     if (selectedPlayerId === '') return;
     // Simple foul handling: subtract 2 per press (press twice => -4)
@@ -146,6 +151,14 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
                   +{c.value}
                 </Button>
               ))}
+              <Button
+                variant="outlined"
+                onClick={handleMissColour}
+                disabled={selectedPlayerId === '' || !coloursEnabled}
+                sx={{ minWidth: 56, height: 56, borderRadius: '50%' }}
+              >
+                Miss
+              </Button>
             </Box>
             <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
               {coloursEnabled ? 'Select exactly one colour' : 'Sink a red to enable colours'}
