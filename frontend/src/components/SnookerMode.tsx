@@ -1,10 +1,8 @@
-import React, { useMemo, useState } from 'react';
-import { Box, Paper, Typography, IconButton, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Paper, Typography, IconButton, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { Player } from '../types/Player.ts';
 
 interface SnookerModeProps {
-  players: Player[];
   open: boolean;
   onClose: () => void;
 }
@@ -46,21 +44,15 @@ const ballButtonStyles = (bg: string) => ({
   '&:disabled': { opacity: 0.4 }
 });
 
-const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => {
-  const [selectedPlayerId, setSelectedPlayerId] = useState<number | ''>('');
+const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
   const [selectedScoreSlot, setSelectedScoreSlot] = useState<ScoreSlot>('top');
   const [scores, setScores] = useState<{ top: number; bottom: number }>({ top: 0, bottom: 0 });
   const [coloursEnabled, setColoursEnabled] = useState<boolean>(false);
-
-  const sortedPlayers = useMemo(() => {
-    return [...players].sort((a, b) => a.player_name.localeCompare(b.player_name));
-  }, [players]);
 
   const currentTop = scores.top;
   const currentBottom = scores.bottom;
 
   function updateScore(delta: number) {
-    if (selectedPlayerId === '') return;
     setScores(prev => ({
       ...prev,
       [selectedScoreSlot]: prev[selectedScoreSlot] + delta
@@ -68,13 +60,11 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
   }
 
   function handleRed() {
-    if (selectedPlayerId === '') return;
     updateScore(RED_VALUE);
     setColoursEnabled(true);
   }
 
   function handleColour(value: number) {
-    if (selectedPlayerId === '') return;
     if (!coloursEnabled) return;
     updateScore(value);
     setColoursEnabled(false);
@@ -86,7 +76,6 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
   }
 
   function handleFoul() {
-    if (selectedPlayerId === '') return;
     // Simple foul handling: subtract 2 per press (press twice => -4)
     updateScore(-4);
     // Optionally mimic red flow (single next colour opportunity but still subtracts)
@@ -96,7 +85,6 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
   }
 
   function handleFoulColour(value: number) {
-    if (selectedPlayerId === '') return;
     updateScore(-value);
     setColoursEnabled(false);
   }
@@ -113,22 +101,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
           </IconButton>
         </Box>
 
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel id="snooker-player-select-label">Select Player</InputLabel>
-          <Select
-            labelId="snooker-player-select-label"
-            value={selectedPlayerId}
-            label="Select Player"
-            onChange={(e) => setSelectedPlayerId(e.target.value as number | '')}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {sortedPlayers.map(p => (
-              <MenuItem key={p.id} value={p.id}>{p.player_name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        
 
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, gap: 2 }}>
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -165,7 +138,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
             <Button
               variant="contained"
               onClick={handleRed}
-              disabled={selectedPlayerId === '' || coloursEnabled}
+              disabled={coloursEnabled}
               sx={ballButtonStyles('#B22222')}
             >
               +1
@@ -179,7 +152,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
                   key={c.key}
                   variant="contained"
                   onClick={() => handleColour(c.value)}
-                  disabled={selectedPlayerId === '' || !coloursEnabled}
+                  disabled={!coloursEnabled}
                   sx={ballButtonStyles(c.color)}
                 >
                   +{c.value}
@@ -188,7 +161,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
               <Button
                 variant="outlined"
                 onClick={handleMissColour}
-                disabled={selectedPlayerId === '' || !coloursEnabled}
+                disabled={!coloursEnabled}
                 sx={{ minWidth: 56, height: 56, borderRadius: '50%' }}
               >
                 Miss
@@ -204,7 +177,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
               variant="outlined"
               color="error"
               onClick={handleFoul}
-              disabled={selectedPlayerId === ''}
+              disabled={false}
             >
               -4
             </Button>
@@ -217,7 +190,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
                   key={c.key}
                   variant="outlined"
                   onClick={() => handleFoulColour(c.value)}
-                  disabled={selectedPlayerId === ''}
+                  disabled={false}
                   sx={ballButtonStyles(c.color)}
                 >
                   -{c.value}

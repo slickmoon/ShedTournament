@@ -872,7 +872,6 @@ function App() {
                   
                   {/* Snooker Mode Dialog */}
                   <SnookerMode
-                    players={players}
                     open={snookerModeOpen}
                     onClose={() => setSnookerModeOpen(false)}
                   />
