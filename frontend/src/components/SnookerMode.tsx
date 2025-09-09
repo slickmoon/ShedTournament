@@ -52,7 +52,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
   async function fetchState() {
     try {
       const token = localStorage.getItem('shed-tournament-token');
-      const res = await fetch(`/shed/shedapi/snooker/state`, {
+      const res = await fetch(`/shedapi/snooker/state`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -66,7 +66,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
   async function sendAction(action: any) {
     try {
       const token = localStorage.getItem('shed-tournament-token');
-      const res = await fetch(`/shed/shedapi/snooker/action`, {
+      const res = await fetch(`/shedapi/snooker/action`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
