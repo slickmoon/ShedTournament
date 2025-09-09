@@ -30,6 +30,7 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import InstallPrompt from './components/InstallPrompt.tsx';
+import SnookerMode from './components/SnookerMode.tsx';
 // @ts-ignore
 import krackemSponsored from './assets/krackemsponsored.png';
 import './App.css';
@@ -160,6 +161,7 @@ function App() {
   const [snackbar, setSnackbar] = useState<{open: boolean, message: string, severity: 'success' | 'error'}>({open: false, message: '', severity: 'success'});
   const [showPlayerNumbers, setShowPlayerNumbers] = useState(false);
   const [matchesPerDay, setMatchesPerDay] = useState<MatchesPerDay[]>([]);
+  const [snookerModeOpen, setSnookerModeOpen] = useState(false);
 
   // Initialize app on mount
   useEffect(() => {
@@ -724,6 +726,31 @@ function App() {
                       </Typography>
                     )}
                     <img src={krackemSponsored} alt="Krackem Sponsored" style={{ maxWidth: 280, margin: '0 auto 1em', paddingRight: '2em', display: 'block' }} />
+                    
+                    {/* Enter Snooker Mode Button */}
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        size="large"
+                        onClick={() => setSnookerModeOpen(true)}
+                        sx={{
+                          background: 'linear-gradient(45deg, #ff6b35 30%, #f7931e 90%)',
+                          fontWeight: 'bold',
+                          px: 4,
+                          py: 1.5,
+                          fontSize: '1.1rem',
+                          boxShadow: '0 4px 15px rgba(255, 107, 53, 0.3)',
+                          '&:hover': {
+                            background: 'linear-gradient(45deg, #e55a2b 30%, #e6850a 90%)',
+                            boxShadow: '0 6px 20px rgba(255, 107, 53, 0.4)',
+                          }
+                        }}
+                      >
+                        🎱 Enter Snooker Mode
+                      </Button>
+                    </Box>
+                    
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
                       <PlayerPodium players={players} showPlayerNumbers={showPlayerNumbers} />
                       <PlayerStreaks playerStreaks={playerStreaks} />
@@ -842,6 +869,13 @@ function App() {
                       {snackbar.message}
                     </Alert>
                   </Snackbar>
+                  
+                  {/* Snooker Mode Dialog */}
+                  <SnookerMode
+                    players={players}
+                    open={snookerModeOpen}
+                    onClose={() => setSnookerModeOpen(false)}
+                  />
                 </div>
               </div>
             } />
