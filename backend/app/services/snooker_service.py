@@ -87,6 +87,7 @@ class SnookerService:
             _state['colours_enabled'] = {k: False for k in _state['colours_enabled']}
             if _state['red_count'] <= 0:
                 _state['red_enabled'] = False
+                _state['colours_enabled'] = {k: True for k in _state['colours_enabled']}
             return dict(_state)
 
         if action_type == 'foul_colour':
