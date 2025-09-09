@@ -102,9 +102,9 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
     sendAction({ type: 'red', slot: selectedScoreSlot });
   }
 
-  function handleColour(value: number) {
+  function handleColour(colour: string) {
     if (!coloursEnabled) return;
-    sendAction({ type: 'colour', slot: selectedScoreSlot, value });
+    sendAction({ type: 'colour', slot: selectedScoreSlot, colour });
   }
 
   function handleMissColour() {
@@ -120,8 +120,8 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
     sendAction({ type: 'foul_red', slot: selectedScoreSlot})
   }
 
-  function handleFoulColour(value: number) {
-    sendAction({ type: 'foul_colour', slot: selectedScoreSlot, value });
+  function handleFoulColour(colour: string) {
+    sendAction({ type: 'foul_colour', slot: selectedScoreSlot, colour });
   }
 
   function handleReset() {
@@ -195,7 +195,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
                 <Button
                   key={c.key}
                   variant="contained"
-                  onClick={() => handleColour(c.value)}
+                  onClick={() => handleColour(c.key)}
                   disabled={!coloursEnabled}
                   sx={ballButtonStyles(c.color)}
                 >
@@ -230,7 +230,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
                   <Button
                     key={c.key}
                     variant="outlined"
-                    onClick={() => handleFoulColour(c.value)}
+                    onClick={() => handleFoulColour(c.key)}
                     disabled={false}
                     sx={ballButtonStyles(c.color)}
                   >
