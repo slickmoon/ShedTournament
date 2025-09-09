@@ -1,31 +1,7 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Button,
-  Typography,
-  Paper,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Chip,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Grid,
-  Card,
-  CardContent,
-  Divider,
-  useTheme,
-  useMediaQuery
-} from '@mui/material';
-import {
-  Close as CloseIcon,
-  Remove as RemoveIcon,
-  Sports as SportsIcon
-} from '@mui/icons-material';
-import { Player } from '../types/Player';
+import React, { useMemo, useState } from 'react';
+import { Box, Paper, Typography, IconButton, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { Player } from '../types/Player.ts';
 
 interface SnookerModeProps {
   players: Player[];
@@ -33,363 +9,166 @@ interface SnookerModeProps {
   onClose: () => void;
 }
 
-interface Team {
-  id: number;
-  name: string;
-  players: Player[];
-  score: number;
-}
+type PlayerScoreMap = Record<number, number>;
 
-interface SnookerBall {
-  name: string;
-  color: string;
-  points: number;
-  count: number;
-}
-
-const SNOOKER_BALLS: SnookerBall[] = [
-  { name: 'Red', color: '#d32f2f', points: 1, count: 15 },
-  { name: 'Yellow', color: '#fbc02d', points: 2, count: 1 },
-  { name: 'Green', color: '#388e3c', points: 3, count: 1 },
-  { name: 'Brown', color: '#8d6e63', points: 4, count: 1 },
-  { name: 'Blue', color: '#1976d2', points: 5, count: 1 },
-  { name: 'Pink', color: '#e91e63', points: 6, count: 1 },
-  { name: 'Black', color: '#212121', points: 7, count: 1 }
+const RED_VALUE = 1;
+const COLOURS = [
+  { key: 'yellow', label: 'Yellow', value: 2, color: '#FFD700' },
+  { key: 'green', label: 'Green', value: 3, color: '#228B22' },
+  { key: 'brown', label: 'Brown', value: 4, color: '#8B4513' },
+  { key: 'blue', label: 'Blue', value: 5, color: '#1E90FF' },
+  { key: 'pink', label: 'Pink', value: 6, color: '#FF69B4' },
+  { key: 'black', label: 'Black', value: 7, color: '#000000' }
 ];
 
+const overlayStyles = {
+  position: 'fixed' as const,
+  inset: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  zIndex: 1300
+};
+
+const panelStyles = {
+  width: { xs: '95%', md: 600 },
+  maxWidth: '95vw',
+  p: 3
+};
+
+const ballButtonStyles = (bg: string) => ({
+  minWidth: 56,
+  height: 56,
+  borderRadius: '50%',
+  backgroundColor: bg,
+  color: '#fff',
+  '&:disabled': { opacity: 0.4 }
+});
+
 const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
-  const [teams, setTeams] = useState<Team[]>([
-    { id: 1, name: 'Team 1', players: [], score: 0 },
-    { id: 2, name: 'Team 2', players: [], score: 0 }
-  ]);
-  
-  const [selectedPlayer, setSelectedPlayer] = useState<number | ''>('');
-  const [selectedTeam, setSelectedTeam] = useState<number>(1);
-  const [ballCounts, setBallCounts] = useState<{ [key: string]: number }>({
-    'Red': 15,
-    'Yellow': 1,
-    'Green': 1,
-    'Brown': 1,
-    'Blue': 1,
-    'Pink': 1,
-    'Black': 1
-  });
+  const [selectedPlayerId, setSelectedPlayerId] = useState<number | ''>('');
+  const [scoresByPlayer, setScoresByPlayer] = useState<PlayerScoreMap>({});
+  const [coloursEnabled, setColoursEnabled] = useState<boolean>(false);
 
-  const handleAddPlayerToTeam = () => {
-    if (!selectedPlayer) return;
-    
-    const player = players.find(p => p.id === selectedPlayer);
-    if (!player) return;
+  const sortedPlayers = useMemo(() => {
+    return [...players].sort((a, b) => a.player_name.localeCompare(b.player_name));
+  }, [players]);
 
-    // Check if player is already on a team
-    const isPlayerOnTeam = teams.some(team => 
-      team.players.some(p => p.id === selectedPlayer)
-    );
-    
-    if (isPlayerOnTeam) {
-      alert('Player is already on a team!');
-      return;
-    }
+  const currentScore = selectedPlayerId === '' ? 0 : (scoresByPlayer[selectedPlayerId] ?? 0);
 
-    // Check team size limit
-    const team = teams.find(t => t.id === selectedTeam);
-    if (team && team.players.length >= 2) {
-      alert('Team is full! Maximum 2 players per team.');
-      return;
-    }
-
-    setTeams(prevTeams => 
-      prevTeams.map(team => 
-        team.id === selectedTeam 
-          ? { ...team, players: [...team.players, player] }
-          : team
-      )
-    );
-    
-    setSelectedPlayer('');
-  };
-
-  const handleRemovePlayerFromTeam = (teamId: number, playerId: number) => {
-    setTeams(prevTeams =>
-      prevTeams.map(team =>
-        team.id === teamId
-          ? { ...team, players: team.players.filter(p => p.id !== playerId) }
-          : team
-      )
-    );
-  };
-
-  const handleAddPoints = (ballName: string, points: number) => {
-    if (ballCounts[ballName] <= 0) return;
-    
-    setTeams(prevTeams =>
-      prevTeams.map(team =>
-        team.id === selectedTeam
-          ? { ...team, score: team.score + points }
-          : team
-      )
-    );
-    
-    setBallCounts(prev => ({
+  function updateScore(delta: number) {
+    if (selectedPlayerId === '') return;
+    setScoresByPlayer(prev => ({
       ...prev,
-      [ballName]: prev[ballName] - 1
+      [selectedPlayerId]: (prev[selectedPlayerId] ?? 0) + delta
     }));
-  };
+  }
 
-  const handleResetGame = () => {
-    setTeams(prevTeams =>
-      prevTeams.map(team => ({ ...team, players: [], score: 0 }))
-    );
-    setBallCounts({
-      'Red': 15,
-      'Yellow': 1,
-      'Green': 1,
-      'Brown': 1,
-      'Blue': 1,
-      'Pink': 1,
-      'Black': 1
-    });
-  };
+  function handleRed() {
+    if (selectedPlayerId === '') return;
+    updateScore(RED_VALUE);
+    setColoursEnabled(true);
+  }
 
-  const availablePlayers = players.filter(player => 
-    !teams.some(team => team.players.some(p => p.id === player.id))
-  );
+  function handleColour(value: number) {
+    if (selectedPlayerId === '') return;
+    if (!coloursEnabled) return;
+    updateScore(value);
+    setColoursEnabled(false);
+  }
+
+  function handleFoul() {
+    if (selectedPlayerId === '') return;
+    // Simple foul handling: subtract 2 per press (press twice => -4)
+    updateScore(-2);
+    // Optionally mimic red flow (single next colour opportunity but still subtracts)
+    // For simplicity, do not enable colours on foul; requirement focuses on -4 for two presses
+  }
+
+  if (!open) return null;
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="lg"
-      fullWidth
-      fullScreen={isMobile}
-      PaperProps={{
-        sx: {
-          background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
-          color: 'white',
-          minHeight: isMobile ? '100vh' : '80vh'
-        }
-      }}
-    >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        background: 'rgba(0,0,0,0.2)',
-        borderBottom: '2px solid rgba(255,255,255,0.1)'
-      }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <SportsIcon sx={{ fontSize: 32 }} />
-          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-            Snooker Mode
-          </Typography>
+    <Box sx={overlayStyles}>
+      <Paper elevation={6} sx={panelStyles}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h5">Snooker Mode</Typography>
+          <IconButton onClick={onClose} aria-label="Close snooker mode" size="large">
+            <CloseIcon />
+          </IconButton>
         </Box>
-        <IconButton onClick={onClose} sx={{ color: 'white' }}>
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
 
-      <DialogContent sx={{ p: 3 }}>
-        <Grid container spacing={3}>
-          {/* Team Selection */}
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>
-              <Typography variant="h5" sx={{ mb: 3, textAlign: 'center', fontWeight: 'bold' }}>
-                Team Selection
-              </Typography>
-              
-              {/* Add Player to Team */}
-              <Box sx={{ mb: 3 }}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} sm={5}>
-                    <FormControl fullWidth>
-                      <InputLabel sx={{ color: 'white' }}>Select Player</InputLabel>
-                      <Select
-                        value={selectedPlayer}
-                        onChange={(e) => setSelectedPlayer(e.target.value === '' ? '' : Number(e.target.value))}
-                        sx={{ 
-                          color: 'white',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
-                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.5)' }
-                        }}
-                      >
-                        {availablePlayers.map(player => (
-                          <MenuItem key={player.id} value={player.id}>
-                            {player.player_name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <FormControl fullWidth>
-                      <InputLabel sx={{ color: 'white' }}>Team</InputLabel>
-                      <Select
-                        value={selectedTeam}
-                        onChange={(e) => setSelectedTeam(Number(e.target.value))}
-                        sx={{ 
-                          color: 'white',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' }
-                        }}
-                      >
-                        <MenuItem value={1}>Team 1</MenuItem>
-                        <MenuItem value={2}>Team 2</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Button
-                      variant="contained"
-                      onClick={handleAddPlayerToTeam}
-                      disabled={!selectedPlayer}
-                      fullWidth
-                      sx={{ 
-                        background: 'linear-gradient(45deg, #4caf50 30%, #66bb6a 90%)',
-                        '&:hover': { background: 'linear-gradient(45deg, #388e3c 30%, #4caf50 90%)' }
-                      }}
-                    >
-                      Add Player
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel id="snooker-player-select-label">Select Player</InputLabel>
+          <Select
+            labelId="snooker-player-select-label"
+            value={selectedPlayerId}
+            label="Select Player"
+            onChange={(e) => setSelectedPlayerId(e.target.value as number | '')}
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {sortedPlayers.map(p => (
+              <MenuItem key={p.id} value={p.id}>{p.player_name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-              {/* Teams Display */}
-              {teams.map(team => (
-                <Card key={team.id} sx={{ 
-                  mb: 2, 
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)'
-                }}>
-                  <CardContent>
-                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold' }}>
-                      {team.name} - Score: {team.score}
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                      {team.players.map(player => (
-                        <Chip
-                          key={player.id}
-                          label={player.player_name}
-                          onDelete={() => handleRemovePlayerFromTeam(team.id, player.id)}
-                          deleteIcon={<RemoveIcon />}
-                          sx={{ 
-                            background: 'rgba(255,255,255,0.2)',
-                            color: 'white',
-                            '& .MuiChip-deleteIcon': { color: 'white' }
-                          }}
-                        />
-                      ))}
-                      {team.players.length === 0 && (
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                          No players selected
-                        </Typography>
-                      )}
-                    </Box>
-                  </CardContent>
-                </Card>
-              ))}
-            </Paper>
-          </Grid>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Current Score: {currentScore}
+        </Typography>
 
-          {/* Scoring Panel */}
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>
-              <Typography variant="h5" sx={{ mb: 3, textAlign: 'center', fontWeight: 'bold' }}>
-                Scoring Panel
-              </Typography>
-              
-              {/* Current Team Selection */}
-              <Box sx={{ mb: 3 }}>
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: 'white' }}>Scoring for Team</InputLabel>
-                  <Select
-                    value={selectedTeam}
-                    onChange={(e) => setSelectedTeam(Number(e.target.value))}
-                    sx={{ 
-                      color: 'white',
-                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' }
-                    }}
-                  >
-                    <MenuItem value={1}>Team 1 ({teams[0].score} points)</MenuItem>
-                    <MenuItem value={2}>Team 2 ({teams[1].score} points)</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>Reds</Typography>
+            <Button
+              variant="contained"
+              onClick={handleRed}
+              disabled={selectedPlayerId === ''}
+              sx={ballButtonStyles('#B22222')}
+            >
+              +1
+            </Button>
+          </Box>
 
-              {/* Ball Buttons */}
-              <Grid container spacing={2}>
-                {SNOOKER_BALLS.map(ball => (
-                  <Grid item xs={6} sm={4} key={ball.name}>
-                    <Button
-                      variant="contained"
-                      onClick={() => handleAddPoints(ball.name, ball.points)}
-                      disabled={ballCounts[ball.name] <= 0}
-                      fullWidth
-                      sx={{
-                        background: ball.color,
-                        color: 'white',
-                        fontWeight: 'bold',
-                        fontSize: '0.9rem',
-                        py: 2,
-                        '&:hover': {
-                          background: ball.color,
-                          filter: 'brightness(1.1)'
-                        },
-                        '&:disabled': {
-                          background: 'rgba(255,255,255,0.1)',
-                          color: 'rgba(255,255,255,0.3)'
-                        }
-                      }}
-                    >
-                      <Box sx={{ textAlign: 'center' }}>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {ball.name}
-                        </Typography>
-                        <Typography variant="caption">
-                          {ball.points} pts ({ballCounts[ball.name]} left)
-                        </Typography>
-                      </Box>
-                    </Button>
-                  </Grid>
-                ))}
-              </Grid>
-
-              <Divider sx={{ my: 3, borderColor: 'rgba(255,255,255,0.2)' }} />
-
-              {/* Action Buttons */}
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>Colours</Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {COLOURS.map(c => (
                 <Button
-                  variant="outlined"
-                  onClick={handleResetGame}
-                  sx={{
-                    borderColor: 'rgba(255,255,255,0.5)',
-                    color: 'white',
-                    '&:hover': {
-                      borderColor: 'white',
-                      background: 'rgba(255,255,255,0.1)'
-                    }
-                  }}
-                >
-                  Reset Game
-                </Button>
-                <Button
+                  key={c.key}
                   variant="contained"
-                  onClick={onClose}
-                  sx={{
-                    background: 'linear-gradient(45deg, #f44336 30%, #e57373 90%)',
-                    '&:hover': { background: 'linear-gradient(45deg, #d32f2f 30%, #f44336 90%)' }
-                  }}
+                  onClick={() => handleColour(c.value)}
+                  disabled={selectedPlayerId === '' || !coloursEnabled}
+                  sx={ballButtonStyles(c.color)}
                 >
-                  Close
+                  +{c.value}
                 </Button>
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
-      </DialogContent>
-    </Dialog>
+              ))}
+            </Box>
+            <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+              {coloursEnabled ? 'Select exactly one colour' : 'Sink a red to enable colours'}
+            </Typography>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul</Typography>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleFoul}
+              disabled={selectedPlayerId === ''}
+            >
+              -2
+            </Button>
+            <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+              Press twice to subtract 4
+            </Typography>
+          </Box>
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 
