@@ -48,6 +48,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
   const [selectedScoreSlot, setSelectedScoreSlot] = useState<ScoreSlot>('top');
   const [scores, setScores] = useState<{ top: number; bottom: number }>({ top: 0, bottom: 0 });
   const [coloursEnabled, setColoursEnabled] = useState<boolean>(false);
+  const [redCount, setRedCount] = useState<number>(15);
 
   async function fetchState() {
     try {
@@ -60,6 +61,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
       const data = await res.json();
       setScores({ top: data.top, bottom: data.bottom });
       setColoursEnabled(data.colours_enabled);
+      setRedCount(data.red_count)
     } catch {}
   }
 
@@ -77,6 +79,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
       const data = await res.json();
       setScores({ top: data.top, bottom: data.bottom });
       setColoursEnabled(data.colours_enabled);
+      setRedCount(data.red_count);
     } catch {}
   }
 
@@ -111,6 +114,10 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
 
   function handleFoul() {
     sendAction({ type: 'foul', slot: selectedScoreSlot });
+  }
+
+  function handleFoulRed() {
+    sendAction({ type: 'foulred', slot: selectedScoreSlot})
   }
 
   function handleFoulColour(value: number) {
@@ -167,14 +174,19 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Box>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>Reds</Typography>
-            <Button
-              variant="contained"
-              onClick={handleRed}
-              disabled={coloursEnabled}
-              sx={ballButtonStyles('#B22222')}
-            >
-              +1
-            </Button>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Button
+                variant="contained"
+                onClick={handleRed}
+                disabled={coloursEnabled}
+                sx={ballButtonStyles('#B22222')}
+              >
+                +1
+              </Button>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Reds remaining: {redCount}
+              </Typography>
+            </Box>
           </Box>
           <Box>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>Colours</Typography>
@@ -204,30 +216,36 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
             </Typography>
           </Box>
           <Box>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul</Typography>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul (Colour)</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
             <Button
-              variant="outlined"
-              color="error"
-              onClick={handleFoul}
-              disabled={false}
+              variant="contained"
+              onClick={handleFoulRed}
+              sx={ballButtonStyles('#B22222')}
             >
               -4
             </Button>
-          </Box>
-          <Box>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul (Colour)</Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {COLOURS.map(c => (
-                <Button
-                  key={c.key}
-                  variant="outlined"
-                  onClick={() => handleFoulColour(c.value)}
-                  disabled={false}
-                  sx={ballButtonStyles(c.color)}
-                >
-                  -{c.value}
-                </Button>
-              ))}
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {COLOURS.map(c => (
+                  <Button
+                    key={c.key}
+                    variant="outlined"
+                    onClick={() => handleFoulColour(c.value)}
+                    disabled={false}
+                    sx={ballButtonStyles(c.color)}
+                  >
+                    -{c.value}
+                  </Button>
+                ))}
+              </Box>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleFoul}
+              >
+                Foul Miss/Pot White
+                -4
+              </Button>
             </Box>
           </Box>
 
