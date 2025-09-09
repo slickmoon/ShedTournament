@@ -52,7 +52,7 @@ class SnookerService:
             _state['colours_enabled'] = False
             return dict(_state)
 
-        if action_type == 'foulred':
+        if action_type == 'foul_red':
             if slot in ('top', 'bottom') and _state['red_count'] <= 0:
                 _state[slot] -= 4
                 _state['red_count'] -= 1

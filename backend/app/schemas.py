@@ -78,9 +78,10 @@ class SnookerState(BaseModel):
     top: int
     bottom: int
     colours_enabled: bool
+    red_count: int
 
 class SnookerAction(BaseModel):
-    type: Literal['red', 'colour', 'miss', 'foul', 'foul_colour', 'reset']
+    type: Literal['red', 'colour', 'miss', 'foul', 'foul_colour', 'reset', 'foul_red']
     slot: Optional[Literal['top', 'bottom']] = None
     value: Optional[int] = None
 

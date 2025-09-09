@@ -117,7 +117,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
   }
 
   function handleFoulRed() {
-    sendAction({ type: 'foulred', slot: selectedScoreSlot})
+    sendAction({ type: 'foul_red', slot: selectedScoreSlot})
   }
 
   function handleFoulColour(value: number) {
