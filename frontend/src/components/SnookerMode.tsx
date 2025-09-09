@@ -55,8 +55,8 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
     pink: false,
     black: false
   });
-  const [redEnabled, setRedEnabled] = useState<boolean>(true);
   const [redCount, setRedCount] = useState<number>(15);
+  const [redEnabled, setRedEnabled] = useState<boolean>(true);
 
   async function fetchState() {
     try {
@@ -88,8 +88,8 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
       const data = await res.json();
       setScores({ top: data.top, bottom: data.bottom });
       setColoursEnabled(data.colours_enabled);
-      setRedEnabled(data.red_enabled);
       setRedCount(data.red_count);
+      setRedEnabled(data.red_enabled);
     } catch {}
   }
 
@@ -234,6 +234,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
             <Button
               variant="contained"
               onClick={handleFoulRed}
+              disabled={!redEnabled}
               sx={ballButtonStyles('#B22222')}
             >
               -4
