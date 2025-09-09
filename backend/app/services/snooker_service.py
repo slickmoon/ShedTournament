@@ -63,7 +63,7 @@ class SnookerService:
             value = colour_values.get(colour)
             if _state['colours_enabled'] and slot in ('top', 'bottom') and isinstance(value, int):
                 _state[slot] += value
-                if _state['red_enabled'] = True:
+                if _state['red_enabled']:
                     _state['colours_enabled'] = {k: False for k in _state['colours_enabled']}
                 else: #no reds, only allow unsunk balls
                     _state['colours_enabled'][colour]
@@ -92,7 +92,7 @@ class SnookerService:
            value = colour_values.get(colour)
             if slot in ('top', 'bottom') and isinstance(value, int):
                 _state[slot] -= value
-                if _state['red_enabled'] = True:
+                if _state['red_enabled']:
                     _state['colours_enabled'] = {k: False for k in _state['colours_enabled']}
                 else: #no reds, only allow unsunk balls
                     _state['colours_enabled'][colour]
