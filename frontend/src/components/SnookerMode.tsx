@@ -86,10 +86,16 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
   function handleFoul() {
     if (selectedPlayerId === '') return;
     // Simple foul handling: subtract 2 per press (press twice => -4)
-    updateScore(-2);
+    updateScore(-4);
     // Optionally mimic red flow (single next colour opportunity but still subtracts)
     // For simplicity, do not enable colours on foul; requirement focuses on -4 for two presses
     // Also, a foul ends the colour phase to re-enable reds
+    setColoursEnabled(false);
+  }
+
+  function handleFoulColour(value: number) {
+    if (selectedPlayerId === '') return;
+    updateScore(-value);
     setColoursEnabled(false);
   }
 
@@ -146,11 +152,24 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
               onClick={handleFoul}
               disabled={selectedPlayerId === ''}
             >
-              -2
+              -4
             </Button>
-            <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
-              Press twice to subtract 4
-            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul (Colour)</Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {COLOURS.map(c => (
+                <Button
+                  key={c.key}
+                  variant="outlined"
+                  onClick={() => handleFoulColour(c.value)}
+                  disabled={selectedPlayerId === ''}
+                  sx={ballButtonStyles(c.color)}
+                >
+                  -{c.value}
+                </Button>
+              ))}
+            </Box>
           </Box>
           <Box>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>Colours</Typography>
