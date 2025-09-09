@@ -67,7 +67,7 @@ class SnookerService:
                 if _state['red_enabled']:
                     _state['colours_enabled'] = {k: False for k in _state['colours_enabled']}
                 else: #no reds, only allow unsunk balls
-                    _state['colours_enabled'][colour]
+                    _state['colours_enabled'][colour] = False
             return dict(_state)
 
         if action_type == 'miss':
