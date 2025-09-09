@@ -47,7 +47,14 @@ const ballButtonStyles = (bg: string) => ({
 const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
   const [selectedScoreSlot, setSelectedScoreSlot] = useState<ScoreSlot>('top');
   const [scores, setScores] = useState<{ top: number; bottom: number }>({ top: 0, bottom: 0 });
-  const [coloursEnabled, setColoursEnabled] = useState<boolean>(false);
+  const [coloursEnabled, setColoursEnabled] = useState<Record<string, boolean>>({
+    yellow: false,
+    green: false,
+    brown: false,
+    blue: false,
+    pink: false,
+    black: false
+  });
   const [redCount, setRedCount] = useState<number>(15);
 
   async function fetchState() {
@@ -103,12 +110,13 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
   }
 
   function handleColour(colour: string) {
-    if (!coloursEnabled) return;
+    if (!coloursEnabled[colour]) return;
     sendAction({ type: 'colour', slot: selectedScoreSlot, colour });
   }
 
   function handleMissColour() {
-    if (!coloursEnabled) return;
+    const anyColourEnabled = Object.values(coloursEnabled).some(enabled => enabled);
+    if (!anyColourEnabled) return;
     sendAction({ type: 'miss' });
   }
 
@@ -178,7 +186,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
               <Button
                 variant="contained"
                 onClick={handleRed}
-                disabled={coloursEnabled}
+                disabled={redCount <= 0}
                 sx={ballButtonStyles('#B22222')}
               >
                 +1
@@ -196,7 +204,7 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
                   key={c.key}
                   variant="contained"
                   onClick={() => handleColour(c.key)}
-                  disabled={!coloursEnabled}
+                  disabled={!coloursEnabled[c.key]}
                   sx={ballButtonStyles(c.color)}
                 >
                   +{c.value}
@@ -205,14 +213,14 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
               <Button
                 variant="outlined"
                 onClick={handleMissColour}
-                disabled={!coloursEnabled}
+                disabled={!Object.values(coloursEnabled).some(enabled => enabled)}
                 sx={{ minWidth: 56, height: 56, borderRadius: '50%' }}
               >
                 Miss
               </Button>
             </Box>
             <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
-              {coloursEnabled ? 'Score on a ball' : 'Sink a red to score'}
+              {Object.values(coloursEnabled).some(enabled => enabled) ? 'Score on a ball' : 'Sink a red to score'}
             </Typography>
           </Box>
           <Box>

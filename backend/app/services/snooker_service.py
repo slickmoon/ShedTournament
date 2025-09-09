@@ -5,12 +5,12 @@ _state = {
     'top': 0,
     'bottom': 0,
     'colours_enabled': {
-        'yellow': True,
-        'green': True,
-        'brown': True,
-        'blue': True,
-        'pink': True,
-        'black': True
+        'yellow': False,
+        'green': False,
+        'brown': False,
+        'blue': False,
+        'pink': False,
+        'black': False
     },
     'red_count': 15,
 }
@@ -40,20 +40,20 @@ class SnookerService:
             _state['bottom'] = 0
             _state['red_count'] = 15
             _state['colours_enabled'] = {
-                'yellow': True,
-                'green': True,
-                'brown': True,
-                'blue': True,
-                'pink': True,
-                'black': True
+                'yellow': False,
+                'green': False,
+                'brown': False,
+                'blue': False,
+                'pink': False,
+                'black': False
             }
             _state['red_enabled'] = True
             return dict(_state)
 
         if action_type == 'red':
-            if slot in ('top', 'bottom') and _state['red_count'] >= 0:
+            if slot in ('top', 'bottom') and _state['red_count'] > 0:
                 _state[slot] += 1
-                _state['colours_enabled'] = True
+                _state['colours_enabled'] = {k: True for k in _state['colours_enabled']}
                 _state['red_count'] -= 1
             if _state['red_count'] <= 0:
                 _state['red_enabled'] = False
@@ -61,7 +61,7 @@ class SnookerService:
 
         if action_type == 'colour':
             value = colour_values.get(colour)
-            if _state['colours_enabled'] and slot in ('top', 'bottom') and isinstance(value, int):
+            if _state['colours_enabled'].get(colour, False) and slot in ('top', 'bottom') and isinstance(value, int):
                 _state[slot] += value
                 if _state['red_enabled']:
                     _state['colours_enabled'] = {k: False for k in _state['colours_enabled']}
@@ -70,20 +70,20 @@ class SnookerService:
             return dict(_state)
 
         if action_type == 'miss':
-            _state['colours_enabled'] = False
+            _state['colours_enabled'] = {k: False for k in _state['colours_enabled']}
             return dict(_state)
 
         if action_type == 'foul':
             if slot in ('top', 'bottom'):
                 _state[slot] -= 4
-            _state['colours_enabled'] = False
+            _state['colours_enabled'] = {k: False for k in _state['colours_enabled']}
             return dict(_state)
 
         if action_type == 'foul_red':
-            if slot in ('top', 'bottom') and _state['red_count'] >= 0:
+            if slot in ('top', 'bottom') and _state['red_count'] > 0:
                 _state[slot] -= 4
                 _state['red_count'] -= 1
-            _state['colours_enabled'] = False
+            _state['colours_enabled'] = {k: False for k in _state['colours_enabled']}
             if _state['red_count'] <= 0:
                 _state['red_enabled'] = False
             return dict(_state)

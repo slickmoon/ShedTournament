@@ -77,13 +77,13 @@ class Stats(BaseModel):
 class SnookerState(BaseModel):
     top: int
     bottom: int
-    colours_enabled: bool
+    colours_enabled: dict[str, bool]
     red_count: int
 
 class SnookerAction(BaseModel):
-    type: Literal['red', 'colour', 'miss', 'foul', 'foul_colour', 'reset', 'foul_red']
+    type: Literal['red', 'colour', 'miss', 'foul', 'foul_colour', 'foul_red', 'reset']
     slot: Optional[Literal['top', 'bottom']] = None
-    value: Optional[int] = None
+    colour: Optional[str] = None
 
 class EventTypeBase(BaseModel):
     name: str
