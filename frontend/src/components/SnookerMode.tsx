@@ -145,33 +145,6 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
             </Button>
           </Box>
           <Box>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul</Typography>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={handleFoul}
-              disabled={selectedPlayerId === ''}
-            >
-              -4
-            </Button>
-          </Box>
-          <Box>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul (Colour)</Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {COLOURS.map(c => (
-                <Button
-                  key={c.key}
-                  variant="outlined"
-                  onClick={() => handleFoulColour(c.value)}
-                  disabled={selectedPlayerId === ''}
-                  sx={ballButtonStyles(c.color)}
-                >
-                  -{c.value}
-                </Button>
-              ))}
-            </Box>
-          </Box>
-          <Box>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>Colours</Typography>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               {COLOURS.map(c => (
@@ -198,7 +171,33 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
               {coloursEnabled ? 'Score on a ball' : 'Sink a red to score'}
             </Typography>
           </Box>
-
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul</Typography>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleFoul}
+              disabled={selectedPlayerId === ''}
+            >
+              -4
+            </Button>
+          </Box>
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul (Colour)</Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {COLOURS.map(c => (
+                <Button
+                  key={c.key}
+                  variant="outlined"
+                  onClick={() => handleFoulColour(c.value)}
+                  disabled={selectedPlayerId === ''}
+                  sx={ballButtonStyles(c.color)}
+                >
+                  -{c.value}
+                </Button>
+              ))}
+            </Box>
+          </Box>
           
         </Box>
       </Paper>
