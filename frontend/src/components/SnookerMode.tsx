@@ -89,6 +89,8 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
     updateScore(-2);
     // Optionally mimic red flow (single next colour opportunity but still subtracts)
     // For simplicity, do not enable colours on foul; requirement focuses on -4 for two presses
+    // Also, a foul ends the colour phase to re-enable reds
+    setColoursEnabled(false);
   }
 
   if (!open) return null;
@@ -130,13 +132,26 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
             <Button
               variant="contained"
               onClick={handleRed}
-              disabled={selectedPlayerId === ''}
+              disabled={selectedPlayerId === '' || coloursEnabled}
               sx={ballButtonStyles('#B22222')}
             >
               +1
             </Button>
           </Box>
-
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul</Typography>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleFoul}
+              disabled={selectedPlayerId === ''}
+            >
+              -2
+            </Button>
+            <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+              Press twice to subtract 4
+            </Typography>
+          </Box>
           <Box>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>Colours</Typography>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -161,24 +176,11 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
               </Button>
             </Box>
             <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
-              {coloursEnabled ? 'Select exactly one colour' : 'Sink a red to enable colours'}
+              {coloursEnabled ? 'Score on a ball' : 'Sink a red to score'}
             </Typography>
           </Box>
 
-          <Box>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>Foul</Typography>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={handleFoul}
-              disabled={selectedPlayerId === ''}
-            >
-              -2
-            </Button>
-            <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
-              Press twice to subtract 4
-            </Typography>
-          </Box>
+          
         </Box>
       </Paper>
     </Box>
