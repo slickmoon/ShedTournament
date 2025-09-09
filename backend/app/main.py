@@ -13,9 +13,11 @@ from .auth import (
 from .schemas import (
     PlayerCreate, PlayerUpdate, PlayerResponse,
     MatchCreate, MatchResponse,
-    AuditLogResponse, MatchesPerDay
+    AuditLogResponse, MatchesPerDay,
+    SnookerState, SnookerAction
 )
 from .services import PlayerService, MatchService, AuditLogService, StatsService
+from .services.snooker_service import SnookerService
 from .config import get_settings
 
 settings = get_settings()
@@ -293,6 +295,21 @@ async def get_matches_per_day(
     token: dict = Depends(verify_token)
 ):
     return StatsService.get_matches_per_day(db, player_id)
+
+@api.get("/snooker/state", response_model=SnookerState)
+async def get_snooker_state(
+    db: Session = Depends(database.get_db),
+    token: dict = Depends(verify_token)
+):
+    return SnookerService.get_state(db)
+
+@api.post("/snooker/action", response_model=SnookerState)
+async def post_snooker_action(
+    action: SnookerAction,
+    db: Session = Depends(database.get_db),
+    token: dict = Depends(verify_token)
+):
+    return SnookerService.apply_action(db, action.model_dump())
 
 @api.get("/stats/head-to-head")
 async def get_head_to_head_stats(

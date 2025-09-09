@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Paper, Typography, IconButton, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -49,44 +49,72 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ open, onClose }) => {
   const [scores, setScores] = useState<{ top: number; bottom: number }>({ top: 0, bottom: 0 });
   const [coloursEnabled, setColoursEnabled] = useState<boolean>(false);
 
+  async function fetchState() {
+    try {
+      const token = localStorage.getItem('shed-tournament-token');
+      const res = await fetch(`/shed/shedapi/snooker/state`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      setScores({ top: data.top, bottom: data.bottom });
+      setColoursEnabled(data.colours_enabled);
+    } catch {}
+  }
+
+  async function sendAction(action: any) {
+    try {
+      const token = localStorage.getItem('shed-tournament-token');
+      const res = await fetch(`/shed/shedapi/snooker/action`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(action)
+      });
+      const data = await res.json();
+      setScores({ top: data.top, bottom: data.bottom });
+      setColoursEnabled(data.colours_enabled);
+    } catch {}
+  }
+
+  useEffect(() => {
+    fetchState();
+    const id = setInterval(fetchState, 2000);
+    return () => clearInterval(id);
+  }, []);
+
   const currentTop = scores.top;
   const currentBottom = scores.bottom;
 
   function updateScore(delta: number) {
-    setScores(prev => ({
-      ...prev,
-      [selectedScoreSlot]: prev[selectedScoreSlot] + delta
-    }));
+    const type = delta > 0 ? (delta === 1 ? 'red' : 'colour') : (delta === -4 ? 'foul' : 'foul_colour');
+    const value = Math.abs(delta) === 1 ? undefined : Math.abs(delta);
+    sendAction({ type, slot: selectedScoreSlot, value });
   }
 
   function handleRed() {
-    updateScore(RED_VALUE);
-    setColoursEnabled(true);
+    sendAction({ type: 'red', slot: selectedScoreSlot });
   }
 
   function handleColour(value: number) {
     if (!coloursEnabled) return;
-    updateScore(value);
-    setColoursEnabled(false);
+    sendAction({ type: 'colour', slot: selectedScoreSlot, value });
   }
 
   function handleMissColour() {
     if (!coloursEnabled) return;
-    setColoursEnabled(false);
+    sendAction({ type: 'miss' });
   }
 
   function handleFoul() {
-    // Simple foul handling: subtract 2 per press (press twice => -4)
-    updateScore(-4);
-    // Optionally mimic red flow (single next colour opportunity but still subtracts)
-    // For simplicity, do not enable colours on foul; requirement focuses on -4 for two presses
-    // Also, a foul ends the colour phase to re-enable reds
-    setColoursEnabled(false);
+    sendAction({ type: 'foul', slot: selectedScoreSlot });
   }
 
   function handleFoulColour(value: number) {
-    updateScore(-value);
-    setColoursEnabled(false);
+    sendAction({ type: 'foul_colour', slot: selectedScoreSlot, value });
   }
 
   if (!open) return null;

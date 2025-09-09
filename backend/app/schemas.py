@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Literal
 from datetime import datetime
 
 # Player schemas
@@ -72,6 +72,17 @@ class Stats(BaseModel):
     current_streak: int
     longest_streak: int
     elo: int
+
+# Snooker schemas
+class SnookerState(BaseModel):
+    top: int
+    bottom: int
+    colours_enabled: bool
+
+class SnookerAction(BaseModel):
+    type: Literal['red', 'colour', 'miss', 'foul', 'foul_colour', 'reset']
+    slot: Optional[Literal['top', 'bottom']] = None
+    value: Optional[int] = None
 
 class EventTypeBase(BaseModel):
     name: str
