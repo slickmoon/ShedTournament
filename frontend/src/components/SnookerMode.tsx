@@ -9,7 +9,7 @@ interface SnookerModeProps {
   onClose: () => void;
 }
 
-type PlayerScoreMap = Record<number, number>;
+type ScoreSlot = 'top' | 'bottom';
 
 const RED_VALUE = 1;
 const COLOURS = [
@@ -48,20 +48,22 @@ const ballButtonStyles = (bg: string) => ({
 
 const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => {
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | ''>('');
-  const [scoresByPlayer, setScoresByPlayer] = useState<PlayerScoreMap>({});
+  const [selectedScoreSlot, setSelectedScoreSlot] = useState<ScoreSlot>('top');
+  const [scores, setScores] = useState<{ top: number; bottom: number }>({ top: 0, bottom: 0 });
   const [coloursEnabled, setColoursEnabled] = useState<boolean>(false);
 
   const sortedPlayers = useMemo(() => {
     return [...players].sort((a, b) => a.player_name.localeCompare(b.player_name));
   }, [players]);
 
-  const currentScore = selectedPlayerId === '' ? 0 : (scoresByPlayer[selectedPlayerId] ?? 0);
+  const currentTop = scores.top;
+  const currentBottom = scores.bottom;
 
   function updateScore(delta: number) {
     if (selectedPlayerId === '') return;
-    setScoresByPlayer(prev => ({
+    setScores(prev => ({
       ...prev,
-      [selectedPlayerId]: (prev[selectedPlayerId] ?? 0) + delta
+      [selectedScoreSlot]: prev[selectedScoreSlot] + delta
     }));
   }
 
@@ -128,9 +130,34 @@ const SnookerMode: React.FC<SnookerModeProps> = ({ players, open, onClose }) => 
           </Select>
         </FormControl>
 
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Current Score: {currentScore}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, gap: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Top</Typography>
+              <Typography variant="h6" sx={{ m: 0 }}>{currentTop}</Typography>
+            </Box>
+            <Box>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Bottom</Typography>
+              <Typography variant="h6" sx={{ m: 0 }}>{currentBottom}</Typography>
+            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button 
+              size="small"
+              variant={selectedScoreSlot === 'top' ? 'contained' : 'outlined'}
+              onClick={() => setSelectedScoreSlot('top')}
+            >
+              Top
+            </Button>
+            <Button 
+              size="small"
+              variant={selectedScoreSlot === 'bottom' ? 'contained' : 'outlined'}
+              onClick={() => setSelectedScoreSlot('bottom')}
+            >
+              Bottom
+            </Button>
+          </Box>
+        </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Box>
