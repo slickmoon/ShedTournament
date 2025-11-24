@@ -189,27 +189,59 @@ class PlayerService:
         seasons = []
         # Current seasons (sort_order: 0, 1, 2, ...)
         for i, s in enumerate(current_seasons):
+            time_remaining = PlayerService._format_time_remaining(s.end_date, now)
             seasons.append({
                 "id": s.id, 
                 "season_name": f"*{s.season_name}*",
-                "sort_order": i
+                "sort_order": i,
+                "season_start_date": f"{s.start_date}",
+                "season_end_date": f"{s.end_date}",
+                "season_time_remaining": f"Season ends in {time_remaining}"
             })
         # Next season (sort_order: current_seasons count)
         if next_season:
             seasons.append({
                 "id": next_season.id, 
                 "season_name": next_season.season_name,
-                "sort_order": len(current_seasons)
+                "sort_order": len(current_seasons),
+                "season_start_date": f"{next_season.start_date}",
+                "season_end_date": f"{next_season.end_date}",
+                "season_time_remaining": f"Season starts on {next_season.start_date.strftime('%d/%m/%Y')}"
             })
         # Previous seasons (sort_order: -1, -2, -3, ...)
         for i, s in enumerate(previous_seasons):
             seasons.append({
                 "id": s.id, 
                 "season_name": s.season_name,
-                "sort_order": -(i + 1)
+                "sort_order": -(i + 1),
+                "season_start_date": f"{s.start_date}",
+                "season_end_date": f"{s.end_date}",
+                "season_time_remaining": f"Season ended on {s.end_date.strftime('%d/%m/%Y')}"
             })
         
         # Sort the final list by sort_order
         seasons.sort(key=lambda x: x['sort_order'])
             
         return seasons 
+
+    @staticmethod
+    def _format_time_remaining(end_date: datetime, now: datetime) -> str:
+        """Return a human-readable time remaining string."""
+        remaining = end_date - now
+        if remaining.total_seconds() <= 0:
+            return "0 minutes"
+
+        if remaining.days >= 1:
+            days = remaining.days
+            return f"{days} day{'s' if days != 1 else ''}"
+
+        total_seconds = remaining.seconds
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+
+        parts = []
+        if hours:
+            parts.append(f"{hours} hour{'s' if hours != 1 else ''}")
+            parts.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
+
+        return " ".join(parts)
