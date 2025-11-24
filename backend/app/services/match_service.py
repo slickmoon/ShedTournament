@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from typing import Tuple, Optional
 from .. import base, elo
 from ..schemas import MatchCreate
+from player_service import PlayerService
 
 class MatchService:
     @staticmethod

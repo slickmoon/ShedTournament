@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, or_, and_, cast, Date
 from typing import List, Dict, Any
 from .. import base
+from player_service import PlayerService
 
 class StatsService:
     @staticmethod
