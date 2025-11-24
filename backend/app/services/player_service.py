@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_, and_, select
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Tuple
 from .. import base
 from ..schemas import PlayerCreate, PlayerUpdate
@@ -170,7 +170,7 @@ class PlayerService:
 
     @staticmethod
     def get_seasons(db: Session):
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         # Current season
         current_seasons = db.query(base.GameSeason).filter(
             base.GameSeason.start_date <= now,
@@ -227,7 +227,9 @@ class PlayerService:
     @staticmethod
     def _format_time_remaining(end_date: datetime, now: datetime) -> str:
         """Return a human-readable time remaining string."""
-        remaining = end_date - now
+        normalized_end = PlayerService._ensure_timezone(end_date)
+        normalized_now = PlayerService._ensure_timezone(now)
+        remaining = normalized_end - normalized_now
         if remaining.total_seconds() <= 0:
             return "0 minutes"
 
@@ -242,6 +244,13 @@ class PlayerService:
         parts = []
         if hours:
             parts.append(f"{hours} hour{'s' if hours != 1 else ''}")
-            parts.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
+        parts.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
 
         return " ".join(parts)
+
+    @staticmethod
+    def _ensure_timezone(dt: datetime) -> datetime:
+        """Ensure datetime is timezone-aware in UTC for calculations."""
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
