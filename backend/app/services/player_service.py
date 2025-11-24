@@ -127,7 +127,9 @@ class PlayerService:
             ).all()
             # Exclude matches that belong to special event seasons within the current season
             special_seasons = db.query(base.GameSeason).filter(
-                base.GameSeason.id != current_season.id
+                base.GameSeason.id != current_season.id,
+                base.GameSeason.start_date >= current_season.start_date,
+                base.GameSeason.end_date <= current_season.end_date
             ).all()
             if special_seasons:
                 filtered_matches = []
