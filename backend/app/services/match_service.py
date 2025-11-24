@@ -66,53 +66,50 @@ class MatchService:
                     db.add(loser2_event)
 
         if match.is_doubles:
-            team1_elo = (players[match.winner1_id].elo + players[match.winner2_id].elo) / 2
-            team2_elo = (players[match.loser1_id].elo + players[match.loser2_id].elo) / 2
+
+            winner1_elo, _ = PlayerService.calculate_player_season_data(players[match.winner1_id], current_season, db)
+            winner2_elo, _ = PlayerService.calculate_player_season_data(players[match.winner2_id], current_season, db)
+            loser1_elo, _ = PlayerService.calculate_player_season_data(players[match.loser1_id], current_season, db)
+            loser2_elo, _ = PlayerService.calculate_player_season_data(players[match.loser2_id], current_season, db)
+
+            team1_elo = (winner1_elo + winner2_elo) / 2
+            team2_elo = (loser1_elo + loser2_elo) / 2
             new_team1_elo, new_team2_elo = elo.calculate_new_ratings(team1_elo, team2_elo)
             
             elo_diff1 = new_team1_elo - team1_elo
             elo_diff2 = new_team2_elo - team2_elo
             
-            # Update player ratings
-            players[match.winner1_id].elo = int(players[match.winner1_id].elo + elo_diff1)
-            players[match.winner2_id].elo = int(players[match.winner2_id].elo + elo_diff1)
-            players[match.loser1_id].elo = int(players[match.loser1_id].elo + elo_diff2)
-            players[match.loser2_id].elo = int(players[match.loser2_id].elo + elo_diff2)
-            
             match_record = base.Match(
                 is_doubles=True,
                 winner1_id=match.winner1_id,
                 winner2_id=match.winner2_id,
-                winner1_starting_elo=players[match.winner1_id].elo - elo_diff1,
-                winner2_starting_elo=players[match.winner2_id].elo - elo_diff1,
+                winner1_starting_elo=winner1_elo,
+                winner2_starting_elo=winner2_elo,
                 winner1_elo_change=elo_diff1,
                 winner2_elo_change=elo_diff1,
                 loser1_id=match.loser1_id,
                 loser2_id=match.loser2_id,
-                loser1_starting_elo=players[match.loser1_id].elo - elo_diff2,
-                loser2_starting_elo=players[match.loser2_id].elo - elo_diff2,
+                loser1_starting_elo=loser1_elo,
+                loser2_starting_elo=loser2_elo,
                 loser1_elo_change=elo_diff2,
                 loser2_elo_change=elo_diff2
             )
         else:
             new_winner_elo, new_loser_elo = elo.calculate_new_ratings(
-                players[match.winner1_id].elo,
-                players[match.loser1_id].elo
+                winner1_elo,
+                loser1_elo
             )
             
-            winner_elo_change = new_winner_elo - players[match.winner1_id].elo
-            loser_elo_change = new_loser_elo - players[match.loser1_id].elo
-            
-            players[match.winner1_id].elo = new_winner_elo
-            players[match.loser1_id].elo = new_loser_elo
+            winner_elo_change = new_winner_elo - winner1_elo
+            loser_elo_change = new_loser_elo - loser1_elo
             
             match_record = base.Match(
                 is_doubles=False,
                 winner1_id=match.winner1_id,
-                winner1_starting_elo=players[match.winner1_id].elo - winner_elo_change,
+                winner1_starting_elo=winner1_elo,
                 winner1_elo_change=winner_elo_change,
                 loser1_id=match.loser1_id,
-                loser1_starting_elo=players[match.loser1_id].elo - loser_elo_change,
+                loser1_starting_elo=loser1_elo,
                 loser1_elo_change=loser_elo_change
             )
         

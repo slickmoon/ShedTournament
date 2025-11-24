@@ -27,11 +27,12 @@ class StatsService:
                     break
             
             if current_streak > 1:
+                player_elo, _ = PlayerService.calculate_player_season_data(player, None, db)
                 player_streaks.append({
                     "player_id": player.id,
                     "player_name": player.player_name,
                     "current_streak": current_streak,
-                    "elo": player.elo,
+                    "elo": player_elo,
                     "elo_change": streak_elo_change
                 })
         
@@ -170,7 +171,8 @@ class StatsService:
             player_appearances.c.match_date,
             player_appearances.c.matches_played
         ).order_by(
-            player_appearances.c.matches_played.desc()
+            player_appearances.c.matches_played.desc(),
+            player_appearances.c.player_name.asc()
         ).first()
 
         if not max_matches:
@@ -310,13 +312,17 @@ class StatsService:
             day_of_week = match.timestamp.strftime('%A')
             day_counts[day_of_week] = day_counts.get(day_of_week, 0) + 1
         
+        # Get current elo for players
+        player1_elo, _ = PlayerService.calculate_player_season_data(player1, None, db)
+        player2_elo, _ = PlayerService.calculate_player_season_data(player2, None, db)
+
         # Find most frequent play day
         most_frequent_day = max(day_counts.items(), key=lambda x: x[1]) if day_counts else None
         
         # Calculate win percentages
         player1_win_percentage = round((player1_wins / total_matches) * 100, 1) if total_matches > 0 else 0
         player2_win_percentage = round((player2_wins / total_matches) * 100, 1) if total_matches > 0 else 0
-        
+
         return {
             "player1": {
                 "id": player1_id,
@@ -325,7 +331,7 @@ class StatsService:
                 "losses": player2_wins,
                 "win_percentage": player1_win_percentage,
                 "elo_gained": player1_elo_gained,
-                "current_elo": player1.elo
+                "current_elo": player1_elo
             },
             "player2": {
                 "id": player2_id,
@@ -334,7 +340,7 @@ class StatsService:
                 "losses": player1_wins,
                 "win_percentage": player2_win_percentage,
                 "elo_gained": player2_elo_gained,
-                "current_elo": player2.elo
+                "current_elo": player2_elo
             },
             "total_matches": total_matches,
             "most_frequent_day": most_frequent_day[0] if most_frequent_day else None,
