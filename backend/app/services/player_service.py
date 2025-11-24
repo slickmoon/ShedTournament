@@ -112,7 +112,7 @@ class PlayerService:
     
     @staticmethod
     def calculate_player_season_data(player, current_season, db: Session):
-        seasons = PlayerService.get_seasons(db)
+        
         
         elo = base.DEFAULT_ELO
         
@@ -126,6 +126,7 @@ class PlayerService:
                 (base.Match.timestamp <= current_season.end_date)
             ).all()
             #exclude matches that are in special event seasons that are not currently active
+            seasons = db.query(base.GameSeason).all()
             for season in seasons:
                 if season.id != current_season.id:
                     if(season.start_date >= current_season.start_date and season.end_date <= current_season.end_date):
