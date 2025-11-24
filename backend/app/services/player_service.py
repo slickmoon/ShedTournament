@@ -112,7 +112,7 @@ class PlayerService:
     
     @staticmethod
     def calculate_player_season_data(player, current_season, db: Session):
-        seasons = get_seasons(db)
+        seasons = PlayerService.get_seasons(db)
         
         elo = base.DEFAULT_ELO
         
