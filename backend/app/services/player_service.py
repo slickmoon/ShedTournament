@@ -125,12 +125,20 @@ class PlayerService:
                 (base.Match.timestamp >= current_season.start_date) &
                 (base.Match.timestamp <= current_season.end_date)
             ).all()
-            #exclude matches that are in special event seasons that are not currently active
-            seasons = db.query(base.GameSeason).all()
-            for season in seasons:
-                if season.id != current_season.id:
-                    if(season.start_date >= current_season.start_date and season.end_date <= current_season.end_date):
-                        matches = matches.exclude(base.Match.timestamp >= season.start_date and base.Match.timestamp <= season.end_date)
+            # Exclude matches that belong to special event seasons within the current season
+            special_seasons = db.query(base.GameSeason).filter(
+                base.GameSeason.id != current_season.id
+            ).all()
+            if special_seasons:
+                filtered_matches = []
+                for match in matches:
+                    in_special_season = any(
+                        season.start_date <= match.timestamp <= season.end_date
+                        for season in special_seasons
+                    )
+                    if not in_special_season:
+                        filtered_matches.append(match)
+                matches = filtered_matches
         else:
             matches = db.query(base.Match).filter(
                 (base.Match.winner1_id == player.id) |
