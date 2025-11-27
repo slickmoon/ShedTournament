@@ -101,7 +101,7 @@ class PlayerService:
                 base.GameSeason.start_date <= now,
                 base.GameSeason.end_date >= now
             ).order_by(
-                (base.GameSeason.end_date - base.GameSeason.start_date).asc()
+                (base.GameSeason.start_date).desc()
             ).first()
 
         # Return specified season
