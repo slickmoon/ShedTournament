@@ -66,11 +66,11 @@ class MatchService:
                     )
                     db.add(loser2_event)
 
+        winner1_elo, _ = PlayerService.calculate_player_season_data(players[match.winner1_id], current_season, db)
+        loser1_elo, _ = PlayerService.calculate_player_season_data(players[match.loser1_id], current_season, db)
         if match.is_doubles:
 
-            winner1_elo, _ = PlayerService.calculate_player_season_data(players[match.winner1_id], current_season, db)
             winner2_elo, _ = PlayerService.calculate_player_season_data(players[match.winner2_id], current_season, db)
-            loser1_elo, _ = PlayerService.calculate_player_season_data(players[match.loser1_id], current_season, db)
             loser2_elo, _ = PlayerService.calculate_player_season_data(players[match.loser2_id], current_season, db)
 
             team1_elo = (winner1_elo + winner2_elo) / 2
