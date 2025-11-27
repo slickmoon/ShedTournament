@@ -65,6 +65,7 @@ class MatchService:
                         event_id=event.id
                     )
                     db.add(loser2_event)
+        current_season = PlayerService.get_current_season(-998, db)
 
         winner1_elo, _ = PlayerService.calculate_player_season_data(players[match.winner1_id], current_season, db)
         loser1_elo, _ = PlayerService.calculate_player_season_data(players[match.loser1_id], current_season, db)
