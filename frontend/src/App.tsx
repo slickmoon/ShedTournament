@@ -154,6 +154,7 @@ function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
   const [seasons, setSeasons] = useState<{id: number, season_name: string, sort_order: number, start_date: string, end_date: string, season_time_remaining: string}[]>([]);
+  const [seasonsLoading, setSeasonsLoading] = useState(true);
   const [selectedSeasonId, setSelectedSeasonId] = useState<number>(-998);
   const [recentMatchIds, setRecentMatchIds] = useState<{id: number, ts: number}[]>(getRecentMatchIds());
   const [undoDialogOpen, setUndoDialogOpen] = useState(false);
@@ -202,6 +203,8 @@ function App() {
         }
       } catch (error) {
         setSnackbar({open: true, message: `Error fetching seasons: ${error}`, severity: 'error'});
+      } finally {
+        setSeasonsLoading(false);
       }
     };
     fetchSeasons();
@@ -688,7 +691,11 @@ function App() {
                       ))}
                       <MenuItem value={-999}>All Time</MenuItem>
                     </Select>
-                    <Typography variant="body2" sx={{ textAlign: 'center', mb: 2 }}>{seasons.find(season => season.id === selectedSeasonId)?.season_time_remaining || ''}</Typography>
+                    <Typography variant="body2" sx={{ textAlign: 'center', mb: 2 }}>
+                      {seasonsLoading
+                        ? 'Loading season info...'
+                        : seasons.find(season => season.id === selectedSeasonId)?.season_time_remaining || ''}
+                    </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3 , marginLeft: "0.5em", marginRight: "0.5em"}}>
                     <Button 
