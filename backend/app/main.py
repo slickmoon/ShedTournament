@@ -190,9 +190,9 @@ async def record_match(
     match_record, error = MatchService.create_match(db, match)
     if error:
         raise HTTPException(status_code=400, detail=error)
-    
-    winner1 = PlayerService.get_player(db,match.winner1_id)
-    loser1 = PlayerService.get_player(db,match.loser1_id)
+    season_id = PlayerService.get_current_season(-998, db).id
+    winner1 = PlayerService.get_player(db,match.winner1_id, season_id)
+    loser1 = PlayerService.get_player(db,match.loser1_id, season_id)
     winner2 = None
     loser2 = None
 
@@ -201,8 +201,8 @@ async def record_match(
         lossMessage = "pantsed"
     # Create audit log
     if match.is_doubles:
-        winner2 = PlayerService.get_player(db,match.winner2_id)
-        loser2 = PlayerService.get_player(db,match.loser2_id)
+        winner2 = PlayerService.get_player(db,match.winner2_id, season_id)
+        loser2 = PlayerService.get_player(db,match.loser2_id, season_id)
         
         AuditLogService.create_log(
             db,
