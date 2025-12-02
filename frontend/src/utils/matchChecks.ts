@@ -67,7 +67,7 @@ export const checkAssassination = (data: MatchData, players: Player[]): SpecialM
 
   if (isAssassination) {
     return {
-      message: "💥🎯🥇 !HEADSHOT! 🥇🎯💥",
+      message: "🥇 !HEADSHOT! 🥇",
       color: "#e30202"
     };
   }
