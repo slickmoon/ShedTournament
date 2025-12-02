@@ -7,13 +7,16 @@ from ..schemas import PlayerCreate, PlayerUpdate
 
 class PlayerService:
     @staticmethod
-    def create_player(db: Session, player: PlayerCreate) -> base.Player:
+    def create_player(db: Session, player: PlayerCreate) -> dict:
         db_player = base.Player(player_name=player.player_name)
         db.add(db_player)
         db.commit()
         db.refresh(db_player)
-        db_player['elo'] = base.DEFAULT_ELO
-        return db_player
+        return {
+            "id": db_player.id,
+            "player_name": db_player.player_name,
+            "elo": base.DEFAULT_ELO,
+        }
 
     @staticmethod
     def get_player(db: Session, player_id: int, season_id: int = 0) -> Optional[dict]:
