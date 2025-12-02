@@ -1,8 +1,12 @@
 // Custom confetti shapes using emojis
-const shapes = ['🎱'];
+const defaultShapes = ['🎱'];
 
-export const drawCustomConfetti = (ctx: CanvasRenderingContext2D) => {
-  const shape = shapes[Math.floor(Math.random() * shapes.length)];
+export const drawCustomConfetti = (
+  ctx: CanvasRenderingContext2D,
+  shapes: string[] = defaultShapes
+) => {
+  const safeShapes = shapes.length > 0 ? shapes : defaultShapes;
+  const shape = safeShapes[Math.floor(Math.random() * safeShapes.length)];
   const size = Math.random() * 20 + 10; // Random size between 10 and 30
   
   ctx.font = `${size}px Arial`;
@@ -22,7 +26,8 @@ export const drawImageConfetti = (ctx: CanvasRenderingContext2D) => {
     '/confetti/trophy.png',
     '/confetti/star.png',
     '/confetti/target.png',
-    '/confetti/palette.png'
+    '/confetti/palette.png',
+    '/confetti/pants.png'
   ];
   
   const randomImage = images[Math.floor(Math.random() * images.length)];

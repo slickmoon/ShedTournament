@@ -163,6 +163,7 @@ function App() {
   const [showPlayerNumbers, setShowPlayerNumbers] = useState(false);
   const [matchesPerDay, setMatchesPerDay] = useState<MatchesPerDay[]>([]);
   const [snookerModeOpen, setSnookerModeOpen] = useState(false);
+  const [confettiEmojis, setConfettiEmojis] = useState<string[] | undefined>(undefined);
 
   // Initialize app on mount
   useEffect(() => {
@@ -417,6 +418,11 @@ function App() {
     }
   };
 
+  const triggerConfetti = (emojis?: string[]) => {
+    setConfettiEmojis(emojis);
+    setShowConfetti(true);
+  };
+
   const recordMatch = async () => {
     try {
       setIsRecordingMatch(true);
@@ -478,7 +484,9 @@ function App() {
             </Box>
           );
           setSpecialMatchResults(checkSpecialMatchResult(data, players));
-          setShowConfetti(true);
+          
+          // Set custom confetti emojis for this celebration only
+          triggerConfetti(['🎱', '🏆', '⭐']);
         } else {
           const errorData = await response.json();
           setSnackbar({open: true, message: `Error recording match: ${errorData.detail}`, severity: 'error'});
@@ -517,7 +525,8 @@ function App() {
             </Box>
           );
           setSpecialMatchResults(checkSpecialMatchResult(data, players));
-          setShowConfetti(true);
+          // Set custom confetti emojis for this celebration only
+          triggerConfetti(['🎱', '🏆', '⭐']);
         } else {
           const errorData = await response.json();
           setSnackbar({open: true, message: `Error recording match: ${errorData.detail}`, severity: 'error'});
@@ -639,7 +648,14 @@ function App() {
         <CssBaseline />
         {isWednesday && <BouncingWednesday />}
         {showConfetti && (
-          <MatchConfetti onComplete={() => setShowConfetti(false)} />
+          <MatchConfetti
+            emojis={confettiEmojis}
+            onComplete={() => {
+              setShowConfetti(false);
+              // Reset emojis so future runs use the default
+              setConfettiEmojis(undefined);
+            }}
+          />
         )}
         <Router basename="/shed">
           <Routes>

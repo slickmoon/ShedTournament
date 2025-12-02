@@ -4,9 +4,10 @@ import { drawCustomConfetti } from '../utils/confettiShapes.ts';
 
 interface MatchConfettiProps {
   onComplete: () => void;
+  emojis?: string[];
 }
 
-const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
+const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete, emojis }) => {
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -63,6 +64,7 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
           initialVelocityY={-10}
           initialVelocityX={5}
           recycle={false}
+          drawShape={(ctx) => drawCustomConfetti(ctx, emojis)}
         />
       </div>
       {/* Right cannon */}
@@ -84,6 +86,7 @@ const MatchConfetti: React.FC<MatchConfettiProps> = ({ onComplete }) => {
           initialVelocityY={-10}
           initialVelocityX={-5}
           recycle={false}
+          drawShape={(ctx) => drawCustomConfetti(ctx, emojis)}
         />
       </div>
     </>
