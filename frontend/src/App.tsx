@@ -484,8 +484,12 @@ function App() {
             </Box>
           );
           setSpecialMatchResults(checkSpecialMatchResult(data, players));
-          
-          triggerConfetti(undefined);
+
+          const shouldUsePantsConfetti =
+            isPantsed &&
+            (loser1Player.recently_pantsed || loser2Player.recently_pantsed);
+
+          triggerConfetti(shouldUsePantsConfetti ? ['👖'] : undefined);
         } else {
           const errorData = await response.json();
           setSnackbar({open: true, message: `Error recording match: ${errorData.detail}`, severity: 'error'});
@@ -525,7 +529,10 @@ function App() {
           );
           setSpecialMatchResults(checkSpecialMatchResult(data, players));
 
-          triggerConfetti(undefined);
+          const shouldUsePantsConfetti =
+            isPantsed && loser1Player.recently_pantsed;
+
+          triggerConfetti(shouldUsePantsConfetti ? ['👖'] : undefined);
         } else {
           const errorData = await response.json();
           setSnackbar({open: true, message: `Error recording match: ${errorData.detail}`, severity: 'error'});
