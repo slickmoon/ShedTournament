@@ -485,8 +485,7 @@ function App() {
           );
           setSpecialMatchResults(checkSpecialMatchResult(data, players));
           
-          // Set custom confetti emojis for this celebration only
-          triggerConfetti(['🎱', '🏆', '⭐']);
+          triggerConfetti(undefined);
         } else {
           const errorData = await response.json();
           setSnackbar({open: true, message: `Error recording match: ${errorData.detail}`, severity: 'error'});
@@ -525,8 +524,8 @@ function App() {
             </Box>
           );
           setSpecialMatchResults(checkSpecialMatchResult(data, players));
-          // Set custom confetti emojis for this celebration only
-          triggerConfetti(['🎱', '🏆', '⭐']);
+
+          triggerConfetti(undefined);
         } else {
           const errorData = await response.json();
           setSnackbar({open: true, message: `Error recording match: ${errorData.detail}`, severity: 'error'});
