@@ -12,6 +12,7 @@ class PlayerService:
         db.add(db_player)
         db.commit()
         db.refresh(db_player)
+        db_player['elo'] = base.DEFAULT_ELO
         return db_player
 
     @staticmethod
