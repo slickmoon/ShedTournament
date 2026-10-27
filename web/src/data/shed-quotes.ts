@@ -40,7 +40,13 @@ export const randomTexts = [
     "'Once you pop you can’t stop!' - Blake while observing Loz Beeby’s pringles underwear",
     "Enhanced league when???",
     "They've got magnets in the balls!",
-    "Let's get absolutely pixelated tonight"
+    "Let's get absolutely pixelated tonight",
+    "Straight to cool room",
+    "Racoon hands = can I has drugs",
+    "Click your heels 3 times and say there’s no place like Bonnie doon",
+    "The Norwood Slim™️",
+    "That's Texas",
+    "A good relationship starts with the break and ends with a handshake"
 ];
 
 export const wednesdayTexts = [ 
