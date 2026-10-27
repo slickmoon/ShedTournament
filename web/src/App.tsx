@@ -94,6 +94,15 @@ interface MatchesPerDay {
   count: number;
 }
 
+interface Season {
+  id: number;
+  season_name: string;
+  sort_order: number;
+  season_start_date: string;
+  season_end_date: string;
+  season_time_remaining: string;
+}
+
 // Helper for localStorage match IDs
 const MATCH_IDS_KEY = 'recent-match-ids';
 
@@ -153,7 +162,7 @@ function App() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
-  const [seasons, setSeasons] = useState<{id: number, season_name: string, sort_order: number, start_date: string, end_date: string, season_time_remaining: string}[]>([]);
+  const [seasons, setSeasons] = useState<Season[]>([]);
   const [seasonsLoading, setSeasonsLoading] = useState(true);
   const [selectedSeasonId, setSelectedSeasonId] = useState<number>(-998);
   const [recentMatchIds, setRecentMatchIds] = useState<{id: number, ts: number}[]>(getRecentMatchIds());
@@ -191,31 +200,46 @@ function App() {
       setRandomText(randomTexts[Math.floor(Math.random() * randomTexts.length)]);
     }
 
-    // Fetch seasons data
-    const fetchSeasons = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/seasons`, { headers: getAuthHeaders() });
-        const data = await response.json();
-        setSeasons(data);
-        // Set default to season with sort_order = 0 if not already set
-        if (selectedSeasonId === undefined || selectedSeasonId === null || selectedSeasonId === -998) {
-          const defaultSeason = data.find((season: any) => season.sort_order === 0);
-          setSelectedSeasonId(defaultSeason ? defaultSeason.id : 0);
-        }
-      } catch (error) {
-        setSnackbar({open: true, message: `Error fetching seasons: ${error}`, severity: 'error'});
-      } finally {
-        setSeasonsLoading(false);
-      }
-    };
-    fetchSeasons();
-
     // Cleanup function
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  // Seasons are protected by authentication, so load them after a token is available.
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+
+    const fetchSeasons = async () => {
+      setSeasonsLoading(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}/seasons`, { headers: getAuthHeaders() });
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid seasons response');
+        }
+
+        setSeasons(data);
+        const defaultSeason = data.find((season: Season) => season.sort_order === 0);
+        setSelectedSeasonId(currentSeasonId =>
+          currentSeasonId === -998 ? defaultSeason?.id ?? 0 : currentSeasonId
+        );
+      } catch (error) {
+        setSnackbar({open: true, message: `Error fetching seasons: ${error}`, severity: 'error'});
+      } finally {
+        setSeasonsLoading(false);
+      }
+    };
+
+    fetchSeasons();
+  }, [token]);
 
   // Load players and audit log when token is available
   useEffect(() => {
