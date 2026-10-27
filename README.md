@@ -11,7 +11,7 @@ This app can be self-hosted with minimal modification.
 - Match recording with automatic ELO updates
 - Audit log for tracking all system activities
 - Modern, responsive UI built with Material-UI
-- RESTful API backend
+- RESTful API backend API
 
 ## Prerequisites
 
@@ -28,15 +28,15 @@ git clone https://github.com/yourusername/ShedTournament.git
 cd ShedTournament
 ```
 
-2. Set up the backend:
+2. Set up the backend API:
 ```bash
-cd backend
+cd api
 pip install flask flask-sqlalchemy flask-migrate flask-cors python-dotenv
 ```
 
-3. Set up the frontend:
+3. Set up the web:
 ```bash
-cd frontend
+cd web
 npm install
 ```
 
@@ -53,7 +53,7 @@ docker compose up -d
 ### Going Live
 
 If you want to make this app externally accessible in production you will need to update the docker-compose.yml file:
-- Update `BACKEND_API_URL` environment parameter for the frontend app
+- Update `API_URL` environment parameter for the web app
 - Add the network your reverse proxy container (such as nginx)
 
 ## Contributing
@@ -89,5 +89,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Built with React and Flask
-- Uses Material-UI for the frontend components
+- Uses Material-UI for the web components
 - Implements the ELO rating system for fair competition 

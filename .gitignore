@@ -36,17 +36,17 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# React / Frontend
-/frontend/build
-/frontend/dist
-/frontend/.env
-/frontend/.env.local
-/frontend/.env.development.local
-/frontend/.env.test.local
-/frontend/.env.production.local
-/frontend/coverage
-/frontend/.pnp
-/frontend/.pnp.js
+# React / web
+/web/build
+/web/dist
+/web/.env
+/web/.env.local
+/web/.env.development.local
+/web/.env.test.local
+/web/.env.production.local
+/web/coverage
+/web/.pnp
+/web/.pnp.js
 
 # IDE
 .idea/

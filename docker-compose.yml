@@ -2,7 +2,7 @@ services:
   shed-api:
     
     build: 
-      context: ./backend
+      context: ./api
       dockerfile: Dockerfile
     restart: unless-stopped
     networks:
@@ -17,12 +17,12 @@ services:
     depends_on:
       - shed-db
     volumes:
-      - ./backend:/app
+      - ./api:/app
 
   shed-app:
     container_name: shed-app
     build:
-      context: ./frontend
+      context: ./web
       dockerfile: Dockerfile
       args:
         - PUBLIC_URL=/shed
@@ -35,9 +35,6 @@ services:
       - "4321:80"
     depends_on:
       - shed-api
-    environment:
-      - BACKEND_API_URL=http://localhost:4322/shedapi
-      - PUBLIC_URL=/shed
     healthcheck:
       test: ["CMD", "wget", "--spider", "http://localhost:4321/shed"]
       interval: 30s
